@@ -21,7 +21,7 @@ api_session = ApiConnection(SERVER, SESSION)
 
 
 
-for _ in range(10):
+for _ in range(30):
 
     version     = OneSystemVersion(api_session)
     try:
@@ -29,7 +29,7 @@ for _ in range(10):
     except Exception as e:
         print_method_fail(version.method_info.xml_rpc_method_name)
         print("Failure:", e)
-        print(f"Usage with cli: {version.method_info.cli_command}")
+        print(f"CLI: {version.method_info.cli_command}")
     else:
         print_method_pass(version.method_info.xml_rpc_method_name)
 

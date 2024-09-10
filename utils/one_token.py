@@ -9,7 +9,6 @@ ONEADMIN_TOKEN_SCRIPT_PATH  = f"{PROJECT_ROOT_PATH}/commands/create_oneadmin_tok
 
 
 def create_oneadmin_token():
-
     try:
         result = subprocess.run(
             ["bash", ONEADMIN_TOKEN_SCRIPT_PATH],
