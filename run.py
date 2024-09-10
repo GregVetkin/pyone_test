@@ -2,17 +2,19 @@ import sys
 sys.path.append("api")
 sys.path.append("data")
 sys.path.append("utils")
+sys.path.append("commands")
 
 
 from api    import OneSystemVersion, OneSystemConfig, ApiConnection
-from utils  import print_method_fail, print_method_pass
+from utils  import print_method_fail, print_method_pass, create_oneadmin_token
 
 
 
 SERVER      = "http://10.0.70.21:2633/RPC2"
-SESSION     = "oneadmin:89f2e258d42eeaa7c9e2c42d5c9f31e11f315b074d5a164a71d9c9ba7fdc8a91"
-api_session = ApiConnection(SERVER, SESSION)
+SESSION     = create_oneadmin_token()
 
+
+api_session = ApiConnection(SERVER, SESSION)
 
 
 
