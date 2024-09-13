@@ -3,6 +3,7 @@ sys.path.append("api")
 sys.path.append("data")
 sys.path.append("utils")
 sys.path.append("commands")
+sys.path.append("tests")
 
 
 from api    import OneSystemVersion, OneSystemConfig, ApiConnection
@@ -21,11 +22,12 @@ api_session = ApiConnection(SERVER, SESSION)
 
 
 
-for _ in range(30):
+for _ in range(1):
 
     version     = OneSystemVersion(api_session)
     try:
-        version.get_version()
+        v = version.get_version()
+        print(v)
     except Exception as e:
         print_method_fail(version.method_info.xml_rpc_method_name)
         print("Failure:", e)

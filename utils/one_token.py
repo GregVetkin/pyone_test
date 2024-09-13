@@ -22,3 +22,12 @@ def create_oneadmin_token():
 
     else:
         return result.stdout.strip()
+
+
+
+def create_token(username:str, group:str, exptime=3600) -> str:
+    pass
+
+
+def remove_token(username:str, group:str, exptime=3600) -> str:
+    pass
