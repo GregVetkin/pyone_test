@@ -22,7 +22,7 @@ for method_class in method_list:
     method = method_class(api_session)
     
     try:
-        
+        pass
 
     except Exception as e:
         print_method_fail(method.method_info.xml_rpc_method_name)

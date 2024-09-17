@@ -1,33 +1,41 @@
 import subprocess
 
-from pathlib import Path
+def create_user_token(username:str, group="", exp_time=3600) -> str:
 
-PROJECT_ROOT_PATH           = Path(__file__).resolve().parent.parent
-ONEADMIN_TOKEN_SCRIPT_PATH  = f"{PROJECT_ROOT_PATH}/commands/create_oneadmin_token.sh"
+    command = ["sudo", "oneuser", "token-create", username, "--time", exp_time]
 
+    if group:
+        command.append("--group")
+        command.append(group)
+    
 
-
-
-def create_oneadmin_token():
     try:
         result = subprocess.run(
-            ["bash", ONEADMIN_TOKEN_SCRIPT_PATH],
+            command,
             capture_output=True,
             text=True,
             check=True
         )
+
     except subprocess.CalledProcessError as err:
         print(err.stderr.strip())
         exit(1)
-
     else:
         return result.stdout.strip()
 
 
 
-def create_token(username:str, group:str, exptime=3600) -> str:
-    pass
+def remove_all_user_tokens(username:str) -> None:
+    try:
+        command_exec = subprocess.run(
+            ["sudo", "oneuser", "token-delete-all", username],
+            check=True,
+            shell=True,
+            capture_output=True,
+            text=True
+        )
 
+    except subprocess.CalledProcessError as err:
+        print(f"Удаление токенов для {username} завершилось неудачей:", err.stderr.strip())
+        exit(1)
 
-def remove_token(username:str, group:str, exptime=3600) -> str:
-    pass
