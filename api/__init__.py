@@ -1,11 +1,7 @@
-from api.base       import ApiConnection
-from api.system     import OneSystemVersion, OneSystemConfig
+from api.one  import One
 
 
 
 __all__ = [
-    "ApiConnection",
-
-    "OneSystemVersion",
-    "OneSystemConfig",
+    "One"
 ]

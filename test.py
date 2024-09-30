@@ -1,33 +1,22 @@
-from api    import OneSystemConfig, OneSystemVersion, ApiConnection
-from utils  import print_method_fail, print_method_pass
+import sys
+
+from pyone      import OneServer
+from api        import One
+
+sys.path.append("api")
+
+
+
+URL     = "http://bufn1.brest.local:2633/RPC2"
+USER    = "brestadm"
+TOKEN   = "ca62add7b4897b9e4e8a527ce2dfc63eafe83fd7a4401102bf13be0423c7ffe2"
 
 
 
 
-SERVER      = "http://10.0.70.21:2633/RPC2"
-SESSION     = "test"
+one  = One(OneServer(URL, f"{USER}:{TOKEN}"))
 
 
-api_session = ApiConnection(SERVER, SESSION)
-
-
-
-
-
-method_list = [OneSystemConfig, OneSystemVersion]
-
-
-
-for method_class in method_list:
-    method = method_class(api_session)
-    
-    try:
-        pass
-
-    except Exception as e:
-        print_method_fail(method.method_info.xml_rpc_method_name)
-        print("Failure:", e)
-        print(f"CLI: {method.method_info.cli_command}")
-    else:
-        print_method_pass(method.method_info.xml_rpc_method_name)
+vers = one.system.version()
+conf = one.system.config()
 
