@@ -2,16 +2,14 @@ import unittest
 
 from pyone  import OneServer
 from api    import One
+from utils  import create_user, create_user_token, delete_user
 
 
 class TestOneSystemVersion(unittest.TestCase):
 
     def setUp(self):
         self.server_url = 'http://bufn1.brest.local:2633/RPC2'
-        self.username   = 'tester'
-        self.token      = '1d9cf00e958b9f6ac7d4472e24a2ecaa1f9ee9e862958f8ae04477542e4e466c'
-        self.one        = One(OneServer(self.server_url, session=f'{self.username}:{self.token}'))
-        
+
         if self._testMethodName == "test_case_1":
             self.setup_test_case_1()
         
@@ -26,19 +24,22 @@ class TestOneSystemVersion(unittest.TestCase):
             self.cleanup_test_case_2()
 
     def setup_test_case_1(self):
-        # Уникальные подготовительные действия для test_case_1
-        pass
+        self.user       = "tester"
+        self.password   = "12345678"
+        self.group      = "brestusers"
+
+        create_user(self.user, self.password, self.group)
+        self.session    = create_user_token(self.user, self.group)
+        self.one        = One(OneServer(self.server_url, self.session))
 
     def cleanup_test_case_1(self):
-        # Уникальные послетестовые действия для test_case_1
-        pass
+        delete_user(self.user)
 
     def setup_test_case_2(self):
         # Уникальные подготовительные действия для test_case_2
         pass
 
     def cleanup_test_case_2(self):
-        # Уникальные послетестовые действия для test_case_2
         pass
 
     def test_case_1(self):
@@ -62,6 +63,7 @@ class TestOneSystemVersion(unittest.TestCase):
 
 if __name__ == '__main__':
     # Запускаем тесты и отслеживаем результат
+
     result = unittest.TextTestRunner(verbosity=0).run(unittest.makeSuite(TestOneSystemVersion))
     if result.wasSuccessful():
         print("Все тесты прошли успешно: PASS")
