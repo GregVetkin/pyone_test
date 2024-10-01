@@ -11,13 +11,18 @@ sys.path.append("utils")
 
 URL     = "http://bufn1.brest.local:2633/RPC2"
 
+user = "tester_admin"
+create_user(user, "12345678", "brestadmins")
 
+session = create_user_token(user, "brestadmins")
+print(session)
 
-one = One(OneServer(URL, "brestadm:ca62add7b4897b9e4e8a527ce2dfc63eafe83fd7a4401102bf13be0423c7ffe2"))
+one = One(OneServer(URL, session))
 
 vers = one.system.version()
 conf = one.system.config()
 
+delete_user(user)
 
 print(vers)
 print(conf)

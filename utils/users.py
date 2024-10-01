@@ -23,12 +23,8 @@ def create_user(name: str, password: str, group="brestusers", driver="public") -
     return _run_command(command)
 
 
-def create_user_token(user: str, group="brestusers") -> str:
-    command = f"sudo -u brestadm oneuser token-create {user}"
-    
-    if group:
-        command += f" --group {group}"
-
+def create_user_token(user: str, group: str) -> str:
+    command = f"sudo -u brestadm oneuser token-create {user} --group {group}"
     return _run_command(command)
 
 

@@ -12,4 +12,3 @@ python3 -m venv ~/one_api/.venv               #&>/dev/null
 
 . .venv/bin/activate && pip3 install lxml==4.4.0
 . .venv/bin/activate && pip3 install pyone
-
