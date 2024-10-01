@@ -36,22 +36,25 @@ class TestOneSystemVersion(unittest.TestCase):
         delete_user(self.user)
 
     def setup_test_case_2(self):
-        # Уникальные подготовительные действия для test_case_2
-        pass
+        self.user       = "tester_admin"
+        self.password   = "12345678"
+        self.group      = "brestadmins"
+
+        create_user(self.user, self.password, self.group)
+        
+        self.session    = create_user_token(self.user, self.group)
+        self.one        = One(OneServer(self.server_url, self.session))
 
     def cleanup_test_case_2(self):
-        pass
+        delete_user(self.user)
 
     def test_case_1(self):
         try:
-            # Выполнение первого теста
             version = self.one.system.version()
             self.assertIsInstance(version, str, msg="Ошибка: Версия должна быть строкой.")
 
-            # Проверка формата версии
             version_parts = version.split('.')
             self.assertTrue(all(part.isdigit() for part in version_parts), msg="Ошибка: Части версии должны быть числами.")
-            
 
         except AssertionError as e:
             print("test_case_1____FAIL")
@@ -59,12 +62,22 @@ class TestOneSystemVersion(unittest.TestCase):
             raise
 
     def test_case_2(self):
-        pass
+        try:
+            version = self.one.system.version()
+            self.assertIsInstance(version, str, msg="Ошибка: Версия должна быть строкой.")
+
+            version_parts = version.split('.')
+            self.assertTrue(all(part.isdigit() for part in version_parts), msg="Ошибка: Части версии должны быть числами.")
+            
+        except AssertionError as e:
+            print("test_case_1____FAIL")
+            print(f"Причина: {e}")
+            raise
 
 if __name__ == '__main__':
     # Запускаем тесты и отслеживаем результат
 
-    result = unittest.TextTestRunner(verbosity=0).run(unittest.makeSuite(TestOneSystemVersion))
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.makeSuite(TestOneSystemVersion))
     if result.wasSuccessful():
         print("Все тесты прошли успешно: PASS")
     else:
