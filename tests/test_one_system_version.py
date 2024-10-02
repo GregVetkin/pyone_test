@@ -1,6 +1,6 @@
 import unittest
 
-from pyone  import OneServer, OneAuthorizationException, OneAuthenticationException
+from pyone  import OneServer
 from api    import One
 from utils  import create_user, create_user_token, delete_user
 

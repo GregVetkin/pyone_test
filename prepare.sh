@@ -40,14 +40,20 @@ function install_python_packages_in_venv_with_pip() {
     deactivate
 }
 
+DIR=$(dirname "$(realpath "$0")")
 
-if ! is_package_in_repos "python3-venv"; then
-    echo "Нет пакета в репозитории, отмена"
+PACKAGE="python3-venv"
+VENV_DIR="${DIR}/.venv/"
+PIP_PACKAGES=("lxml==4.4.0" "pyone")
+
+
+if ! is_package_in_repos "${PACKAGE}"; then
+    echo "Нет пакета <${PACKAGE}> в доступных репозиториях, отмена"
     exit 1
 fi
 
 
-install_package "python3-venv"
-create_python_venv ~/pyone_test/.venv/
-install_python_packages_in_venv_with_pip ~/pyone_test/.venv/ "lxml==4.4.0" "pyone"
+install_package "${PACKAGE}"
+create_python_venv $VENV_DIR
+install_python_packages_in_venv_with_pip $VENV_DIR "${PIP_PACKAGES[@]}"
 
