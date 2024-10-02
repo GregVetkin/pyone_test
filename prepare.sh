@@ -44,7 +44,7 @@ DIR=$(dirname "$(realpath "$0")")
 
 PACKAGE="python3-venv"
 VENV_DIR="${DIR}/.venv/"
-PIP_PACKAGES=("lxml==4.4.0" "pyone")
+PIP_PACKAGES=("lxml==4.4.0" "pyone" "pytest")
 
 
 if ! is_package_in_repos "${PACKAGE}"; then

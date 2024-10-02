@@ -6,8 +6,6 @@ from tests  import TestOneSystemConfig
 
 
 
-
-
 if __name__ == "__main__":
     result = unittest.TextTestRunner(verbosity=2).run(unittest.makeSuite(TestOneSystemVersion))
     if result.wasSuccessful():

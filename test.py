@@ -1,12 +1,19 @@
-import pyone
+import pytest
+import sys
+import subprocess
 
 
+from utils.printing import pretty_print_test_result
 
 
-URL     = "http://bufn1.brest.local:2633/RPC2"
+result = subprocess.run(
+    [sys.executable, '-m', 'pytest', 'tests/system/test_system_version.py'],
+    stdout=subprocess.PIPE,
+    stderr=subprocess.PIPE,
+)
 
-
-
-#one = pyone.OneServer(URL, "test:9f232fe3e7c46821fa94d50f5d78a8b1f9bca2f44173c296ced3beb00a3456e6")
-one = pyone.OneServer(URL, "brestadm:ca62add7b4897b9e4e8a527ce2dfc63eafe83fd7a4401102bf13be0423c7ffe2")
-print(type(one.system.config()))
+if result.returncode == 0:
+    pretty_print_test_result("one.system.version", True)
+else:
+    pretty_print_test_result("one.system.version", False)
+    print(result.stdout.decode())
