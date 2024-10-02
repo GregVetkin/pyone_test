@@ -1,25 +1,44 @@
-import pytest
 import sys
 import subprocess
 import os
 
+from tests              import TestData
 from utils.printing     import pretty_print_test_result
 from _tests             import TESTS
 
 
 
-current_directory = os.path.dirname(os.path.abspath(__file__))
+
+def run_test(test: TestData) -> None:
+    result = subprocess.run(
+        [sys.executable, '-m', 'pytest', test.test_file_path],
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+    )
+
+    if result.returncode == 0:
+        test_passed = True
+    else:
+        test_passed = False
+        print(result.stdout.decode())
+    
+    pretty_print_test_result(test.xml_rpc_method, test_passed)
+        
 
 
-result = subprocess.run(
-    [sys.executable, '-m', 'pytest', f'{current_directory}/{TESTS["one"]["system"]["version"]}'],
-    stdout=subprocess.PIPE,
-    stderr=subprocess.PIPE,
-)
 
+if __name__ == "__main__":
+    if len(sys.argv) > 1:
+        method = sys.argv[1]
+    else:
+        method = "one"
 
-if result.returncode == 0:
-    pretty_print_test_result("one.system.version", True)
-else:
-    pretty_print_test_result("one.system.version", False)
-    print(result.stdout.decode())
+    l = method.split(".")
+
+    test = TestData(
+        xml_rpc_method  =   "one.system.version",
+        test_file_path  =   "/home/gregory/Документы/Projects/pyone_test/tests/system/test_version.py",
+        cli_command     =   "-"
+    )
+
+    run_test(test)
