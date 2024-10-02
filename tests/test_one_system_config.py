@@ -1,13 +1,13 @@
 import unittest
 
-from pyone  import OneServer, OneAuthorizationException, OneAuthenticationException
+from pyone  import OneServer, OneAuthorizationException
 from api    import One
 from utils  import create_user, create_user_token, delete_user
 
 
 
 
-class TestOneSystemVersion(unittest.TestCase):
+class TestOneSystemConfig(unittest.TestCase):
 
     def setUp(self):
         self.server_url = 'http://bufn1.brest.local:2633/RPC2'
@@ -31,24 +31,18 @@ class TestOneSystemVersion(unittest.TestCase):
 
     def test_case_1(self):
         try:
-            version = self.one.system.version()
-
-            self.assertIsInstance(version, str, msg="Ошибка: Версия должна быть строкой.")
-            self.assertTrue(all(part.isdigit() for part in version.split('.')), msg="Ошибка: Части версии должны быть числами.")
+            self.assertRaises(OneAuthorizationException, self.one.system.config)
 
         except AssertionError as e:
             print(f"Провален тест для группы {self.group}")
-            print(f"Причина: {e}")
+            print(f"Ошибка: пользователь из неадминистративной группы brestusers имеет доступ к конфигурации")
             raise
 
     def test_case_2(self):
         try:
-            version = self.one.system.version()
+            self.one.system.config()
 
-            self.assertIsInstance(version, str, msg="Ошибка: Версия должна быть строкой.")
-            self.assertTrue(all(part.isdigit() for part in version.split('.')), msg="Ошибка: Части версии должны быть числами.")
-            
-        except AssertionError as e:
+        except Exception as e:
             print(f"Провален тест для группы {self.group}")
             print(f"Причина: {e}")
             raise
@@ -56,7 +50,7 @@ class TestOneSystemVersion(unittest.TestCase):
 
 
 if __name__ == '__main__':
-    result = unittest.TextTestRunner(verbosity=2).run(unittest.makeSuite(TestOneSystemVersion))
+    result = unittest.TextTestRunner(verbosity=2).run(unittest.makeSuite(TestOneSystemConfig))
     if result.wasSuccessful():
         print("Все тесты прошли успешно: PASS")
     else:
