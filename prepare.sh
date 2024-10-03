@@ -4,10 +4,10 @@
 function is_package_in_repos() {
     local PACKAGE_NAME="$1"
 
-    if sudo apt show "${PACKAGE_NAME}" &>/dev/null; then
-        return 0
-    else
+    if sudo apt-cache policy "${PACKAGE_NAME}" | grep "Кандидат" | grep "(отсутствует)" &>/dev/null; then
         return 1
+    else
+        return 0
     fi
 }
 
@@ -40,15 +40,39 @@ function install_python_packages_in_venv_with_pip() {
     deactivate
 }
 
-DIR=$(dirname "$(realpath "$0")")
 
+function add_base_repository() {
+    local BUILD_VERSION=$(cat /etc/astra/build_version)
+
+    local MAJOR=$(echo "${BUILD_VERSION}" | cut -d'.' -f1)
+    local MINOR=$(echo "${BUILD_VERSION}" | cut -d'.' -f2)
+    local PATCH=$(echo "${BUILD_VERSION}" | cut -d'.' -f3)
+
+    local REPO_DATA="deb ${REPO}/${MAJOR}.${MINOR}/${MAJOR}.${MINOR}.${PATCH}/_REPO/base-repository ${MAJOR}.${MINOR}_x86-64 main contrib non-free"
+
+    echo "${REPO_DATA}" | sudo tee -a /etc/apt/sources.list &>/dev/null
+    sudo apt update &>/dev/null
+}
+
+
+
+REPO="https://releases.devos.astralinux.ru/stable/"
+
+DIR=$(dirname "$(realpath "$0")")
 PACKAGE="python3-venv"
 VENV_DIR="${DIR}/.venv/"
 PIP_PACKAGES=("lxml==4.4.0" "pyone" "pytest")
 
 
+
+
 if ! is_package_in_repos "${PACKAGE}"; then
-    echo "Нет пакета <${PACKAGE}> в доступных репозиториях, отмена"
+    add_base_repository
+fi
+
+if ! is_package_in_repos "${PACKAGE}"; then
+    echo "Пакет ${PACKAGE} не найден после добавления base репозитория."
+    echo "Добавьте корретный репозиторий и перезапустите скрипт."
     exit 1
 fi
 
