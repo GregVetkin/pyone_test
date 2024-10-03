@@ -1,6 +1,5 @@
 import sys
 import subprocess
-import os
 
 from tests              import TestData
 from utils.printing     import pretty_print_test_result
@@ -33,8 +32,8 @@ def dfs_tests(test_tree, dotted_key):
 
 
 def run_test(test: TestData) -> None:
-    command = f"source {PROJECT_DIR}/.venv/bin/activate && python3 -m pytest {test.test_file_path} ; deactivate"
-    
+    command = f"{PROJECT_DIR}/.venv/bin/python3 -m pytest {test.test_file_path}"
+
     result = subprocess.run(
         command,
         shell=True,
@@ -59,7 +58,5 @@ if __name__ == "__main__":
     else:
         method = "one"
 
-
-    method = "one.system"   # for now
     for test in dfs_tests(TESTS, method):
         run_test(test)
