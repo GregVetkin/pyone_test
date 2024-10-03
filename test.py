@@ -2,8 +2,9 @@ import sys
 import subprocess
 
 from tests              import TestData
-from utils.printing     import pretty_print_test_result
 from _tests             import TESTS, PROJECT_DIR
+from utils.printing     import pretty_print_test_result
+
 
 
 
