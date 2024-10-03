@@ -1,5 +1,5 @@
 from api.one import OneServer
-
+from pyone.bindings import OPENNEBULA_CONFIGURATIONSub
 
 
 
@@ -17,7 +17,7 @@ class OneSystem:
         return self._one_system.version()
     
 
-    def config(self) -> str:
+    def config(self) -> OPENNEBULA_CONFIGURATIONSub:
         """
         Command: -\n
         XML-RPC Method: one.system.config\n
