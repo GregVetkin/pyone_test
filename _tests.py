@@ -25,20 +25,7 @@ TESTS["one"]["system"]["config"]    = TestData(
         cli_command     =   "-"
     )
 # =======================================================================================================================
-# one.documents
-TESTS["one"]["documents"] = {}
-TESTS["one"]["documents"]["update"]     = ""
-TESTS["one"]["documents"]["allocate"]   = ""
-TESTS["one"]["documents"]["clone"]      = ""
-TESTS["one"]["documents"]["delete"]     = ""
-TESTS["one"]["documents"]["info"]       = ""
-TESTS["one"]["documents"]["chown"]      = ""
-TESTS["one"]["documents"]["chmod"]      = ""
-TESTS["one"]["documents"]["rename"]     = ""
-TESTS["one"]["documents"]["lock"]       = ""
-TESTS["one"]["documents"]["unlock"]     = ""
-TESTS["one"]["documents"]["info"]       = ""
-# =======================================================================================================================
+
 
 
 
