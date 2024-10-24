@@ -8,3 +8,11 @@ class OneImage:
         return self._one_image.allocate(template, storage_id, check_storage_capacity)
     
 
+    def chmod(self, image_id: int, 
+              user_use: int = -1, user_manage: int = -1, user_admin: int = -1,
+              group_use: int = -1, group_manage: int = -1, group_admin: int = -1,
+              other_use: int = -1, other_manage: int = -1, other_admin: int = -1) -> int:
+        
+        return self._one_image.chmod(image_id, user_use, user_manage, user_admin,
+                                     group_use, group_manage, group_admin,
+                                     other_use, other_manage, other_admin)

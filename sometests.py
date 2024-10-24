@@ -9,17 +9,20 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
+# image_template = """
 
-image_template = """
+#             NAME = "test"
+#             TYPE = "OS"
+#             PATH = "http://buarm/mini.qcow2"
 
-            NAME = "test"
-            TYPE = "OS"
-            PATH = "http://buarm/mini.qcow2"
-
-"""
+# """
 
 # result = client.image.allocate(image_template , 1, False)
 
-result = One(client).image.allocate(image_template, 1, True)
+# result = One(client).image.allocate(image_template, 1, True)
 
+
+
+
+result = One(client).image.chmod(222, other_admin=1)
 print(result)

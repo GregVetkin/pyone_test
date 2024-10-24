@@ -41,8 +41,8 @@ def test_create_datablock_and_check_capacity():
     
 
 
-def test_create_datablock_when_datastore_not_exists():
-    disk_name   = "test_create_datablock_when_datastore_not_exists"
+def test_create_datablock_when_datastore_not_exist():
+    disk_name   = "test_create_datablock_when_datastore_not_exist"
     template    = f"""
         NAME = "{disk_name}"
         TYPE = "DATABLOCK"
