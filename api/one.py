@@ -1,5 +1,6 @@
 from pyone          import OneServer
 from api._system    import OneSystem
+from api._image     import OneImage
 
 
 class One():
@@ -7,5 +8,6 @@ class One():
         self._one_api   = one_server
 
         self.system     = OneSystem(self._one_api)
+        self.image      = OneImage(self._one_api)
     
 
