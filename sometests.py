@@ -12,17 +12,11 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 image_template = """
 
-               NAME          = "Experiment results"
+            NAME = "test"
+            TYPE = "OS"
+            PATH = "http://buarm/mini.qcow2"
 
-               TYPE          = DATABLOCK
-
-               # No PATH set, this image will start as a new empty disk
-
-               SIZE          = "30000"  
-
-               DESCRIPTION   = "Storage for my Thesis experiments."
-
-                """
+"""
 
 # result = client.image.allocate(image_template , 1, False)
 
