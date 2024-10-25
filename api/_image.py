@@ -16,3 +16,7 @@ class OneImage:
         return self._one_image.chmod(image_id, user_use, user_manage, user_admin,
                                      group_use, group_manage, group_admin,
                                      other_use, other_manage, other_admin)
+    
+
+    def chown(self, image_id: int, user_id: int = -1, group_id: int = -1) -> int:
+        return self._one_image.chown(image_id, user_id, group_id)

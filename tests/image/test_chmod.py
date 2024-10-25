@@ -13,7 +13,7 @@ BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
     with pytest.raises(OneNoExistsException, match="Error getting image"):
-        one.image.chmod(9999)
+        one.image.chmod(999999)
 
 
 def test_change_image_rights():
