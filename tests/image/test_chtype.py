@@ -83,7 +83,7 @@ def test_incompatible_file_type_for_file_datastore(prepare_image_for_file_ds):
 
 def test_available_image_types(prepare_image_for_image_ds):
     one                 = One(BRESTADM_SESSION)
-    image_id, _         = prepare_image_for_file_ds
+    image_id, _         = prepare_image_for_image_ds
     command_image_type  = f"sudo oneimage show {image_id} | grep TYPE | head -n 1 " + " | awk '{printf $3}'"
 
     for new_image_type in IMAGE_TYPES:
