@@ -1,9 +1,9 @@
 import pytest
 
-from api    import One
-from pyone  import OneServer, OneActionException, OneNoExistsException, OneException
-from utils  import get_brestadm_auth, run_command
-from commands.images import get_image_type
+from api                import One
+from pyone              import OneServer, OneActionException, OneNoExistsException, OneException
+from utils              import get_brestadm_auth, run_command
+from commands.images    import get_image_type
 
 
 URI                 = "http://localhost:2633/RPC2"

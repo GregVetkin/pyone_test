@@ -13,5 +13,6 @@ def get_image_user(image_id: int) -> str:
 
 
 def get_image_group(image_id: int) -> str:
-    command = ""
+    command = f"sudo oneimage show {image_id} | grep GROUP | head -n 1 " + " | awk '{print $3}'"
     return run_command(command)
+
