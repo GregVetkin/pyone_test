@@ -20,3 +20,9 @@ class OneImage:
 
     def chown(self, image_id: int, user_id: int = -1, group_id: int = -1) -> int:
         return self._one_image.chown(image_id, user_id, group_id)
+    
+
+    def chtype(self, image_id: int, new_type: str) -> int:
+        return self._one_image.chtype(image_id, new_type)
+    
+    

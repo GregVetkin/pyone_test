@@ -3,7 +3,7 @@ from api import One
 
 auth_url = "http://bufn1.brest.local:2633/RPC2"
 auth_user = "brestadm"
-auth_token="145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b913faf6e4ff085d2"
+auth_token="c709ad80eab3785053665faa66c6a141c57cc2b13d3d37c710ecbc9d2df660c4"
 
 client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
@@ -12,5 +12,5 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
-result = One(client).image.chown(7, group_id=999999)
+result = One(client).image.chtype(0, "KERNEL")
 print(result)
