@@ -3,6 +3,7 @@ import pytest
 from api    import One
 from pyone  import OneServer, OneActionException, OneNoExistsException, OneException
 from utils  import get_brestadm_auth, run_command
+from commands.images import get_image_type
 
 
 URI                 = "http://localhost:2633/RPC2"
@@ -54,7 +55,7 @@ def test_incompatible_image_type_for_image_datastore(prepare_image_for_image_ds)
     one                 = One(BRESTADM_SESSION)
     image_id, _         = prepare_image_for_image_ds
     command_image_type  = f"sudo oneimage show {image_id} | grep TYPE | head -n 1 " + " | awk '{printf $3}'"
-    created_image_type  = run_command(command_image_type)
+    created_image_type  = get_image_type(image_id)#run_command(command_image_type)
 
     for new_image_type in FILE_TYPES:
         with pytest.raises(OneActionException, match=ERROR_INCOMPATIBLE_TYPE):
