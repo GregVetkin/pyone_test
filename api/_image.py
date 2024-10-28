@@ -1,5 +1,6 @@
 from api.one import OneServer
 
+
 class OneImage:
     def __init__(self, one_api: OneServer) -> None:
         self._one_image = one_api.image
@@ -26,3 +27,5 @@ class OneImage:
         return self._one_image.chtype(image_id, new_type)
     
     
+    def clone(self, image_id: int, clone_name: str, datastore_id: int = -1) -> int:
+        return self._one_image.clone(image_id, clone_name, datastore_id)

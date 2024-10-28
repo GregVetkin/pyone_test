@@ -12,5 +12,5 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
-result = One(client).image.chtype(0, "KERNEL")
+result = One(client).image.clone(1, "ggga", 2)
 print(result)
