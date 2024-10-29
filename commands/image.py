@@ -13,7 +13,7 @@ def create_image_by_tempalte(datastore_id: int, image_template: str, await_image
     image_id    = int(run_command(command))
 
     if await_image_rdy:
-        await_image_rdy(image_id)
+        wait_image_rdy(image_id)
         
     os.remove(template_file_path)
     return image_id
