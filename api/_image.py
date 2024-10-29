@@ -33,6 +33,6 @@ class OneImage:
     
 
     def delete(self, image_id: int, force: bool = False) -> int:
-        return self._one_image.clone(image_id, force)
+        return self._one_image.delete(image_id, force)
     
     
