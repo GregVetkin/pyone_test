@@ -37,7 +37,7 @@ def prepare_image_datastore():
         NAME = {datastore_name}
         TYPE = IMAGE_DS
         DS_MAD = fs
-        TM_MAD = ssh
+        TM_MAD = shared
     """
     with open(template_file_path, "w") as template_file:
         template_file.write(datastore_template)
