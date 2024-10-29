@@ -30,3 +30,9 @@ class OneImage:
     
     def clone(self, image_id: int, clone_name: str, datastore_id: int = -1) -> int:
         return self._one_image.clone(image_id, clone_name, datastore_id)
+    
+
+    def delete(self, image_id: int, force: bool = False) -> int:
+        return self._one_image.clone(image_id, force)
+    
+    
