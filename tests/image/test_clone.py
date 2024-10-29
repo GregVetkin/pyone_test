@@ -3,7 +3,7 @@ import pytest
 from api                import One
 from pyone              import OneServer, OneActionException, OneNoExistsException, OneException
 from utils              import get_brestadm_auth, run_command
-from commands.images    import is_image_exist, delete_image
+from commands.images    import is_image_exist, delete_image, wait_image_rdy
 
 
 URI                 = "http://localhost:2633/RPC2"
@@ -22,7 +22,8 @@ ERROR_CLONE_SUPPORT     = "Clone only supported for IMAGE_DS Datastores"
 def prepare_image_datablock():
     image_name  = "api_test_image"
     image_id    = int(run_command(f"sudo oneimage create -d 1 --name {image_name} --type DATABLOCK --size 10 " + " | awk '{print $2}'"))
-
+    wait_image_rdy(image_id)
+    
     yield (image_id, image_name)
 
     run_command(f"sudo oneimage delete {image_id}")
