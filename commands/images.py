@@ -18,7 +18,7 @@ def wait_image_rdy(image_id: int, check_interval: float = 1.0) -> None:
 
 
 def get_image_state(image_id: int) -> str:
-    command = f"sudo oneimage show {image_id} | grep STATE | head -n 1 " + " awk '{print $3}'"
+    command = f"sudo oneimage show {image_id} | grep STATE | head -n 1 " + " | awk '{print $3}'"
     return run_command(command)
 
 
