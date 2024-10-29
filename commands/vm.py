@@ -35,7 +35,7 @@ def get_vm_state(vm_id: int) -> str:
 
 
 def delete_vm(vm_id: int, hard: bool = True) -> None:
-    command = f"sudo onevm delete {vm_id} "
+    command = f"sudo onevm terminate {vm_id} "
     if hard:
         command += " --hard"
     run_command(command)
