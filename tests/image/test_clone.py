@@ -3,7 +3,7 @@ import pytest
 from api                import One
 from pyone              import OneServer, OneActionException, OneNoExistsException, OneException
 from utils              import get_brestadm_auth, run_command
-from commands.images    import is_image_exist, delete_image, wait_image_rdy
+from commands.image     import is_image_exist, delete_image, create_image_by_tempalte
 
 
 URI                 = "http://localhost:2633/RPC2"
@@ -20,13 +20,17 @@ ERROR_CLONE_SUPPORT     = "Clone only supported for IMAGE_DS Datastores"
 
 @pytest.fixture
 def prepare_image_datablock():
-    image_name  = "api_test_image"
-    image_id    = int(run_command(f"sudo oneimage create -d 1 --name {image_name} --type DATABLOCK --size 10 " + " | awk '{print $2}'"))
-    wait_image_rdy(image_id)
+    image_name      = "api_test_image"
+    image_template  = f"""
+    NAME = {image_name}
+    TYPE = DATABLOCK
+    SIZE = 10
+    """
+    image_id = create_image_by_tempalte(1, image_template, True)
     
     yield (image_id, image_name)
 
-    run_command(f"sudo oneimage delete {image_id}")
+    delete_image(image_id)
 
 
 @pytest.fixture
@@ -43,6 +47,7 @@ def prepare_image_datastore():
         template_file.write(datastore_template)
 
     datastore_id   = int(run_command(f"sudo onedatastore create {template_file_path} " + " | awk '{print $2}'"))
+    
     
     yield datastore_id, datastore_name
     
@@ -84,7 +89,7 @@ def test_clone_into_the_same_datastore(prepare_image_datablock):
     delete_image(clone_id)
 
 
-def test_clone_into_another_datastore(prepare_image_datablock, prepare_image_datastore):
+def test_clone_into_another_datastore(prepare_image_datastore, prepare_image_datablock):
     one             = One(BRESTADM_SESSION)
     image_id, _     = prepare_image_datablock
     datastore_id, _ = prepare_image_datastore
