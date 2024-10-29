@@ -18,9 +18,8 @@ ERROR_CANNOT_DELETE_IMAGE   = "Cannot delete image"
 
 @pytest.fixture
 def prepare_image():
-    image_name      = "api_test_image"
-    image_template  = f"""
-        NAME = {image_name}
+    image_template  = """
+        NAME = api_test_image
         TYPE = DATABLOCK
         SIZE = 10
     """
@@ -28,27 +27,30 @@ def prepare_image():
     
     yield image_id
 
-    delete_image(image_id)
+    try:
+        delete_image(image_id)
+    except Exception as _:
+        pass
+
+
 
 @pytest.fixture
 def prepare_image_and_vm():
-    image_name      = "api_test_image"
-    image_template  = f"""
-        NAME = {image_name}
+    image_template = """
+        NAME = api_test_image
         TYPE = DATABLOCK
         SIZE = 10
     """
     image_id    = create_image_by_tempalte(1, image_template, True)
-    vm_name     = "apt_test_vm"
     vm_tempalte = f"""
-        NAME    = {vm_name}
+        NAME    = apt_test_vm
         CPU     = 1
         MEMORY  = 32
         DISK    = [
             IMAGE_ID = {image_id}
         ]
     """
-    vm_id       = create_vm_by_tempalte(vm_tempalte, await_vm_offline=True)
+    vm_id = create_vm_by_tempalte(vm_tempalte, await_vm_offline=True)
 
     yield image_id
 
