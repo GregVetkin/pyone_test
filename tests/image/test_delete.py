@@ -30,7 +30,7 @@ def prepare_image():
 
     delete_image(image_id)
 
-
+@pytest.fixture
 def prepare_image_and_vm():
     image_name      = "api_test_image"
     image_template  = f"""
