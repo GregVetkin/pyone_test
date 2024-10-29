@@ -1,6 +1,16 @@
 from utils  import run_command
 
 
+def is_image_exist(image_id: int) -> bool:
+    command     = f"sudo oneimage show {image_id} &>/dev/null; echo $?"
+    exec_code   = int(run_command(command))
+    return True if exec_code == 0 else False
+
+
+def delete_image(image_id: int) -> None:
+    command = f"sudo oneimage delete {image_id}"
+    run_command(command)
+
 
 def get_image_type(image_id: int) -> str:
     command = f"sudo oneimage show {image_id} | grep TYPE | head -n 1 " + " | awk '{printf $3}'"
