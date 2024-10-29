@@ -3,8 +3,8 @@ import pytest
 from api                import One
 from pyone              import OneServer, OneActionException, OneNoExistsException, OneException
 from utils              import get_brestadm_auth, run_command
-from commands.image     import is_image_exist, delete_image, create_image_by_tempalte
-
+from commands.image     import is_image_exist, delete_image, create_image_by_tempalte, change_image_user
+from commands.user      import get_user_id_by_name
 
 URI                 = "http://localhost:2633/RPC2"
 BRESTADM_AUTH       = get_brestadm_auth()
@@ -70,6 +70,7 @@ def test_datastore_not_exist(prepare_image_datablock):
 def test_name_is_taken(prepare_image_datablock):
     one                  = One(BRESTADM_SESSION)
     image_id, image_name = prepare_image_datablock
+    change_image_user(image_id, get_user_id_by_name("brestadm"))
     with pytest.raises(OneException, match=ERROR_NAME_IS_TAKEN):
         one.image.clone(image_id, image_name)
 

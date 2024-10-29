@@ -72,3 +72,7 @@ def get_image_other_rights(image_id: int) -> str:
     command = f"sudo oneimage show {image_id} | grep -A 4 PERMISSIONS | grep OTHER " + " | awk '{print $3}'"
     return run_command(command)
 
+
+def change_image_user(image_id: int, user_id: int) -> None:
+    command = f"sudo oneimage chown {image_id} {user_id}"
+    run_command(command)
