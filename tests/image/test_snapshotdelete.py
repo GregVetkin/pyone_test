@@ -27,7 +27,6 @@ def prepare_image():
     delete_image(image_id)
 
 
-
 @pytest.fixture
 def prepare_image_with_snapshot():
     image_name     = "api_test_image"
