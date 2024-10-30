@@ -79,10 +79,10 @@ def change_image_user(image_id: int, user_id: int) -> None:
 
 
 def disable_image(image_id: int) -> None:
-    command = f"sudo oneimage enable {image_id}"
+    command = f"sudo oneimage disable {image_id}"
     run_command(command)
 
 
 def enable_image(image_id: int) -> None:
-    command = f"sudo oneimage disable {image_id}"
+    command = f"sudo oneimage enable {image_id}"
     run_command(command)
