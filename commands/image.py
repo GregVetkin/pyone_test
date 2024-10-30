@@ -127,3 +127,16 @@ def get_image_lock_status(image_id: int) -> str:
 def get_image_name(image_id: int) -> str:
     command = f"sudo oneimage show {image_id} | grep NAME | head -n 1 " + " | awk '{printf $3}'"
     return run_command(command)
+
+
+def get_snapshot_id(image_id: int, snapshot_name: str) -> int:  
+    command = f"sudo oneimage show {image_id} | grep {snapshot_name} " + " | awk '{printf $2}'"
+    return int(run_command(command))
+
+
+def is_snapshot_exist(image_id: int, snapshot_name: str) -> bool:
+    command     = f"sudo oneimage show {image_id} | grep {snapshot_name} &>/dev/null; echo $?"
+    return_code = int(run_command(command))
+    return True if return_code == 0 else False
+
+

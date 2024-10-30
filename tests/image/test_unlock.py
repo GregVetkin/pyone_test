@@ -1,7 +1,7 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneNoExistsException, OneActionException
+from pyone              import OneServer, OneNoExistsException
 from utils              import get_brestadm_auth
 from commands.image     import delete_image, create_image_by_tempalte, unlock_image, lock_image, get_image_lock_status
 
@@ -63,7 +63,6 @@ def test_unlock_locked_image(prepare_image):
     assert get_image_lock_status(image_id) == "All"
     one.image.unlock(image_id)
     assert get_image_lock_status(image_id) == "None"
-
 
 
 def test_unlock_unlocked_image(prepare_image):

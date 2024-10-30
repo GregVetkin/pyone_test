@@ -69,4 +69,6 @@ class OneImage:
         return self._one_image.rename(image_id, new_name)
     
 
-    
+    def snapshotdelete(self, image_id: int, snapshot_id: int) -> int:
+        self._one_image.snapshotdelete(image_id, snapshot_id)
+
