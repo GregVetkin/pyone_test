@@ -61,6 +61,10 @@ class OneImage:
         return self._one_image.lock(image_id, lock_level, check_already_locked)
 
 
+    def unlock(self, image_id: int) -> int:
+        return self._one_image.unlock(image_id)
+
+
     def rename(self, image_id: int, new_name: str) -> int:
         return self._one_image.rename(image_id, new_name)
     

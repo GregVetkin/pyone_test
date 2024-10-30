@@ -6,3 +6,4 @@ scp -r ~/Документы/Projects/pyone_test u@bufn1:/home/u/brest/ &>/dev/nu
 
 ssh u@bufn1 "sudo chmod 777 -R ~/brest/pyone_test &>/dev/null" 
 
+ssh u@bufn1 "~/brest/pyone_test/prepare.sh"
