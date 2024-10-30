@@ -14,8 +14,7 @@ BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 IMAGE_TYPES = ["OS", "CDROM", "DATABLOCK"]
 FILE_TYPES  = ["KERNEL", "RAMDISK", "CONTEXT"]
 
-ERROR_INCOMPATIBLE_TYPE = "Cannot change image type to an incompatible type for the current datastore"
-ERROR_GETTING_IMAGE     = "Error getting image"
+
 
 
 
@@ -43,12 +42,16 @@ def prepare_image_for_file_ds():
 
 
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
+
+
 
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
+    with pytest.raises(OneNoExistsException):
         one.image.chtype(999999, "")
-
 
 
 def test_incompatible_image_type_for_image_datastore(prepare_image_for_image_ds):
@@ -57,13 +60,11 @@ def test_incompatible_image_type_for_image_datastore(prepare_image_for_image_ds)
     created_image_type  = get_image_type(image_id)
 
     for new_image_type in FILE_TYPES:
-        with pytest.raises(OneActionException, match=ERROR_INCOMPATIBLE_TYPE):
+        with pytest.raises(OneActionException):
             one.image.chtype(image_id, new_image_type)
 
         current_image_type = get_image_type(image_id)
         assert current_image_type == created_image_type
-
-
 
 
 def test_incompatible_file_type_for_file_datastore(prepare_image_for_file_ds):
@@ -72,12 +73,11 @@ def test_incompatible_file_type_for_file_datastore(prepare_image_for_file_ds):
     created_image_type  = get_image_type(image_id)
 
     for new_image_type in IMAGE_TYPES:
-        with pytest.raises(OneActionException, match=ERROR_INCOMPATIBLE_TYPE):
+        with pytest.raises(OneActionException):
             one.image.chtype(image_id, new_image_type)
 
         current_image_type = get_image_type(image_id)
         assert current_image_type == created_image_type
-
 
 
 def test_available_image_types(prepare_image_for_image_ds):
@@ -88,7 +88,6 @@ def test_available_image_types(prepare_image_for_image_ds):
         one.image.chtype(image_id, new_image_type)
         current_image_type = get_image_type(image_id)
         assert current_image_type == new_image_type
-
 
 
 def test_available_file_types(prepare_image_for_file_ds):

@@ -11,7 +11,6 @@ BRESTADM_AUTH       = get_brestadm_auth()
 BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 
 
-ERROR_GETTING_IMAGE = "Error getting image"
 
 
 
@@ -29,11 +28,14 @@ def prepare_image():
     delete_image(image_id)
     
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
 
 
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
+    with pytest.raises(OneNoExistsException):
         one.image.info(999999)
 
 

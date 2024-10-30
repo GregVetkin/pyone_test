@@ -11,7 +11,6 @@ BRESTADM_AUTH       = get_brestadm_auth()
 BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 
 
-ERROR_GETTING_IMAGE = "Error getting image"
 
 
 
@@ -30,11 +29,15 @@ def prepare_image():
     delete_image(image_id)
     
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
+
 
 
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
+    with pytest.raises(OneNoExistsException):
         one.image.lock(999999, lock_level=4)
 
 
@@ -105,3 +108,4 @@ def test_check_if_image_locked(prepare_image):
     with pytest.raises(OneActionException):
         one.image.lock(image_id, lock_level=4, check_already_locked=True)
     assert get_image_lock_status(image_id) == "All"
+

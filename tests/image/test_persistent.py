@@ -7,10 +7,10 @@ from commands.image     import delete_image, create_image_by_tempalte, make_imag
 from commands.vm        import create_vm_by_tempalte, delete_vm, wait_vm_offline
 from utils              import run_command
 
+
 URI                 = "http://localhost:2633/RPC2"
 BRESTADM_AUTH       = get_brestadm_auth()
 BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
-
 
 
 
@@ -86,6 +86,12 @@ def prepare_image_with_snapshot():
 
 
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
+
+
+
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
     with pytest.raises(OneNoExistsException):
@@ -145,3 +151,4 @@ def test_make_nonpers_image_with_snapshots(prepare_image_with_snapshot):
     with pytest.raises(OneInternalException):
         one.image.make_nonpersistent(image_id)
     assert get_image_persistence_status(image_id) == "Yes"
+

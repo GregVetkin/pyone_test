@@ -46,6 +46,9 @@ def prepare_second_image():
 
 
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
 
 
 
@@ -95,3 +98,4 @@ def test_unavailable_symbols_in_image_name(prepare_image):
         with pytest.raises(OneActionException):
             one.image.rename(image_id, new_name)
         assert get_image_name(image_id) == image_name
+

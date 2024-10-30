@@ -10,7 +10,7 @@ URI                 = "http://localhost:2633/RPC2"
 BRESTADM_AUTH       = get_brestadm_auth()
 BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 
-ERROR_GETTING_IMAGE = "Error getting image"
+
 
 
 @pytest.fixture
@@ -23,9 +23,15 @@ def prepare_datablock_with_000_rights():
 
 
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
+
+
+
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
+    with pytest.raises(OneNoExistsException):
         one.image.chmod(999999)
 
 

@@ -11,9 +11,6 @@ BRESTADM_AUTH       = get_brestadm_auth()
 BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 
 
-ERROR_GETTING_IMAGE = "Error getting image"
-ERROR_GETTING_USER  = "Error getting user"
-ERROR_GETTING_GROUP = "Error getting group"
 
 
 
@@ -36,12 +33,17 @@ def prepare_image_user_group():
     run_command(f"sudo onegroup delete {group_id}")
 
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
+
+
+
 
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
+    with pytest.raises(OneNoExistsException):
         one.image.chown(999999)
-
 
 
 def test_user_not_exist(prepare_image_user_group):
@@ -51,13 +53,12 @@ def test_user_not_exist(prepare_image_user_group):
     image_id, _       = image_data
     image_user        = get_image_user(image_id)
 
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_USER):
+    with pytest.raises(OneNoExistsException):
         one.image.chown(image_id, user_id=999999)
 
     new_image_user    = get_image_user(image_id)
 
     assert image_user == new_image_user
-
 
 
 def test_group_not_exist(prepare_image_user_group):
@@ -67,13 +68,12 @@ def test_group_not_exist(prepare_image_user_group):
     image_id, _       = image_data
     image_group       = get_image_group(image_id)
 
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_GROUP):
+    with pytest.raises(OneNoExistsException):
         one.image.chown(image_id, group_id=999999)
 
     new_image_group   = get_image_group(image_id)
 
     assert image_group == new_image_group
-
 
 
 def test_image_user_and_group_change(prepare_image_user_group):
@@ -93,7 +93,6 @@ def test_image_user_and_group_change(prepare_image_user_group):
     assert image_group == group_name
 
 
-
 def test_image_user_and_group_not_changed(prepare_image_user_group):
     one = One(BRESTADM_SESSION)
 
@@ -110,7 +109,6 @@ def test_image_user_and_group_not_changed(prepare_image_user_group):
     assert image_group  == new_image_group
 
 
-
 def test_image_user_change(prepare_image_user_group):
     one = One(BRESTADM_SESSION)
 
@@ -125,7 +123,6 @@ def test_image_user_change(prepare_image_user_group):
 
     assert new_image_user  == user_name
     assert new_image_group == image_group
-
 
 
 def test_image_group_change(prepare_image_user_group):

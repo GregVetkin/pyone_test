@@ -13,6 +13,11 @@ BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 
 
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
+
+
 def test_create_datablock_and_dont_check_capacity():
     disk_name   = "test_create_datablock_and_dont_check_capacity"
     template    = f"""
@@ -26,7 +31,6 @@ def test_create_datablock_and_dont_check_capacity():
     run_command(f"sudo oneimage delete {disk_name}")
 
 
-
 def test_create_datablock_and_check_capacity():
     disk_name   = "test_create_datablock_and_check_capacity"
     template    = f"""
@@ -38,7 +42,6 @@ def test_create_datablock_and_check_capacity():
 
     with pytest.raises(OneActionException, match="Not enough space in datastore"):
         one.image.allocate(template, 1, True)
-    
 
 
 def test_create_datablock_when_datastore_not_exist():
@@ -54,7 +57,6 @@ def test_create_datablock_when_datastore_not_exist():
         one.image.allocate(template, 99999)
 
 
-
 def test_create_datablock_in_system_datastore():
     disk_name   = "test_create_datablock_in_system_datastore"
     template    = f"""
@@ -66,7 +68,6 @@ def test_create_datablock_in_system_datastore():
 
     with pytest.raises(OneException, match="New images cannot be allocated in a system datastore"):
         one.image.allocate(template, 0)
-
 
 
 def test_create_datablock_as_persistent():
@@ -83,7 +84,6 @@ def test_create_datablock_as_persistent():
     persistence = run_command(f"sudo oneimage show {disk_name} | grep PERSISTENT " + " | awk '{print $3}'")
     assert persistence == "Yes"
     run_command(f"sudo oneimage delete {disk_name}")
-
 
 
 def test_create_os_image_by_local_path():

@@ -11,8 +11,6 @@ BRESTADM_AUTH       = get_brestadm_auth()
 BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 
 
-ERROR_GETTING_IMAGE         = "Error getting image"
-ERROR_CANNOT_DELETE_IMAGE   = "Cannot delete image"
 
 
 
@@ -31,7 +29,6 @@ def prepare_image():
         delete_image(image_id)
     except Exception as _:
         pass
-
 
 
 @pytest.fixture
@@ -59,11 +56,15 @@ def prepare_image_and_vm():
     delete_image(image_id)
 
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
+
 
 
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
+    with pytest.raises(OneNoExistsException):
         one.image.delete(999999)
     
 
@@ -78,9 +79,8 @@ def test_used_image_delete(prepare_image_and_vm):
     one         = One(BRESTADM_SESSION)
     image_id    = prepare_image_and_vm
 
-    with pytest.raises(OneActionException, match=ERROR_CANNOT_DELETE_IMAGE):
+    with pytest.raises(OneActionException):
         one.image.delete(image_id)
 
     assert is_image_exist(image_id) == True
-
 

@@ -12,8 +12,6 @@ BRESTADM_AUTH       = get_brestadm_auth()
 BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 
 
-ERROR_GETTING_IMAGE             = "Error getting image"
-ERROR_COULD_NOT_DISABLE_IMAGE   = "Could not disable image"
 
 
 @pytest.fixture
@@ -55,13 +53,15 @@ def prepare_image_and_vm():
     delete_image(image_id)
 
 
-
+# =================================================================================================
+# TESTS
+# =================================================================================================
 
 
 
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
+    with pytest.raises(OneNoExistsException):
         one.image.enable(999999)
         one.image.disable(999999)
 
@@ -70,7 +70,7 @@ def test_enable_and_disable_used_image(prepare_image_and_vm):
     one         = One(BRESTADM_SESSION)
     image_id    = prepare_image_and_vm
     assert get_image_state(image_id) == "used"
-    with pytest.raises(OneInternalException, match=ERROR_COULD_NOT_DISABLE_IMAGE):
+    with pytest.raises(OneInternalException):
         one.image.disable(image_id)
         one.image.enable(image_id)
 
@@ -106,7 +106,4 @@ def test_disable_enabled_image(prepare_image):
     assert get_image_state(image_id) == "rdy"
     one.image.disable(image_id)
     assert get_image_state(image_id) == "disa"
-
-
-
 

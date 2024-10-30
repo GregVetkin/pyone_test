@@ -7,10 +7,10 @@ from commands.image     import delete_image, create_image_by_tempalte, wait_imag
 from commands.vm        import create_vm_by_tempalte, delete_vm, wait_vm_offline
 from utils              import run_command
 
+
 URI                 = "http://localhost:2633/RPC2"
 BRESTADM_AUTH       = get_brestadm_auth()
 BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
-
 
 
 
@@ -60,6 +60,9 @@ def prepare_image_with_snapshot():
 
 
 
+# =================================================================================================
+# TESTS
+# =================================================================================================
 
 
 
@@ -82,3 +85,4 @@ def test_delete_image_snapshot(prepare_image_with_snapshot):
     assert is_snapshot_exist(image_id, snap_name) == True
     one.image.snapshotdelete(image_id, snap_id)
     assert is_snapshot_exist(image_id, snap_name) == False
+

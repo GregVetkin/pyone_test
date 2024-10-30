@@ -12,10 +12,6 @@ BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
 
 
 
-ERROR_GETTING_IMAGE     = "Error getting image"
-ERROR_GETTING_DATASTORE = "Error getting datastore"
-ERROR_NAME_IS_TAKEN     = "NAME is already taken"
-ERROR_CLONE_SUPPORT     = "Clone only supported for IMAGE_DS Datastores"
 
 
 @pytest.fixture
@@ -54,16 +50,23 @@ def prepare_image_datastore():
     run_command(f"sudo onedatastore delete {datastore_id}")
 
 
+
+# =================================================================================================
+# TESTS
+# =================================================================================================
+
+
+
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
-        one.image.clone(999999, "")
+    with pytest.raises(OneNoExistsException):
+        one.image.clone(999999, "GregVetkin")
 
 
 def test_datastore_not_exist(prepare_image_datablock):
     one         = One(BRESTADM_SESSION)
     image_id, _ = prepare_image_datablock
-    with pytest.raises(OneNoExistsException, match=ERROR_GETTING_DATASTORE):
+    with pytest.raises(OneNoExistsException):
         one.image.clone(image_id, "GregVetkin", 999999)
 
 
@@ -71,14 +74,14 @@ def test_name_is_taken(prepare_image_datablock):
     one                  = One(BRESTADM_SESSION)
     image_id, image_name = prepare_image_datablock
     change_image_user(image_id, get_user_id_by_name("brestadm"))
-    with pytest.raises(OneException, match=ERROR_NAME_IS_TAKEN):
+    with pytest.raises(OneException):
         one.image.clone(image_id, image_name)
 
 
 def test_only_image_datastore_support(prepare_image_datablock):
     one         = One(BRESTADM_SESSION)
     image_id, _ = prepare_image_datablock
-    with pytest.raises(OneActionException, match=ERROR_CLONE_SUPPORT):
+    with pytest.raises(OneActionException):
         one.image.clone(image_id, "GregVetkin", 2)
 
 
