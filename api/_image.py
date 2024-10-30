@@ -1,4 +1,5 @@
-from api.one import OneServer
+from api.one        import OneServer
+from pyone.bindings import IMAGESub
 
 
 class OneImage:
@@ -52,3 +53,7 @@ class OneImage:
         return self._one_image.persistent(image_id, False)
     
     
+    def info(self, image_id: int, decrypt_secrets: bool = False) -> IMAGESub:
+        return self._one_image.info(image_id, decrypt_secrets)
+    
+
