@@ -86,3 +86,17 @@ def disable_image(image_id: int) -> None:
 def enable_image(image_id: int) -> None:
     command = f"sudo oneimage enable {image_id}"
     run_command(command)
+
+
+def get_image_persistence_status(image_id: int) -> str:
+    command = f"sudo oneimage show {image_id} | grep PERSISTENT | head -n 1 " + " | awk '{print $3}'"
+    return run_command(command)
+
+
+def make_image_persistent(image_id: int) -> None:
+    command = f"sudo oneimage persistent {image_id}"
+    run_command(command)
+
+def make_image_nonpersistent(image_id: int) -> None:
+    command = f"sudo oneimage nonpersistent {image_id}"
+    run_command(command)

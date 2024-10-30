@@ -62,7 +62,8 @@ def prepare_image_and_vm():
 def test_image_not_exist():
     one = One(BRESTADM_SESSION)
     with pytest.raises(OneNoExistsException, match=ERROR_GETTING_IMAGE):
-        one.image.delete(999999)
+        one.image.enable(999999)
+        one.image.disable(999999)
 
 
 def test_enable_and_disable_used_image(prepare_image_and_vm):

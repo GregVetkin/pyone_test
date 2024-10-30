@@ -12,5 +12,5 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
-result = One(client).image.enable(8)
+result = One(client).image.make_nonpersistent(8)
 print(result)
