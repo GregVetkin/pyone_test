@@ -6,6 +6,7 @@ class OneImage:
     def __init__(self, one_api: OneServer) -> None:
         self._one_image = one_api.image
     
+
     def allocate(self, template: str, storage_id: int, check_storage_capacity: bool = True) -> int:
         return self._one_image.allocate(template, storage_id, check_storage_capacity)
     
@@ -70,5 +71,21 @@ class OneImage:
     
 
     def snapshotdelete(self, image_id: int, snapshot_id: int) -> int:
-        self._one_image.snapshotdelete(image_id, snapshot_id)
+        return self._one_image.snapshotdelete(image_id, snapshot_id)
+
+
+    def snapshotrevert(self, image_id: int, snapshot_id: int) -> int:
+        return self._one_image.snapshotrevert(image_id, snapshot_id)
+
+
+    def snapshotflatten(self, image_id: int, snapshot_id: int) -> int:
+        return self._one_image.snapshotflatten(image_id, snapshot_id)
+
+
+    def restore(self, image_id: int, datastore_id: int, restore_template: str) -> int: #Blank separated list of restored objects IDs. The first one is the VM Template ID.
+        return self._one_image.restore(image_id, datastore_id, restore_template)
+
+
+    def update(self, image_id: int, template: str, replace: bool = False) -> int:
+        return self._one_image.update(image_id, template, 0 if replace else 1)
 
