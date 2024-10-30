@@ -122,3 +122,8 @@ def unlock_image(image_id: int) -> None:
 def get_image_lock_status(image_id: int) -> str:
     command = f"sudo oneimage show {image_id} | grep LOCK | head -n 1 " + " | awk '{printf $3}'"
     return run_command(command)
+
+
+def get_image_name(image_id: int) -> str:
+    command = f"sudo oneimage show {image_id} | grep NAME | head -n 1 " + " | awk '{printf $3}'"
+    return run_command(command)

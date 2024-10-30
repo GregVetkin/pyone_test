@@ -12,5 +12,5 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
-result = One(client).image.lock(8, 1, True)
+result = One(client).image.rename(119, "kek")
 print(result)
