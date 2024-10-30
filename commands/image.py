@@ -102,3 +102,23 @@ def make_image_nonpersistent(image_id: int) -> None:
     command = f"sudo oneimage nonpersistent {image_id}"
     run_command(command)
 
+
+def lock_image(image_id: int, lock_level: int = 4) -> None:
+    lock_levels = {
+        1: "--use",
+        2: "--manage",
+        3: "--admin",
+        4: "--all",
+    }
+    command = f"sudo oneimage lock {image_id} {lock_levels[lock_level]}"
+    run_command(command)
+
+
+def unlock_image(image_id: int) -> None:
+    command = f"sudo oneimage unlock {image_id}"
+    run_command(command)
+
+
+def get_image_lock_status(image_id: int) -> str:
+    command = f"sudo oneimage show {image_id} | grep LOCK | head -n 1 " + " | awk '{printf $3}'"
+    return run_command(command)
