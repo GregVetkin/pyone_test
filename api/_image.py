@@ -35,4 +35,10 @@ class OneImage:
     def delete(self, image_id: int, force: bool = False) -> int:
         return self._one_image.delete(image_id, force)
     
+
+    def enable(self, image_id: int) -> int:
+        return self._one_image.enable(image_id, True)
     
+
+    def disable(self, image_id: int) -> int:
+        return self._one_image.enable(image_id, False)

@@ -76,3 +76,13 @@ def get_image_other_rights(image_id: int) -> str:
 def change_image_user(image_id: int, user_id: int) -> None:
     command = f"sudo oneimage chown {image_id} {user_id}"
     run_command(command)
+
+
+def disable_image(image_id: int) -> None:
+    command = f"sudo oneimage enable {image_id}"
+    run_command(command)
+
+
+def enable_image(image_id: int) -> None:
+    command = f"sudo oneimage disable {image_id}"
+    run_command(command)
