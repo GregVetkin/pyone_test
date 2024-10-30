@@ -97,6 +97,8 @@ def make_image_persistent(image_id: int) -> None:
     command = f"sudo oneimage persistent {image_id}"
     run_command(command)
 
+
 def make_image_nonpersistent(image_id: int) -> None:
     command = f"sudo oneimage nonpersistent {image_id}"
     run_command(command)
+

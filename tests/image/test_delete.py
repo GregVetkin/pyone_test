@@ -1,8 +1,8 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneActionException, OneNoExistsException, OneException
-from utils              import get_brestadm_auth, run_command
+from pyone              import OneServer, OneActionException, OneNoExistsException
+from utils              import get_brestadm_auth
 from commands.image     import is_image_exist, delete_image, create_image_by_tempalte, wait_image_rdy
 from commands.vm        import create_vm_by_tempalte, delete_vm
 

@@ -57,3 +57,5 @@ class OneImage:
         return self._one_image.info(image_id, decrypt_secrets)
     
 
+    def lock(self, image_id: int, lock_level: int = 4, check_already_locked: bool = False) -> int:
+        return self._one_image.lock(image_id, lock_level, check_already_locked)
