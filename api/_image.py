@@ -82,7 +82,7 @@ class OneImage:
         return self._one_image.snapshotflatten(image_id, snapshot_id)
 
 
-    def restore(self, image_id: int, datastore_id: int, restore_template: str) -> int: #Blank separated list of restored objects IDs. The first one is the VM Template ID.
+    def restore(self, image_id: int, datastore_id: int, restore_template: str = "") -> int: #Blank separated list of restored objects IDs. The first one is the VM Template ID.
         return self._one_image.restore(image_id, datastore_id, restore_template)
 
 

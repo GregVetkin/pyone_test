@@ -11,6 +11,8 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
-
-result = One(client).image.make_nonpersistent(139)
+image_id = 259
+template = """
+"""
+result = One(client).image.update(image_id, template, True)
 print(result)
