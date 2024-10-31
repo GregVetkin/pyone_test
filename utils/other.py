@@ -1,6 +1,7 @@
 import subprocess
 
 
+
 def run_command(command: str) -> str:
     try:
         result = subprocess.run(

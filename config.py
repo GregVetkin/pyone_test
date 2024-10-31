@@ -1,8 +1,5 @@
 
 
-API_URI             = "http://localhost:2633/RPC2"
-COMMAND_EXECUTER    = "sudo"
+API_URI             = "http://bufn1:2633/RPC2"
+COMMAND_EXECUTOR    = "ssh u@bufn1 sudo"
 
-
-IMAGE_TYPES         = ["OS", "CDROM", "DATABLOCK"]
-FILE_TYPES          = ["KERNEL", "RAMDISK", "CONTEXT"]

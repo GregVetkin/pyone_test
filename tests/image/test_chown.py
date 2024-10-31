@@ -3,9 +3,8 @@ import pytest
 from api                import One
 from pyone              import OneServer, OneNoExistsException
 from utils              import get_brestadm_auth, run_command
-from commands.image     import get_image_user, get_image_group
-
-from config             import API_URI
+from one_cli.image      import Image
+from config             import API_URI, COMMAND_EXECUTOR
 
 
 BRESTADM_AUTH       = get_brestadm_auth()
@@ -21,17 +20,17 @@ def prepare_image_user_group():
     user_name   = "api_test_user"
     group_name  = "api_test_group"
 
-    image_id    = int(run_command(f"sudo oneimage create -d 1 --name {image_name} --type DATABLOCK --size 10 " + " | awk '{print $2}'"))
-    user_id     = int(run_command(f"sudo oneuser create {user_name} 12345678 " + " | awk '{print $2}'"))
-    group_id    = int(run_command(f"sudo onegroup create {group_name} " + " | awk '{print $2}'"))
+    image_id    = int(run_command(COMMAND_EXECUTOR + " " + f"oneimage create -d 1 --name {image_name} --type DATABLOCK --size 10 " + " | awk '{print $2}'"))
+    user_id     = int(run_command(COMMAND_EXECUTOR + " " + f"oneuser create {user_name} 12345678 " + " | awk '{print $2}'"))
+    group_id    = int(run_command(COMMAND_EXECUTOR + " " + f"onegroup create {group_name} " + " | awk '{print $2}'"))
 
     yield ((image_id, image_name),
            (user_id, user_name),
            (group_id, group_name))
 
-    run_command(f"sudo oneimage delete {image_id}")
-    run_command(f"sudo oneuser delete {user_id}")
-    run_command(f"sudo onegroup delete {group_id}")
+    run_command(COMMAND_EXECUTOR + " " + f"oneimage delete {image_id}")
+    run_command(COMMAND_EXECUTOR + " " + f"oneuser delete {user_id}")
+    run_command(COMMAND_EXECUTOR + " " + f"onegroup delete {group_id}")
 
 
 # =================================================================================================
@@ -42,102 +41,71 @@ def prepare_image_user_group():
 
 
 def test_image_not_exist():
-    one = One(BRESTADM_SESSION)
     with pytest.raises(OneNoExistsException):
-        one.image.chown(999999)
+        One(BRESTADM_SESSION).image.chown(999999)
+
 
 
 def test_user_not_exist(prepare_image_user_group):
-    one = One(BRESTADM_SESSION)
-
-    image_data, _, _  = prepare_image_user_group
-    image_id, _       = image_data
-    image_user        = get_image_user(image_id)
-
+    (image_id, _), _, _ = prepare_image_user_group
+    image_old_info      = Image(image_id).info()
     with pytest.raises(OneNoExistsException):
-        one.image.chown(image_id, user_id=999999)
+        One(BRESTADM_SESSION).image.chown(image_id, user_id=999999)
+    image_new_info      = Image(image_id).info()
 
-    new_image_user    = get_image_user(image_id)
+    assert image_old_info.UNAME == image_new_info.UNAME
 
-    assert image_user == new_image_user
 
 
 def test_group_not_exist(prepare_image_user_group):
-    one = One(BRESTADM_SESSION)
-
-    image_data, _, _  = prepare_image_user_group
-    image_id, _       = image_data
-    image_group       = get_image_group(image_id)
-
+    (image_id, _), _, _ = prepare_image_user_group
+    image_old_info      = Image(image_id).info()
     with pytest.raises(OneNoExistsException):
-        one.image.chown(image_id, group_id=999999)
+        One(BRESTADM_SESSION).image.chown(image_id, group_id=999999)
+    image_new_info      = Image(image_id).info()
 
-    new_image_group   = get_image_group(image_id)
+    assert image_old_info.GNAME == image_new_info.GNAME
 
-    assert image_group == new_image_group
 
 
 def test_image_user_and_group_change(prepare_image_user_group):
-    one = One(BRESTADM_SESSION)
+    (image_id, _), (user_id, user_name), (group_id, group_name) = prepare_image_user_group
+    One(BRESTADM_SESSION).image.chown(image_id, user_id=user_id, group_id=group_id)
+    image_new_info = Image(image_id).info()
 
-    image_data, user_data, group_data   = prepare_image_user_group
-    image_id, _                         = image_data
-    user_id, user_name                  = user_data
-    group_id, group_name                = group_data
+    assert user_name  == image_new_info.UNAME
+    assert group_name == image_new_info.GNAME
 
-    one.image.chown(image_id, user_id=user_id, group_id=group_id)
-
-    image_user     = get_image_user(image_id)
-    image_group    = get_image_group(image_id)
-
-    assert image_user  == user_name
-    assert image_group == group_name
 
 
 def test_image_user_and_group_not_changed(prepare_image_user_group):
-    one = One(BRESTADM_SESSION)
-
-    image_data, _, _    = prepare_image_user_group
-    image_id, _         = image_data
-
-    image_user          = get_image_user(image_id)
-    image_group         = get_image_group(image_id)
-    one.image.chown(image_id)
-    new_image_user      = get_image_user(image_id)
-    new_image_group     = get_image_group(image_id)
+    (image_id, _), _, _ = prepare_image_user_group
+    image_old_info      = Image(image_id).info()
+    One(BRESTADM_SESSION).image.chown(image_id)
+    image_new_info      = Image(image_id).info()
     
-    assert image_user   == new_image_user
-    assert image_group  == new_image_group
+    assert image_old_info.UNAME == image_new_info.UNAME
+    assert image_old_info.GNAME == image_new_info.GNAME
+
 
 
 def test_image_user_change(prepare_image_user_group):
-    one = One(BRESTADM_SESSION)
+    (image_id, _), (user_id, user_name), _ = prepare_image_user_group
+    image_old_info = Image(image_id).info()
+    One(BRESTADM_SESSION).image.chown(image_id, user_id=user_id)
+    image_new_info = Image(image_id).info()
 
-    image_data, user_data, _    = prepare_image_user_group
-    image_id, _                 = image_data
-    user_id, user_name          = user_data
+    assert image_new_info.UNAME == user_name
+    assert image_new_info.GNAME == image_old_info.GNAME
 
-    image_group     = get_image_group(image_id)
-    one.image.chown(image_id, user_id=user_id)
-    new_image_user  = get_image_user(image_id)
-    new_image_group = get_image_group(image_id)
-
-    assert new_image_user  == user_name
-    assert new_image_group == image_group
 
 
 def test_image_group_change(prepare_image_user_group):
-    one = One(BRESTADM_SESSION)
+    (image_id, _), _, (group_id, group_name)   = prepare_image_user_group
+    image_old_info = Image(image_id).info()
+    One(BRESTADM_SESSION).image.chown(image_id, group_id=group_id)
+    image_new_info = Image(image_id).info()
 
-    image_data, _, group_data   = prepare_image_user_group
-    image_id, _                 = image_data
-    group_id, group_name        = group_data
-
-    image_user      = get_image_user(image_id)
-    one.image.chown(image_id, group_id=group_id)
-    new_image_user  = get_image_user(image_id)
-    new_image_group = get_image_group(image_id)
-
-    assert new_image_user  == image_user
-    assert new_image_group == group_name
+    assert image_new_info.UNAME == image_old_info.UNAME
+    assert image_new_info.GNAME == group_name
 

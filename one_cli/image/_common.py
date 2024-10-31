@@ -1,11 +1,10 @@
 import xml.etree.ElementTree as xmlTree
 
-from utils          import run_command
-from dataclasses    import dataclass, field
-from typing         import List, Dict
-from time           import sleep
+from dataclasses        import dataclass, field
+from typing             import List, Dict
+from one_cli._common    import UnitPermissions, Permissions
 
-COMMAND_EXECUTOR = "ssh u@bufn1 sudo"
+
 
 
 @dataclass
@@ -138,63 +137,3 @@ def parse_image_info_from_xml(raw_image_xml: str) -> ImageInfo:
 
 
 
-
-class Image:
-    def __init__(self, image_id: int) -> None:
-        self._image_id      = image_id
-        self._lock_levels   = {
-            1: "--use",
-            2: "--manage",
-            3: "--admin",
-            4: "--all",
-        }
-
-
-    def info(self) -> ImageInfo:
-        raw_image_xml = run_command(COMMAND_EXECUTOR + " " + f"oneimage show {self._image_id} -x")
-        return parse_image_info_from_xml(raw_image_xml)
-
- 
-    def delete(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage delete {self._image_id}")
-
-
-    def wait_ready_status(self, interval: float = 1.) -> None:
-        while self.info().STATE != 1:
-            sleep(interval)
-
-
-    def chown(self, user_id: int, group_id: int = -1) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage chown {self._image_id} {user_id} {group_id if group_id != -1 else ''}")
-
-
-    def make_persistent(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage persistent {self._image_id}")
-
-
-    def make_nonpersistent(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage nonpersistent {self._image_id}")
-
-
-    def lock_image(self, lock_level: int = 4) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage lock {self._image_id} {self._lock_levels[lock_level]}")
-
-
-    def unlock_image(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage unlock {self._image_id}")
-
-
-    def disable(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage disable {self._image_id}")
-
-
-    def enable(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage enable {self._image_id}")
-
-
-
-
-
-
-if __name__ == "__main__":
-    pass
