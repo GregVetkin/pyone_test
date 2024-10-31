@@ -1,18 +1,18 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneActionException, OneNoExistsException, OneException
+from pyone              import OneServer, OneActionException, OneNoExistsException
 from utils              import get_brestadm_auth, run_command
 from commands.image     import get_image_type
 
+from config             import API_URI, IMAGE_TYPES, FILE_TYPES
 
-URI                 = "http://localhost:2633/RPC2"
+
 BRESTADM_AUTH       = get_brestadm_auth()
-BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
+BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
 
 
-IMAGE_TYPES = ["OS", "CDROM", "DATABLOCK"]
-FILE_TYPES  = ["KERNEL", "RAMDISK", "CONTEXT"]
+
 
 
 

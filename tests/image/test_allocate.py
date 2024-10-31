@@ -4,11 +4,12 @@ from api    import One
 from pyone  import OneServer, OneActionException, OneNoExistsException, OneException
 from utils  import get_brestadm_auth, run_command
 
+from config import API_URI
 
 
-URI                 = "http://localhost:2633/RPC2"
+
 BRESTADM_AUTH       = get_brestadm_auth()
-BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
+BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
 
 
 

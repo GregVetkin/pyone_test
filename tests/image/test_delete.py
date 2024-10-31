@@ -6,9 +6,11 @@ from utils              import get_brestadm_auth
 from commands.image     import is_image_exist, delete_image, create_image_by_tempalte, wait_image_rdy
 from commands.vm        import create_vm_by_tempalte, delete_vm
 
-URI                 = "http://localhost:2633/RPC2"
+from config             import API_URI
+
+
 BRESTADM_AUTH       = get_brestadm_auth()
-BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
+BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
 
 
 

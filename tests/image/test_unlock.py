@@ -5,11 +5,11 @@ from pyone              import OneServer, OneNoExistsException
 from utils              import get_brestadm_auth
 from commands.image     import delete_image, create_image_by_tempalte, unlock_image, lock_image, get_image_lock_status
 
+from config             import API_URI
 
 
-URI                 = "http://localhost:2633/RPC2"
 BRESTADM_AUTH       = get_brestadm_auth()
-BRESTADM_SESSION    = OneServer(URI, BRESTADM_AUTH)
+BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
 
 
 
