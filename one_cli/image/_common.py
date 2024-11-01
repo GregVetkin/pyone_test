@@ -28,7 +28,9 @@ class SnapshotInfo:
     DATE:       int
     PARENT:     int
     ACTIVE:     bool
+    SIZE:       int
     CHILDREN:   List[int] = field(default_factory=list)
+    
 
 
 
@@ -78,8 +80,9 @@ def parse_image_info_from_xml(raw_image_xml: str) -> ImageInfo:
                 NAME=       snapshot.find('NAME').text,
                 DATE=       int(snapshot.find('DATE').text),
                 PARENT=     int(snapshot.find('PARENT').text),
-                ACTIVE=     snapshot.find('ACTIVE') == "Yes",
+                ACTIVE=     True if snapshot.find('ACTIVE') is not None else False,
                 CHILDREN=   [int(child) for child in snapshot.findtext('CHILDREN', '').split() if child.isdigit()],
+                SIZE=       int(snapshot.find('SIZE').text),
         ))
 
     owner_permissions = UnitPermissions(
