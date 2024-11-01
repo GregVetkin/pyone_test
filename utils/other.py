@@ -1,5 +1,5 @@
 import subprocess
-
+from config import COMMAND_EXECUTOR
 
 
 def run_command(command: str) -> str:
@@ -17,4 +17,12 @@ def run_command(command: str) -> str:
     except subprocess.CalledProcessError as e:
         print(f"{e.stderr}")
         raise
-        
+
+
+
+def create_temp_file(size_mb: int, file_path: str):
+    run_command(COMMAND_EXECUTOR + " " + f"dd if=/dev/urandom of={file_path} bs=1MiB count={size_mb} status=none")
+
+
+def delete_temp_file(file_path: str):
+    run_command(COMMAND_EXECUTOR + " " + f"rm -f {file_path}")

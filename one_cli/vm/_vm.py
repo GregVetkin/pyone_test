@@ -44,7 +44,12 @@ def get_vm_state(vm_id: int) -> str:
 
 class VirtualMachine:
     def __init__(self, vm_id: int) -> None:
-        self._vm_id = vm_id
+        self._id = vm_id
     
     def terminate(self, hard: bool = True) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"onevm terminate {self._vm_id} {'--hard' if hard else ''}")
+        run_command(COMMAND_EXECUTOR + " " + f"onevm terminate {self._id} {'--hard' if hard else ''}")
+
+    def create_disk_snapshot(self, disk_id: int, snapshot_name: str) -> None:
+        run_command(COMMAND_EXECUTOR + " " + f"onevm disk-snapshot-create {self._id} {disk_id} {snapshot_name}")
+
+    

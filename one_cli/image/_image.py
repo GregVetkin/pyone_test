@@ -32,10 +32,12 @@ def create_image_by_tempalte(datastore_id: int, image_template: str, await_image
 
 
 
+
+
 class Image:
     def __init__(self, image_id: int) -> None:
-        self._image_id      = image_id
-        self._lock_levels   = {
+        self._id = image_id
+        self._lock_levels  = {
             1: "--use",
             2: "--manage",
             3: "--admin",
@@ -44,11 +46,11 @@ class Image:
 
 
     def info(self) -> ImageInfo:
-        return parse_image_info_from_xml(run_command(COMMAND_EXECUTOR + " " + f"oneimage show {self._image_id} -x"))
+        return parse_image_info_from_xml(run_command(COMMAND_EXECUTOR + " " + f"oneimage show {self._id} -x"))
 
  
     def delete(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage delete {self._image_id}")
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage delete {self._id}")
 
 
     def wait_ready_status(self, interval: float = 1.) -> None:
@@ -57,35 +59,35 @@ class Image:
 
 
     def chown(self, user_id: int, group_id: int = -1) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage chown {self._image_id} {user_id} {group_id if group_id != -1 else ''}")
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage chown {self._id} {user_id} {group_id if group_id != -1 else ''}")
 
 
     def chmod(self, mod: str) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage chmod {self._image_id} {mod}")
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage chmod {self._id} {mod}")
 
 
     def make_persistent(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage persistent {self._image_id}")
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage persistent {self._id}")
 
 
     def make_nonpersistent(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage nonpersistent {self._image_id}")
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage nonpersistent {self._id}")
 
 
-    def lock_image(self, lock_level: int = 4) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage lock {self._image_id} {self._lock_levels[lock_level]}")
+    def lock(self, lock_level: int = 4) -> None:
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage lock {self._id} {self._lock_levels[lock_level]}")
 
 
-    def unlock_image(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage unlock {self._image_id}")
+    def unlock(self) -> None:
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage unlock {self._id}")
 
 
     def disable(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage disable {self._image_id}")
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage disable {self._id}")
 
 
     def enable(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"oneimage enable {self._image_id}")
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage enable {self._id}")
 
 
 

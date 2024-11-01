@@ -2,13 +2,13 @@ import pytest
 
 from api                import One
 from pyone              import OneServer, OneNoExistsException
-from utils              import get_brestadm_auth
+from utils              import get_user_auth
 from one_cli.image      import Image, create_image_by_tempalte
-from config             import API_URI
+from config             import API_URI, BRESTADM
 
 
-BRESTADM_AUTH       = get_brestadm_auth()
-BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
+BRESTADM_AUTH     = get_user_auth(BRESTADM)
+BRESTADM_SESSION  = OneServer(API_URI, BRESTADM_AUTH)
 
 
 
@@ -24,7 +24,7 @@ def prepare_datablock_with_000_rights():
     image    = Image(image_id)
 
     image.chmod("000")
-    yield image_id
+    yield image
     image.delete()
 
 
@@ -44,14 +44,16 @@ def image_rights(image_id: int):
 
 
 def test_image_not_exist():
+    one  = One(BRESTADM_SESSION)
     with pytest.raises(OneNoExistsException):
-        One(BRESTADM_SESSION).image.chmod(999999)
+        one.image.chmod(999999)
+
 
 
 def test_change_image_rights(prepare_datablock_with_000_rights):
     one      = One(BRESTADM_SESSION)
-    image_id = prepare_datablock_with_000_rights
-    
+    image    = prepare_datablock_with_000_rights
+    image_id = image._id
     
     one.image.chmod(image_id, user_use=1)
     assert image_rights(image_id) == ((True, False, False), 

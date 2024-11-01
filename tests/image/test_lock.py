@@ -2,13 +2,12 @@ import pytest
 
 from api                import One
 from pyone              import OneServer, OneNoExistsException, OneActionException
-from utils              import get_brestadm_auth
-from commands.image     import delete_image, create_image_by_tempalte, unlock_image, get_image_lock_status, lock_image
+from utils              import get_user_auth
+from one_cli.image      import Image, create_image_by_tempalte
+from config             import API_URI, BRESTADM
 
-from config             import API_URI
 
-
-BRESTADM_AUTH       = get_brestadm_auth()
+BRESTADM_AUTH       = get_user_auth(BRESTADM)
 BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
 
 
@@ -17,17 +16,22 @@ BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
 
 @pytest.fixture
 def prepare_image():
-    image_template  = """
+    image_template = """
         NAME = api_test_image
         TYPE = DATABLOCK
         SIZE = 10
     """
     image_id = create_image_by_tempalte(1, image_template, True)
+    image    = Image(image_id)
     
-    yield image_id
+    yield image
 
-    unlock_image(image_id)
-    delete_image(image_id)
+    try:
+        image.unlock()
+    except Exception as _:
+        pass
+
+    image.delete()
     
 
 # =================================================================================================
@@ -42,71 +46,69 @@ def test_image_not_exist():
         one.image.lock(999999, lock_level=4)
 
 
+
 def test_lock_image_use(prepare_image):
     one         = One(BRESTADM_SESSION)
-    image_id    = prepare_image
-    assert get_image_lock_status(image_id) == "None"
-    one.image.lock(image_id, lock_level=1)
-    assert get_image_lock_status(image_id) == "Use"
+    image       = prepare_image
+    lock_level  = 1
+
+    assert image.info().LOCK == None
+    one.image.lock(image._id, lock_level)
+    assert image.info().LOCK.LOCKED == lock_level
 
 
 def test_lock_image_manage(prepare_image):
     one         = One(BRESTADM_SESSION)
-    image_id    = prepare_image
-    assert get_image_lock_status(image_id) == "None"
-    one.image.lock(image_id, lock_level=2)
-    assert get_image_lock_status(image_id) == "Manage"
+    image       = prepare_image
+    lock_level  = 2
+
+    assert image.info().LOCK == None
+    one.image.lock(image._id, lock_level)
+    assert image.info().LOCK.LOCKED == lock_level
 
 
 def test_lock_image_admin(prepare_image):
     one         = One(BRESTADM_SESSION)
-    image_id    = prepare_image
-    assert get_image_lock_status(image_id) == "None"
-    one.image.lock(image_id, lock_level=3)
-    assert get_image_lock_status(image_id) == "Admin"
+    image       = prepare_image
+    lock_level  = 3
+
+    assert image.info().LOCK == None
+    one.image.lock(image._id, lock_level)
+    assert image.info().LOCK.LOCKED == lock_level
 
 
 def test_full_lock_image(prepare_image):
     one         = One(BRESTADM_SESSION)
-    image_id    = prepare_image
-    assert get_image_lock_status(image_id) == "None"
-    one.image.lock(image_id, lock_level=4)
-    assert get_image_lock_status(image_id) == "All"
+    image       = prepare_image
+    lock_level  = 4
+
+    assert image.info().LOCK == None
+    one.image.lock(image._id, lock_level)
+    assert image.info().LOCK.LOCKED == lock_level
 
 
-def test_new_lock_level_image(prepare_image):
-    one         = One(BRESTADM_SESSION)
-    image_id    = prepare_image
-    assert get_image_lock_status(image_id) == "None"
-    one.image.lock(image_id, lock_level=1, check_already_locked=False)
-    assert get_image_lock_status(image_id) == "Use"
-    one.image.lock(image_id, lock_level=2, check_already_locked=False)
-    assert get_image_lock_status(image_id) == "Manage"
-    one.image.lock(image_id, lock_level=3, check_already_locked=False)
-    assert get_image_lock_status(image_id) == "Admin"
-    one.image.lock(image_id, lock_level=4, check_already_locked=False)
-    assert get_image_lock_status(image_id) == "All"
+def test_reset_lock_level_image(prepare_image):
+    one   = One(BRESTADM_SESSION)
+    image = prepare_image
+
+    assert image.info().LOCK == None
+
+    for lock_level in [1, 2, 3, 4]:
+        one.image.lock(image._id, lock_level=lock_level, check_already_locked=False)
+        assert image.info().LOCK.LOCKED == lock_level
+
 
 
 def test_check_if_image_locked(prepare_image):
-    one         = One(BRESTADM_SESSION)
-    image_id    = prepare_image
-    lock_image(image_id, lock_level=4)
-    assert get_image_lock_status(image_id) == "All"
+    one   = One(BRESTADM_SESSION)
+    image = prepare_image
 
-    with pytest.raises(OneActionException):
-        one.image.lock(image_id, lock_level=1, check_already_locked=True)
-    assert get_image_lock_status(image_id) == "All"
+    image.lock(lock_level=4)
+    assert image.info().LOCK.LOCKED == 4
 
-    with pytest.raises(OneActionException):
-        one.image.lock(image_id, lock_level=2, check_already_locked=True)
-    assert get_image_lock_status(image_id) == "All"
-
-    with pytest.raises(OneActionException):
-        one.image.lock(image_id, lock_level=3, check_already_locked=True)
-    assert get_image_lock_status(image_id) == "All"
-
-    with pytest.raises(OneActionException):
-        one.image.lock(image_id, lock_level=4, check_already_locked=True)
-    assert get_image_lock_status(image_id) == "All"
+    for lock_level in [1, 2, 3, 4]:
+        with pytest.raises(OneActionException):
+            one.image.lock(image._id, lock_level=lock_level, check_already_locked=True)
+        assert image.info().LOCK.LOCKED == 4
+    
 

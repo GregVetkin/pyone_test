@@ -27,7 +27,7 @@ def create_ds_by_tempalte(ds_template: str) -> int:
 
 class Datastore:
     def __init__(self, ds_id: int) -> None:
-        self._ds_id = ds_id
+        self._id = ds_id
     
     def delete(self) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"onedatastore delete {self._ds_id}")
+        run_command(COMMAND_EXECUTOR + " " + f"onedatastore delete {self._id}")

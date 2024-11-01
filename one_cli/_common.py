@@ -14,3 +14,13 @@ class Permissions:
     OWNER:  UnitPermissions
     GROUP:  UnitPermissions
     OTHER:  UnitPermissions
+
+
+
+@dataclass
+class LockStatus:
+    LOCKED:     int
+    OWNER:      int
+    TIME:       int
+    REQ_ID:     int
+

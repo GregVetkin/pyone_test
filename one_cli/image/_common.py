@@ -1,8 +1,8 @@
 import xml.etree.ElementTree as xmlTree
 
 from dataclasses        import dataclass, field
-from typing             import List, Dict
-from one_cli._common    import UnitPermissions, Permissions
+from typing             import List, Dict, Optional
+from one_cli._common    import UnitPermissions, Permissions, LockStatus
 
 
 
@@ -31,6 +31,8 @@ class SnapshotInfo:
     CHILDREN:   List[int] = field(default_factory=list)
 
 
+
+
 @dataclass
 class ImageInfo:
     ID:                 int
@@ -57,9 +59,10 @@ class ImageInfo:
     TARGET_SNAPSHOT:    int
     DATASTORE_ID:       int
     DATASTORE:          str
-    VMS:                List[int]           = field(default_factory=list)
-    SNAPSHOTS:          List[SnapshotInfo]  = field(default_factory=list)
-    TEMPLATE:           Dict[str, str]      = field(default_factory=dict)
+    VMS:                List[int]            = field(default_factory=list)
+    SNAPSHOTS:          List[SnapshotInfo]   = field(default_factory=list)
+    TEMPLATE:           Dict[str, str]       = field(default_factory=dict)
+    LOCK:               Optional[LockStatus] = None
 
 
 
@@ -103,6 +106,16 @@ def parse_image_info_from_xml(raw_image_xml: str) -> ImageInfo:
             OTHER=  other_permissions,
         )
     
+    lock = None
+    if image_xml.find('LOCK'):
+        lock = LockStatus(
+            LOCKED=     int(image_xml.find('LOCK/LOCKED').text),
+            OWNER=      int(image_xml.find('LOCK/OWNER').text),
+            TIME=       int(image_xml.find('LOCK/TIME').text),
+            REQ_ID=     int(image_xml.find('LOCK/REQ_ID').text)
+        )
+
+
     image_info = ImageInfo(
             ID=                 int(image_xml.find('ID').text),
             UID=                int(image_xml.find('UID').text),
@@ -131,6 +144,7 @@ def parse_image_info_from_xml(raw_image_xml: str) -> ImageInfo:
             TEMPLATE=           {attribulte.tag: attribulte.text or "" for attribulte in image_xml.find('TEMPLATE')},
             VMS=                [int(vm_id.text) for vm_id in image_xml.find('VMS').findall('ID')],
             SNAPSHOTS=          snapshots,
+            LOCK=               lock,
         )
     
     return image_info

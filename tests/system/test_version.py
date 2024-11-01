@@ -1,12 +1,12 @@
 from api        import One
 from pyone      import OneServer
-from utils      import get_brestadm_auth
+from utils      import get_user_auth
+from config     import API_URI, BRESTADM
 
-from config     import API_URI
 
+BRESTADM_AUTH     = get_user_auth(BRESTADM)
+BRESTADM_SESSION  = OneServer(API_URI, BRESTADM_AUTH)
 
-BRESTADM_AUTH       = get_brestadm_auth()
-BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
 
 
 def test_get_version_by_brestadm():

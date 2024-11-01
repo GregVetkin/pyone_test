@@ -2,13 +2,12 @@ import pytest
 
 from api                import One
 from pyone              import OneServer, OneNoExistsException
-from utils              import get_brestadm_auth
-from commands.image     import delete_image, create_image_by_tempalte
+from utils              import get_user_auth
+from one_cli.image      import Image, create_image_by_tempalte
+from config             import API_URI, BRESTADM
 
-from config             import API_URI
 
-
-BRESTADM_AUTH       = get_brestadm_auth()
+BRESTADM_AUTH       = get_user_auth(BRESTADM)
 BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
 
 
@@ -23,10 +22,11 @@ def prepare_image():
         SIZE = 10
     """
     image_id = create_image_by_tempalte(1, image_template, True)
+    image    = Image(image_id)
     
-    yield image_id
+    yield image
 
-    delete_image(image_id)
+    image.delete()
     
 
 # =================================================================================================
@@ -48,7 +48,8 @@ def test_image_info(prepare_image):
     -   What should be decrypted here?
     """
     one         = One(BRESTADM_SESSION)
-    image_id    = prepare_image
-    image_info  = one.image.info(image_id)
-    assert image_id == image_info.ID
+    image       = prepare_image
+    image_info  = one.image.info(image._id)
+    
+    assert image._id == image_info.ID
 
