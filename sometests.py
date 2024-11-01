@@ -13,14 +13,12 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 from one_cli.image import Image
 
-img = Image(259)
-snaps = img.info().SNAPSHOTS
-print(snaps)
 
-# image_id = 259
 
-# result = One(client).image.snapshotrevert(image_id, 2)
-# print(result)
+image_id = 259
+
+result = One(client).image.snapshotflatten(image_id, 2)
+print(result)
 
 
 
