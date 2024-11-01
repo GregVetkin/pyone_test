@@ -1,15 +1,15 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneActionException, OneNoExistsException
+from pyone              import OneServer, OneActionException, OneNoExistsException, OneAuthorizationException
 from utils              import get_user_auth
 from one_cli.vm         import create_vm_by_tempalte, VirtualMachine
 from one_cli.image      import create_image_by_tempalte, Image, image_exist
 from config             import API_URI, BRESTADM
 
 
-BRESTADM_AUTH       = get_user_auth(BRESTADM)
-BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
+BRESTADM_AUTH    = get_user_auth(BRESTADM)
+BRESTADM_SESSION = OneServer(API_URI, BRESTADM_AUTH)
 
 
 
@@ -28,9 +28,13 @@ def prepare_image():
     yield image
 
     try:
-        image.delete()
+        image.unlock()
     except Exception as _:
         pass
+
+    if image_exist(image._id):
+        image.delete()
+
 
 
 
@@ -63,19 +67,20 @@ def prepare_image_used_by_vm():
     image.delete()
 
 
+
 # =================================================================================================
 # TESTS
 # =================================================================================================
-
 
 
 def test_image_not_exist():
     one  = One(BRESTADM_SESSION)
     with pytest.raises(OneNoExistsException):
         one.image.delete(999999)
-    
 
-def test_unused_image_deleted(prepare_image):
+
+
+def test_image_delete(prepare_image):
     one   = One(BRESTADM_SESSION)
     image = prepare_image
 
@@ -89,5 +94,20 @@ def test_used_image_delete(prepare_image_used_by_vm):
 
     with pytest.raises(OneActionException):
         one.image.delete(image._id)
+
+    assert image_exist(image._id) == True
+
+
+
+@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
+@pytest.mark.parametrize("lock_level", [1, 2, 3, 4])
+def test_delete_locked_image(prepare_image, lock_level):
+    one   = One(BRESTADM_SESSION)
+    image = prepare_image
+    image.lock(lock_level)
+
+    with pytest.raises(OneAuthorizationException):
+        one.image.delete(image._id)
+
     assert image_exist(image._id) == True
 

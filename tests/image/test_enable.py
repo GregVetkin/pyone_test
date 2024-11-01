@@ -73,6 +73,7 @@ def test_image_not_exist():
     one = One(BRESTADM_SESSION)
     with pytest.raises(OneNoExistsException):
         one.image.enable(999999)
+    with pytest.raises(OneNoExistsException):
         one.image.disable(999999)
 
 
@@ -80,10 +81,13 @@ def test_image_not_exist():
 def test_enable_and_disable_used_image(prepare_image_used_by_vm):
     one    = One(BRESTADM_SESSION)
     image  = prepare_image_used_by_vm
-
     assert image.info().STATE == 2
+
     with pytest.raises(OneInternalException):
         one.image.disable(image._id)
+    assert image.info().STATE == 2
+
+    with pytest.raises(OneInternalException):
         one.image.enable(image._id)
     assert image.info().STATE == 2
 

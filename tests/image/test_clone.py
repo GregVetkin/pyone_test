@@ -74,8 +74,11 @@ def test_name_is_taken(prepare_image_datablock):
     one         = One(BRESTADM_SESSION)
     image       = prepare_image_datablock
     image_info  = image.info()
+    brestadm_id = get_user_id_by_name("brestadm")
+    
+    if image.info().UID != brestadm_id:
+        image.chown(brestadm_id)
 
-    image.chown(get_user_id_by_name("brestadm"))
     with pytest.raises(OneException):
         one.image.clone(image._id, image_info.NAME)
 

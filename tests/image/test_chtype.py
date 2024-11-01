@@ -20,7 +20,6 @@ FILE_TYPES          = {3: "KERNEL",
 
 
 
-
 @pytest.fixture
 def prepare_image_for_image_ds():
     image_name      = "api_test_image"
@@ -70,51 +69,46 @@ def test_image_not_exist():
 
 
 
-def test_incompatible_image_type_for_image_datastore(prepare_image_for_image_ds):
+@pytest.mark.parametrize("file_type_id", list(FILE_TYPES.keys()))
+def test_incompatible_image_type_for_image_datastore(prepare_image_for_image_ds, file_type_id):
     one        = One(BRESTADM_SESSION)
     image      = prepare_image_for_image_ds
     image_info = image.info()
     image_type = image_info.TYPE
 
-
-    for type_id in FILE_TYPES:
-        with pytest.raises(OneActionException):
-            one.image.chtype(image._id, FILE_TYPES[type_id])
-
-        assert image.info().TYPE == image_type
+    with pytest.raises(OneActionException):
+        one.image.chtype(image._id, FILE_TYPES[file_type_id])
+    assert image.info().TYPE == image_type
 
 
 
-def test_incompatible_file_type_for_file_datastore(prepare_image_for_file_ds):
+@pytest.mark.parametrize("image_type_id", list(IMAGE_TYPES.keys()))
+def test_incompatible_file_type_for_file_datastore(prepare_image_for_file_ds, image_type_id):
     one        = One(BRESTADM_SESSION)
     image      = prepare_image_for_file_ds
     image_info = image.info()
     image_type = image_info.TYPE
 
-    for type_id in IMAGE_TYPES:
-        with pytest.raises(OneActionException):
-            one.image.chtype(image._id, IMAGE_TYPES[type_id])
-
-        assert image.info().TYPE == image_type
+    with pytest.raises(OneActionException):
+        one.image.chtype(image._id, IMAGE_TYPES[image_type_id])
+    assert image.info().TYPE == image_type
 
 
 
-def test_available_image_types(prepare_image_for_image_ds):
+@pytest.mark.parametrize("image_type_id", list(IMAGE_TYPES.keys()))
+def test_available_image_types(prepare_image_for_image_ds, image_type_id):
     one   = One(BRESTADM_SESSION)
     image = prepare_image_for_image_ds
-
-    for type_id in IMAGE_TYPES:
-        one.image.chtype(image._id, IMAGE_TYPES[type_id])
-        assert image.info().TYPE == type_id
+    one.image.chtype(image._id, IMAGE_TYPES[image_type_id])
+    assert image.info().TYPE == image_type_id
 
 
 
-def test_available_file_types(prepare_image_for_file_ds):
+@pytest.mark.parametrize("file_type_id", list(FILE_TYPES.keys()))
+def test_available_file_types(prepare_image_for_file_ds, file_type_id):
     one   = One(BRESTADM_SESSION)
     image = prepare_image_for_file_ds
-
-    for type_id in FILE_TYPES:
-        one.image.chtype(image._id, FILE_TYPES[type_id])
-        assert image.info().TYPE == type_id
+    one.image.chtype(image._id, FILE_TYPES[file_type_id])
+    assert image.info().TYPE == file_type_id
 
 
