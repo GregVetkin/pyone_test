@@ -15,6 +15,6 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 # vm = VirtualMachine(95)
 # vm.backup(backup_name="api_backup")
-result = client.image.restore(880, 1)
+result = One(client).image.restore(914, 1)
 
 print(result)

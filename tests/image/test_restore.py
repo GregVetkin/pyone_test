@@ -6,12 +6,12 @@ from pyone              import OneServer, OneNoExistsException, OneActionExcepti
 from utils              import get_user_auth
 from one_cli.image      import Image, create_image_by_tempalte, image_exist
 from one_cli.vm         import VirtualMachine, create_vm_by_tempalte, vm_exist
-
 from config             import API_URI, BRESTADM
 
 
 BRESTADM_AUTH       = get_user_auth(BRESTADM)
 BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
+
 
 
 @pytest.fixture
@@ -98,6 +98,9 @@ def test_datastore_not_exist(prepare_backup_image):
     backup = prepare_backup_image
     with pytest.raises(OneNoExistsException):
         one.image.restore(backup._id, 999999)
+    time.sleep(10)
+    assert not image_exist(backup._id + 1)
+    assert not vm_exist(int(backup.info().TEMPLATE["ONEVMID"]))
 
 
 
