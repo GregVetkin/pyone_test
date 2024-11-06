@@ -1,6 +1,6 @@
 import pyone
 from api import One
-
+from one_cli.vm import VirtualMachine
 
 
 auth_url    = "http://bufn1.brest.local:2633/RPC2"
@@ -12,11 +12,9 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
-result = client.imagepool.info(-2, 259, 575).IMAGE
 
+# vm = VirtualMachine(95)
+# vm.backup(backup_name="api_backup")
+result = client.image.restore(880, 1)
 
-
-for _ in result:
-    print(_.ID)
-
-
+print(result)

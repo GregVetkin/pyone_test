@@ -1,4 +1,4 @@
-from one_cli.vm._vm   import VirtualMachine, create_vm_by_tempalte, wait_vm_offline
+from one_cli.vm._vm   import VirtualMachine, create_vm_by_tempalte, wait_vm_offline, vm_exist
 
 
 
@@ -6,5 +6,6 @@ from one_cli.vm._vm   import VirtualMachine, create_vm_by_tempalte, wait_vm_offl
 __all__ = [
     "VirtualMachine",
     "create_vm_by_tempalte",
-    "wait_vm_offline"
+    "wait_vm_offline",
+    "vm_exist",
 ]
