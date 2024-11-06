@@ -99,7 +99,7 @@ def test_used_image_delete(prepare_image_used_by_vm):
 
 
 
-@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
+#@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
 @pytest.mark.parametrize("lock_level", [1, 2, 3, 4])
 def test_delete_locked_image(prepare_image, lock_level):
     one   = One(BRESTADM_SESSION)

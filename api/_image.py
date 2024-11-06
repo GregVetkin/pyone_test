@@ -82,8 +82,8 @@ class OneImage:
         return self._one_image.snapshotflatten(image_id, snapshot_id)
 
 
-    def restore(self, image_id: int, datastore_id: int) -> int:
-        return self._one_image.restore(image_id, datastore_id)
+    def restore(self, image_id: int, datastore_id: int, vm_name: str = "") -> int:
+        return self._one_image.restore(image_id, datastore_id, vm_name)
 
 
     def update(self, image_id: int, template: str, replace: bool = False) -> int:

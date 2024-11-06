@@ -122,8 +122,7 @@ def test_restore_backup_image(prepare_backup_image):
 
     one.image.restore(backup._id, 1)
 
-    while not vm_exist(restored_vm_id):
-        time.sleep(5)
+    time.sleep(30)
     
     assert image_exist(restored_image_id)
     assert vm_exist(restored_vm_id)
