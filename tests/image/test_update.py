@@ -53,11 +53,11 @@ def test_image_not_exist():
 
 
 
-@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
+#@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
 @pytest.mark.parametrize("lock_level", [1, 2, 3, 4])
-def test_update_locked_image(prepare_image, lock_level):
+def test_update_locked_image(prepare_image_with_attr, lock_level):
     one   = One(BRESTADM_SESSION)
-    image = prepare_image
+    image = prepare_image_with_attr
 
     image.lock(lock_level)
     image_lock_level = image.info().LOCK.LOCKED
