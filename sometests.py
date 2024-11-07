@@ -18,6 +18,6 @@ TM_MAD = ssh
 """
 
 
-result = One(client).datastore.allocate("", 9999)
+result = One(client).datastore.delete(1)
 
 print(result)
