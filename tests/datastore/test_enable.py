@@ -25,7 +25,7 @@ def system_datastore():
 @pytest.fixture
 def image_datastore():
     datastore_template = """
-        NAME   = api_test_system_ds
+        NAME   = api_test_image_ds
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -39,7 +39,7 @@ def image_datastore():
 @pytest.fixture
 def file_datastore():
     datastore_template = """
-        NAME   = api_test_system_ds
+        NAME   = api_test_file_ds
         TYPE   = FILE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -72,7 +72,6 @@ def test_enable_disable_file_datastore(one: One, file_datastore: Datastore):
     with pytest.raises(OneInternalException):
         one.datastore.enable(file_datastore._id)
     assert file_datastore.info().STATE == 0
-
 
 
 
