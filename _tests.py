@@ -100,9 +100,46 @@ TESTS["one"]["image"]["restore"]            = TestData(
                                                         xml_rpc_method  =   "one.image.restore",
                                                         test_file_path  =   f"{PROJECT_DIR}/tests/image/test_restore.py"
 )
+
 # =======================================================================================================================
-
-
-
-
-
+# one.datastorepool
+TESTS["one"]["datastorepool"] = {}
+TESTS["one"]["datastorepool"]["info"]       = TestData(
+                                                        xml_rpc_method  =   "one.datastorepool.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastorepool/test_info.py"
+)
+# =======================================================================================================================
+# one.datastore
+TESTS["one"]["datastore"] = {}
+TESTS["one"]["datastore"]["allocate"]       = TestData(
+                                                        xml_rpc_method  =   "one.datastore.allocate",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_allocate.py"
+)
+TESTS["one"]["datastore"]["delete"]         = TestData(
+                                                        xml_rpc_method  =   "one.datastore.delete",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_delete.py"
+)
+TESTS["one"]["datastore"]["info"]           = TestData(
+                                                        xml_rpc_method  =   "one.datastore.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_info.py"
+)
+TESTS["one"]["datastore"]["update"]         = TestData(
+                                                        xml_rpc_method  =   "one.datastore.update",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_update.py"
+)
+TESTS["one"]["datastore"]["rename"]         = TestData(
+                                                        xml_rpc_method  =   "one.datastore.rename",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_rename.py"
+)
+TESTS["one"]["datastore"]["chown"]          = TestData(
+                                                        xml_rpc_method  =   "one.datastore.chown",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_chown.py"
+)
+TESTS["one"]["datastore"]["chmod"]          = TestData(
+                                                        xml_rpc_method  =   "one.datastore.chmod",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_chmod.py"
+)
+TESTS["one"]["datastore"]["enable"]         = TestData(
+                                                        xml_rpc_method  =   "one.datastore.enable",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_enable.py"
+)
