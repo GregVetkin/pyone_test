@@ -1,31 +1,25 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneNoExistsException
+from pyone              import OneNoExistsException
 from utils              import get_user_auth
-from one_cli.image      import Image, create_image_by_tempalte
-from config             import API_URI, BRESTADM
+from one_cli.image      import Image
+from config             import BRESTADM
 
 
 BRESTADM_AUTH     = get_user_auth(BRESTADM)
-BRESTADM_SESSION  = OneServer(API_URI, BRESTADM_AUTH)
+STORAGE_IMAGE_TEMPLATE = """
+NAME   = test_api_img_storage
+TYPE   = IMAGE_DS
+TM_MAD = ssh
+DS_MAD = fs
+"""
+DATABLOCK_IMAGE_TEMPLATE = """
+NAME = test_api_datablock
+TYPE = DATABLOCK
+SIZE = 1
+"""
 
-
-
-
-@pytest.fixture
-def prepare_datablock_with_000_rights():
-    image_template = """
-        NAME = test_api_image
-        TYPE = DATABLOCK
-        SIZE = 10
-    """
-    image_id = create_image_by_tempalte(1, image_template)
-    image    = Image(image_id)
-
-    image.chmod("000")
-    yield image
-    image.delete()
 
 
 def image_rights(image_id: int):
@@ -42,17 +36,18 @@ def image_rights(image_id: int):
 # =================================================================================================
 
 
-
-def test_image_not_exist():
-    one  = One(BRESTADM_SESSION)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
+def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.chmod(999999)
 
 
 
-def test_change_image_rights(prepare_datablock_with_000_rights):
-    one      = One(BRESTADM_SESSION)
-    image    = prepare_datablock_with_000_rights
+@pytest.mark.parametrize("datastore", [STORAGE_IMAGE_TEMPLATE,], indirect=True)
+@pytest.mark.parametrize("image", [DATABLOCK_IMAGE_TEMPLATE,], indirect=True)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
+def test_change_image_rights(one: One, image: Image):
+    image.chmod("000")
     image_id = image._id
     
     one.image.chmod(image_id, user_use=1)

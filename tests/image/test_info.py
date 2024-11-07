@@ -1,50 +1,40 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneNoExistsException
+from one_cli.image      import Image
+from pyone              import OneNoExistsException
 from utils              import get_user_auth
-from one_cli.image      import Image, create_image_by_tempalte
-from config             import API_URI, BRESTADM
+from config             import BRESTADM
 
 
-BRESTADM_AUTH       = get_user_auth(BRESTADM)
-BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
+BRESTADM_AUTH    = get_user_auth(BRESTADM)
+STORAGE_IMAGE_TEMPLATE = """
+NAME   = test_api_storage
+TYPE   = IMAGE_DS
+TM_MAD = ssh
+DS_MAD = fs
+"""
+IMAGE_DATABLOCK_TEMPLATE = """
+NAME = test_api_image
+TYPE = DATABLOCK
+SIZE = 1
+"""
 
 
 
 
 
-@pytest.fixture
-def prepare_image():
-    image_template  = """
-        NAME = api_test_image
-        TYPE = DATABLOCK
-        SIZE = 10
-    """
-    image_id = create_image_by_tempalte(1, image_template, True)
-    image    = Image(image_id)
-    
-    yield image
-
-    image.delete()
-    
-
-# =================================================================================================
-# TESTS
-# =================================================================================================
-
-
-def test_image_not_exist():
-    one = One(BRESTADM_SESSION)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
+def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.info(999999)
 
 
 
-def test_image_info(prepare_image):
-    one   = One(BRESTADM_SESSION)
-    image = prepare_image
-
+@pytest.mark.parametrize("datastore", [STORAGE_IMAGE_TEMPLATE,], indirect=True)
+@pytest.mark.parametrize("image", [IMAGE_DATABLOCK_TEMPLATE,], indirect=True)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
+def test_image_info(one: One, image: Image):
     api_image_info  = one.image.info(image._id)
     cli_image_info  = image.info()
     
@@ -71,4 +61,4 @@ def test_image_info(prepare_image):
     persistence = {0: False, 1: True}
     assert cli_image_info.PERSISTENT == persistence[api_image_info.PERSISTENT]
 
-    
+

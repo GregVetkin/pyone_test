@@ -1,6 +1,6 @@
 
 
-API_URI             = "http://localhost:2633/RPC2"
-COMMAND_EXECUTOR    = "sudo"
+API_URI             = "http://bufn1.brest.local:2633/RPC2"
+COMMAND_EXECUTOR    = "ssh u@bufn1 sudo"
 BRESTADM            = "brestadm"
 
