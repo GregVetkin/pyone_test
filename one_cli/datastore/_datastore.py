@@ -41,3 +41,13 @@ class Datastore:
 
     def info(self) -> DatastoreInfo:
         return parse_datastore_info_from_xml(run_command(COMMAND_EXECUTOR + " " + f"onedatastore show {self._id} -x"))
+    
+    def update(self, template: str, append: bool = False) -> None:
+        file = "/tmp/test_file"
+        if "ssh" in COMMAND_EXECUTOR:
+            run_command(COMMAND_EXECUTOR + " " + f"\'cat <<EOF > {file}\n{template}\nEOF\'")
+        else:
+            run_command(COMMAND_EXECUTOR + " " + f"cat <<EOF > {file}\n{template}\nEOF")
+        append_flag = "-a" if append else ""
+        run_command(COMMAND_EXECUTOR + " " + f"onedatastore update {self._id} {file} {append_flag}")
+        run_command(COMMAND_EXECUTOR + " " + f"rm -f {file}")

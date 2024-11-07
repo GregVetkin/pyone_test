@@ -48,10 +48,10 @@ def test_cluster_not_exist(one: One):
 
 
 
-@pytest.mark.parametrize("template", [IMAGE_DS_TEMPLATE, FILE_DS_TEMPLATE, SYSTEM_DS_TEMPLATE])
+@pytest.mark.parametrize("valid_template", [IMAGE_DS_TEMPLATE, FILE_DS_TEMPLATE, SYSTEM_DS_TEMPLATE])
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_create_datastore(one: One, template: str):
-    datastore_id  = one.datastore.allocate(template)
+def test_create_datastore(one: One, valid_template: str):
+    datastore_id  = one.datastore.allocate(valid_template)
     datastore     = Datastore(datastore_id)
     assert datastore_exist(datastore_id) == True
     datastore.delete()

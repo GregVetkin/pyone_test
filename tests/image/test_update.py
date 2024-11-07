@@ -79,20 +79,20 @@ def test_update_locked_image(prepare_image_with_attr, lock_level):
 def test_update_image__replace(prepare_image_with_attr):
     one   = One(BRESTADM_SESSION)
     image = prepare_image_with_attr
-    image_old_attribules = image.info().TEMPLATE
+    image_old_attributes = image.info().TEMPLATE
 
     new_attibutes = [f"ATTR_{_}" for _ in range(1, 6)]
     attr_template = "".join(f"{attr} = {_}\n" for _, attr in enumerate(new_attibutes))
 
     one.image.update(image._id, attr_template, replace=True)
 
-    image_new_attribules = image.info().TEMPLATE
+    image_new_attributes = image.info().TEMPLATE
 
-    for old_attr in image_old_attribules:
-        assert old_attr not in image_new_attribules
+    for old_attr in image_old_attributes:
+        assert old_attr not in image_new_attributes
 
-    for new_attr in image_new_attribules:
-        assert new_attr in image_new_attribules
+    for new_attr in image_new_attributes:
+        assert new_attr in image_new_attributes
 
 
 
@@ -101,9 +101,9 @@ def test_update_image__merge(prepare_image_with_attr):
     one   = One(BRESTADM_SESSION)
     image = prepare_image_with_attr
 
-    image_old_attribules = image.info().TEMPLATE
+    image_old_attributes = image.info().TEMPLATE
 
-    attr_to_change = random.choice(list(image_old_attribules.keys()))
+    attr_to_change = random.choice(list(image_old_attributes.keys()))
     attr_to_change_new_value = "new_attr_value"
 
     new_attibutes        = [f"ATTR_{_}" for _ in range(1, 6)]
@@ -112,15 +112,15 @@ def test_update_image__merge(prepare_image_with_attr):
 
     one.image.update(image._id, attr_template, replace=False)
 
-    image_new_attribules = image.info().TEMPLATE
+    image_new_attributes = image.info().TEMPLATE
 
-    for new_attr in image_new_attribules:
-        assert new_attr in image_new_attribules
+    for new_attr in image_new_attributes:
+        assert new_attr in image_new_attributes
 
-    for old_attr in image_old_attribules:
-        assert old_attr in image_new_attribules
+    for old_attr in image_old_attributes:
+        assert old_attr in image_new_attributes
     
-    assert image_new_attribules[attr_to_change] == attr_to_change_new_value
+    assert image_new_attributes[attr_to_change] == attr_to_change_new_value
 
     
 @pytest.mark.parametrize("persistent", [True, False])
@@ -136,27 +136,27 @@ def test_update_image(prepare_image_with_attr, replace, disabled, persistent):
     if persistent:
         image.make_persistent()
 
-    image_old_attribules = image.info().TEMPLATE
+    image_old_attributes = image.info().TEMPLATE
 
     new_attibutes = [f"ATTR_{_}" for _ in range(1, 6)]
     attr_template = "".join(f"{attr} = {_}\n" for _, attr in enumerate(new_attibutes))
 
     if not replace:
-        attr_to_change = random.choice(list(image_old_attribules.keys()))
+        attr_to_change = random.choice(list(image_old_attributes.keys()))
         attr_to_change_new_value = "new_attr_value"
         attr_template += f"{attr_to_change} = {attr_to_change_new_value}\n"
 
     one.image.update(image._id, attr_template, replace=replace)
 
-    image_new_attribules = image.info().TEMPLATE
+    image_new_attributes = image.info().TEMPLATE
 
-    for new_attr in image_new_attribules:
-        assert new_attr in image_new_attribules
+    for new_attr in image_new_attributes:
+        assert new_attr in image_new_attributes
 
     if replace:
-        for old_attr in image_old_attribules:
-            assert old_attr not in image_new_attribules
+        for old_attr in image_old_attributes:
+            assert old_attr not in image_new_attributes
     else:
-        for old_attr in image_old_attribules:
-            assert old_attr in image_new_attribules
-        assert image_new_attribules[attr_to_change] == attr_to_change_new_value
+        for old_attr in image_old_attributes:
+            assert old_attr in image_new_attributes
+        assert image_new_attributes[attr_to_change] == attr_to_change_new_value
