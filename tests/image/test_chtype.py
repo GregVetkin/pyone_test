@@ -1,56 +1,76 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneActionException, OneNoExistsException
+from pyone              import OneActionException, OneNoExistsException
 from utils              import get_user_auth, create_temp_file, delete_temp_file
 from one_cli.image      import Image, create_image_by_tempalte
-from config             import API_URI, BRESTADM
+from one_cli.datastore  import Datastore, create_ds_by_tempalte
+from config             import BRESTADM
 
 
-BRESTADM_AUTH       = get_user_auth(BRESTADM)
-BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
-IMAGE_TYPES         = {0: "OS",
-                       1: "CDROM",
-                       2: "DATABLOCK"}
-FILE_TYPES          = {3: "KERNEL",
-                       4: "RAMDISK",
-                       5: "CONTEXT"}
-
-
+BRESTADM_AUTH = get_user_auth(BRESTADM)
+IMAGE_TYPES   = {0: "OS",
+                 1: "CDROM",
+                 2: "DATABLOCK"}
+FILE_TYPES    = {3: "KERNEL",
+                 4: "RAMDISK",
+                 5: "CONTEXT"}
 
 
 
 @pytest.fixture
-def prepare_image_for_image_ds():
-    image_name      = "api_test_image"
-    image_template  = f"""
-        NAME = {image_name}
-        TYPE = DATABLOCK
-        SIZE = 10
+def image_datastore():
+    datastore_template = """
+        NAME   = api_test_image_ds
+        TYPE   = IMAGE_DS
+        TM_MAD = ssh
+        DS_MAD = fs
     """
-    image_id = create_image_by_tempalte(1, image_template)
+    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore    = Datastore(datastore_id)
+    yield datastore
+    datastore.delete()
+
+
+@pytest.fixture
+def file_datastore():
+    datastore_template = """
+        NAME   = api_test_file_ds
+        TYPE   = FILE_DS
+        TM_MAD = ssh
+        DS_MAD = fs
+    """
+    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore    = Datastore(datastore_id)
+    yield datastore
+    datastore.delete()
+
+
+@pytest.fixture
+def datablock_image(image_datastore: Datastore):
+    template = """
+        NAME = api_test_image
+        TYPE = DATABLOCK
+        SIZE = 1
+    """
+    image_id = create_image_by_tempalte(image_datastore._id, template)
     image    = Image(image_id)
-
     yield image
-
     image.delete()
 
 
-
 @pytest.fixture
-def prepare_image_for_file_ds():
+def context_image(file_datastore: Datastore):
     file_path       = "/var/tmp/test_file"
     image_template  = f"""
         NAME = api_test_file
         TYPE = CONTEXT
         PATH = {file_path}
     """
-    create_temp_file(10, file_path)
-    image_id = create_image_by_tempalte(2, image_template)
+    create_temp_file(1, file_path)
+    image_id = create_image_by_tempalte(file_datastore._id, image_template)
     image    = Image(image_id)
-
     yield image
-
     image.delete()
     delete_temp_file(file_path)
 
@@ -61,54 +81,46 @@ def prepare_image_for_file_ds():
 # =================================================================================================
 
 
-
-def test_image_not_exist():
-    one  = One(BRESTADM_SESSION)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
-        one.image.chtype(999999, "")
+        one.image.chtype(999999, "VetkinType")
 
 
 
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 @pytest.mark.parametrize("file_type_id", list(FILE_TYPES.keys()))
-def test_incompatible_image_type_for_image_datastore(prepare_image_for_image_ds, file_type_id):
-    one        = One(BRESTADM_SESSION)
-    image      = prepare_image_for_image_ds
-    image_info = image.info()
-    image_type = image_info.TYPE
-
+def test_incompatible_image_type_for_image_datastore(one: One, datablock_image: Image, file_type_id):
+    image_old_type = datablock_image.info().TYPE
     with pytest.raises(OneActionException):
-        one.image.chtype(image._id, FILE_TYPES[file_type_id])
-    assert image.info().TYPE == image_type
+        one.image.chtype(datablock_image._id, FILE_TYPES[file_type_id])
+    image_new_type = datablock_image.info().TYPE
+    assert image_old_type == image_new_type
 
 
 
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 @pytest.mark.parametrize("image_type_id", list(IMAGE_TYPES.keys()))
-def test_incompatible_file_type_for_file_datastore(prepare_image_for_file_ds, image_type_id):
-    one        = One(BRESTADM_SESSION)
-    image      = prepare_image_for_file_ds
-    image_info = image.info()
-    image_type = image_info.TYPE
-
+def test_incompatible_file_type_for_file_datastore(one: One, context_image: Image, image_type_id):
+    image_old_type = context_image.info().TYPE
     with pytest.raises(OneActionException):
-        one.image.chtype(image._id, IMAGE_TYPES[image_type_id])
-    assert image.info().TYPE == image_type
+        one.image.chtype(context_image._id, IMAGE_TYPES[image_type_id])
+    image_new_type = context_image.info().TYPE
+    assert image_old_type == image_new_type
 
 
 
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 @pytest.mark.parametrize("image_type_id", list(IMAGE_TYPES.keys()))
-def test_available_image_types(prepare_image_for_image_ds, image_type_id):
-    one   = One(BRESTADM_SESSION)
-    image = prepare_image_for_image_ds
-    one.image.chtype(image._id, IMAGE_TYPES[image_type_id])
-    assert image.info().TYPE == image_type_id
+def test_available_image_types(one: One, datablock_image: Image, image_type_id):
+    one.image.chtype(datablock_image._id, IMAGE_TYPES[image_type_id])
+    assert datablock_image.info().TYPE == image_type_id
 
 
 
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 @pytest.mark.parametrize("file_type_id", list(FILE_TYPES.keys()))
-def test_available_file_types(prepare_image_for_file_ds, file_type_id):
-    one   = One(BRESTADM_SESSION)
-    image = prepare_image_for_file_ds
-    one.image.chtype(image._id, FILE_TYPES[file_type_id])
-    assert image.info().TYPE == file_type_id
-
+def test_available_file_types(one: One, context_image: Image, file_type_id):
+    one.image.chtype(context_image._id, FILE_TYPES[file_type_id])
+    assert context_image.info().TYPE == file_type_id
 

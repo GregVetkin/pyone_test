@@ -1,33 +1,43 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneNoExistsException
+from pyone              import OneNoExistsException
 from utils              import get_user_auth
 from one_cli.image      import Image, create_image_by_tempalte
+from one_cli.datastore  import Datastore, create_ds_by_tempalte
 from one_cli.user       import User, create_user
 from one_cli.group      import Group, create_group
-from config             import API_URI, BRESTADM
+from config             import BRESTADM
 
 
-BRESTADM_AUTH     = get_user_auth(BRESTADM)
-BRESTADM_SESSION  = OneServer(API_URI, BRESTADM_AUTH)
-
-
-
+BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture
-def image():
+def datastore():
+    datastore_template = """
+        NAME   = api_test_image_ds
+        TYPE   = IMAGE_DS
+        TM_MAD = ssh
+        DS_MAD = fs
+    """
+    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore    = Datastore(datastore_id)
+    yield datastore
+    datastore.delete()
+
+
+@pytest.fixture
+def image(datastore: Datastore):
     template = """
         NAME = api_test_image
         TYPE = DATABLOCK
-        SIZE = 10
+        SIZE = 1
     """
-    image_id = create_image_by_tempalte(1, template)
+    image_id = create_image_by_tempalte(datastore._id, template)
     image    = Image(image_id)
     yield image
     image.delete()
-    
     
 
 @pytest.fixture
@@ -36,7 +46,6 @@ def user():
     user    = User(user_id)
     yield user
     user.delete()
-
 
 
 @pytest.fixture
@@ -54,44 +63,37 @@ def group():
 
 
 
-
-def test_image_not_exist():
-    one  = One(BRESTADM_SESSION)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.chown(999999)
 
 
 
-def test_user_not_exist(image: Image):
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_user_not_exist(one: One, image: Image):
     image_old_info  = image.info()
-    one             = One(BRESTADM_SESSION)
-
     with pytest.raises(OneNoExistsException):
         one.image.chown(image._id, user_id=999999)
-
     image_new_info  = image.info()
 
-    assert image_old_info.UNAME == image_new_info.UNAME
+    assert image_old_info.UID == image_new_info.UID
 
 
 
-def test_group_not_exist(image: Image):
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_group_not_exist(one: One, image: Image):
     image_old_info  = image.info()
-    one             = One(BRESTADM_SESSION)
-
     with pytest.raises(OneNoExistsException):
         one.image.chown(image._id, group_id=999999)
-
     image_new_info  = image.info()
 
-    assert image_old_info.GNAME == image_new_info.GNAME
+    assert image_old_info.GID == image_new_info.GID
 
 
 
-def test_image_user_and_group_change(image: Image, user: User, group: Group):
-
-    one = One(BRESTADM_SESSION)
-
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_user_and_group_change(one: One, image: Image, user: User, group: Group):
     one.image.chown(image._id, user._id, group._id)
     image_new_info = image.info()
 
@@ -100,37 +102,34 @@ def test_image_user_and_group_change(image: Image, user: User, group: Group):
 
 
 
-def test_image_user_and_group_not_changed(image: Image):
-    image_old_info  = image.info()
-    one             = One(BRESTADM_SESSION)
-
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_user_and_group_not_changed(one: One, image: Image):
+    image_old_info = image.info()
     one.image.chown(image._id)
-    image_new_info  = image.info()
+    image_new_info = image.info()
     
-    assert image_old_info.UNAME == image_new_info.UNAME
-    assert image_old_info.GNAME == image_new_info.GNAME
+    assert image_old_info.UID == image_new_info.UID
+    assert image_old_info.GID == image_new_info.GID
 
 
 
-def test_image_user_change(image: Image, user: User):
-    image_old_info      = image.info()
-    one                 = One(BRESTADM_SESSION)
-
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_user_change(one: One, image: Image, user: User):
+    image_old_info = image.info()
     one.image.chown(image._id, user_id=user._id)
-    image_new_info  = image.info()
+    image_new_info = image.info()
 
-    assert image_new_info.UID   == user._id
+    assert image_new_info.UID == user._id
     assert image_new_info.GID == image_old_info.GID
 
 
 
-def test_image_group_change(image: Image, group: Group):
-    image_old_info          = image.info()
-    one                     = One(BRESTADM_SESSION)
-
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_group_change(one: One, image: Image, group: Group):
+    image_old_info = image.info()
     one.image.chown(image._id, group_id=group._id)
-    image_new_info  = image.info()
+    image_new_info = image.info()
 
     assert image_new_info.UID == image_old_info.UID
-    assert image_new_info.GID   == group._id
+    assert image_new_info.GID == group._id
 
