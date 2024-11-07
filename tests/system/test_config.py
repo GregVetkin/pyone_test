@@ -1,18 +1,15 @@
+import pytest
+
 from api        import One
-from pyone      import OneServer
 from utils      import get_user_auth
+from config     import BRESTADM
 
-from config     import API_URI, BRESTADM
-
-
-
-BRESTADM_AUTH     = get_user_auth(BRESTADM)
-BRESTADM_SESSION  = OneServer(API_URI, BRESTADM_AUTH)
+BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 
 
-def test_get_config_by_brestadm():
-    one     = One(BRESTADM_SESSION)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_get_config(one: One):
     config  = one.system.config()
     assert config.has__content() == True

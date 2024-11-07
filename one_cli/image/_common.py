@@ -7,18 +7,18 @@ from one_cli._common    import UnitPermissions, Permissions, LockStatus
 
 
 
-@dataclass
-class UnitPermissions:
-    USE:    bool
-    MANAGE: bool
-    ADMIN:  bool
+# @dataclass
+# class UnitPermissions:
+#     USE:    bool
+#     MANAGE: bool
+#     ADMIN:  bool
 
 
-@dataclass
-class Permissions:
-    OWNER:  UnitPermissions
-    GROUP:  UnitPermissions
-    OTHER:  UnitPermissions
+# @dataclass
+# class Permissions:
+#     OWNER:  UnitPermissions
+#     GROUP:  UnitPermissions
+#     OTHER:  UnitPermissions
 
 
 @dataclass

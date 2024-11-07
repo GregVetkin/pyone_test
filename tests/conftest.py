@@ -1,28 +1,23 @@
 import pytest
 
-
-# def pytest_terminal_summary(terminalreporter, exitstatus, config):
-#     if exitstatus == 0:
-#         terminalreporter.write_sep("=", "!!!!PASSED")
-#     else:
-#         terminalreporter.write_sep("=", "FAILED")
+from pyone      import OneServer
+from api        import One
+from config     import API_URI
 
 
 
-# @pytest.hookimpl(tryfirst=True)
-# def pytest_sessionfinish(session, exitstatus):
-#     if exitstatus == 0:
-#         print("PASS :0")
-#     else:
-#         print("FAIL >:(")
+
+
+
+@pytest.fixture
+def one(request):
+    user_auth = request.param
+    server    = OneServer(API_URI, user_auth)
+    one       = One(server)
     
+    yield one
 
-
-# @pytest.hookimpl(tryfirst=True)
-# def pytest_runtest_makereport(item, call):
-#     if call.when == "call":
-#         if call.excinfo is not None:
-#             print(f"Test {item.name} failed!!!! with error: {call.excinfo.value}")
+    #one._one_api.server_close()
 
 
 

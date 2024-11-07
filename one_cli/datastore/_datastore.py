@@ -1,8 +1,12 @@
-from config                 import COMMAND_EXECUTOR
-from utils                  import run_command
+from config                     import COMMAND_EXECUTOR
+from utils                      import run_command
+from one_cli.datastore._common  import DatastoreInfo, parse_datastore_info_from_xml
 
 
 
+def datastore_exist(datastore_id: int) -> bool:
+    exec_code = int(run_command(COMMAND_EXECUTOR + " " + f"onedatastore show {datastore_id} &>/dev/null; echo $?"))
+    return True if exec_code == 0 else False
 
 
 def create_ds_by_tempalte(ds_template: str) -> int:
@@ -31,3 +35,9 @@ class Datastore:
     
     def delete(self) -> None:
         run_command(COMMAND_EXECUTOR + " " + f"onedatastore delete {self._id}")
+
+    def chmod(self, mod: str) -> None:
+        run_command(COMMAND_EXECUTOR + " " + f"onedatastore chmod {self._id} {mod}")
+
+    def info(self) -> DatastoreInfo:
+        return parse_datastore_info_from_xml(run_command(COMMAND_EXECUTOR + " " + f"onedatastore show {self._id} -x"))

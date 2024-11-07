@@ -18,6 +18,6 @@ TM_MAD = ssh
 """
 
 
-result = One(client).datastore.allocate(temp)
+result = One(client).datastore.allocate("", 9999)
 
 print(result)
