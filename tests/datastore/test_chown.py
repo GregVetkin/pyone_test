@@ -25,14 +25,12 @@ def datastore():
     datastore.delete()
     
     
-
 @pytest.fixture
 def user():
     user_id = create_user("api_test_user")
     user    = User(user_id)
     yield user
     user.delete()
-
 
 
 @pytest.fixture

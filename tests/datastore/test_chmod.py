@@ -47,7 +47,7 @@ def datastore_rights(datastore_id: int):
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
-        one.image.chmod(999999)
+        one.datastore.chmod(999999)
 
 
 
