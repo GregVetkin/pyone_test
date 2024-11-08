@@ -12,7 +12,7 @@ from config             import BRESTADM
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def datastore():
     datastore_template = """
         NAME   = api_test_image_ds_1
@@ -26,7 +26,7 @@ def datastore():
     datastore.delete()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def datastore_2():
     datastore_template = """
         NAME   = api_test_image_ds_2
@@ -40,7 +40,7 @@ def datastore_2():
     datastore.delete()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def system_datastore():
     datastore_template = """
         NAME   = api_test_system_ds

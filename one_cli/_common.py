@@ -1,8 +1,5 @@
 import xml.etree.ElementTree as xmlTree
-
 from dataclasses    import dataclass
-
-
 
 
 
@@ -12,14 +9,11 @@ class UnitPermissions:
     MANAGE: bool
     ADMIN:  bool
 
-
 @dataclass
 class Permissions:
     OWNER:  UnitPermissions
     GROUP:  UnitPermissions
     OTHER:  UnitPermissions
-
-
 
 @dataclass
 class LockStatus:
@@ -27,7 +21,6 @@ class LockStatus:
     OWNER:      int
     TIME:       int
     REQ_ID:     int
-
 
 
 

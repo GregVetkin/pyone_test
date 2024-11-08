@@ -1,29 +1,20 @@
-from config         import COMMAND_EXECUTOR
-from utils          import run_command
-from time           import sleep   
+from config                 import COMMAND_EXECUTOR
+from utils                  import run_command
+from time                   import sleep   
+from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist, _create
 
 
 
 def vm_exist(vm_id: int) -> bool:
-    exec_code = int(run_command(COMMAND_EXECUTOR + " " + f"onevm show {vm_id} &>/dev/null; echo $?"))
-    return True if exec_code == 0 else False
+    return _exist("onevm", vm_id)
 
 
 
 def create_vm_by_tempalte(vm_template: str, await_vm_offline: bool = True) -> int:
-    template_file_path  = "/tmp/test_template_file"
-
-    if "ssh" in COMMAND_EXECUTOR:
-        run_command(COMMAND_EXECUTOR + " " + f"\'cat <<EOF > {template_file_path}\n{vm_template}\nEOF\'")
-    else:
-        run_command(COMMAND_EXECUTOR + " " + f"cat <<EOF > {template_file_path}\n{vm_template}\nEOF")
-
-    vm_id = int(run_command(COMMAND_EXECUTOR + " " + f"onevm create {template_file_path}" + " | awk '{print $2}'"))
-    run_command(COMMAND_EXECUTOR + " " + f"rm -f {template_file_path}")
+    vm_id = _create("onevm", vm_template)
 
     if await_vm_offline:
         wait_vm_offline(vm_id)
-
 
     return vm_id
 
@@ -49,16 +40,22 @@ def get_vm_state(vm_id: int) -> str:
 
 class VirtualMachine:
     def __init__(self, vm_id: int) -> None:
-        self._id = vm_id
+        self._id            = vm_id
+        self._function      = "onevm"
+        self._exec_command  = COMMAND_EXECUTOR + f" {self._function} "
     
+
     def terminate(self, hard: bool = True) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"onevm terminate {self._id} {'--hard' if hard else ''}")
+        hard_flag = '--hard' if hard else ''
+        run_command(self._exec_command + f"terminate {self._id} {hard_flag}")
+
 
     def create_disk_snapshot(self, disk_id: int, snapshot_name: str) -> None:
-        run_command(COMMAND_EXECUTOR + " " + f"onevm disk-snapshot-create {self._id} {disk_id} {snapshot_name}")
+        run_command(self._exec_command + f"disk-snapshot-create {self._id} {disk_id} {snapshot_name}")
+
 
     def backup(self, datastore_id: int = -1, backup_name: str = "") -> None:
         backup_name     = f"-n {backup_name}" if backup_name else ""
         datastore_id    = f"-d {datastore_id}" if datastore_id != -1 else ""
-        run_command(COMMAND_EXECUTOR + " " + f"onevm backup {self._id} {datastore_id} {backup_name}")
+        run_command(self._exec_command + f"backup {self._id} {datastore_id} {backup_name}")
     
