@@ -3,9 +3,9 @@ import pytest
 from api                import One
 from pyone              import OneActionException, OneNoExistsException, OneException
 from utils              import get_user_auth
-from commands.user      import get_user_id_by_name
 from one_cli.image      import create_image_by_tempalte, Image
 from one_cli.datastore  import create_ds_by_tempalte, Datastore
+from one_cli.user       import get_user_id_by_name
 from config             import BRESTADM
 
 
