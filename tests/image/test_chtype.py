@@ -90,7 +90,7 @@ def test_image_not_exist(one: One):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 @pytest.mark.parametrize("file_type_id", list(FILE_TYPES.keys()))
-def test_incompatible_image_type_for_image_datastore(one: One, datablock_image: Image, file_type_id):
+def test_incompatible_type_for_image_datastore(one: One, datablock_image: Image, file_type_id):
     image_old_type = datablock_image.info().TYPE
     with pytest.raises(OneActionException):
         one.image.chtype(datablock_image._id, FILE_TYPES[file_type_id])
@@ -101,7 +101,7 @@ def test_incompatible_image_type_for_image_datastore(one: One, datablock_image: 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 @pytest.mark.parametrize("image_type_id", list(IMAGE_TYPES.keys()))
-def test_incompatible_file_type_for_file_datastore(one: One, context_image: Image, image_type_id):
+def test_incompatible_type_for_file_datastore(one: One, context_image: Image, image_type_id):
     image_old_type = context_image.info().TYPE
     with pytest.raises(OneActionException):
         one.image.chtype(context_image._id, IMAGE_TYPES[image_type_id])

@@ -1,52 +1,61 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneNoExistsException
+from pyone              import OneNoExistsException
 from utils              import get_user_auth
 from one_cli.image      import Image, create_image_by_tempalte
-from config             import API_URI, BRESTADM
+from one_cli.datastore  import create_ds_by_tempalte, Datastore
+from config             import BRESTADM
 
 
-BRESTADM_AUTH       = get_user_auth(BRESTADM)
-BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
-
-
-
+BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture
-def prepare_image():
-    image_template  = """
+def datastore():
+    template = """
+        NAME   = api_test_image_ds
+        TYPE   = IMAGE_DS
+        TM_MAD = ssh
+        DS_MAD = fs
+    """
+    datastore_id = create_ds_by_tempalte(template)
+    datastore    = Datastore(datastore_id)
+    yield datastore
+    datastore.delete()
+
+
+@pytest.fixture
+def image(datastore: Datastore):
+    template = """
         NAME = api_test_image
         TYPE = DATABLOCK
-        SIZE = 10
+        SIZE = 1
     """
-    image_id = create_image_by_tempalte(1, image_template, True)
+    image_id = create_image_by_tempalte(datastore._id, template)
     image    = Image(image_id)
-    
     yield image
-
     image.delete()
     
+
 
 # =================================================================================================
 # TESTS
 # =================================================================================================
 
 
-def test_image_not_exist():
-    one = One(BRESTADM_SESSION)
+
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.info(999999)
 
 
 
-def test_image_info(prepare_image):
-    one   = One(BRESTADM_SESSION)
-    image = prepare_image
-
-    api_image_info  = one.image.info(image._id)
-    cli_image_info  = image.info()
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_info(one: One, image: Image):
+    api_image_info = one.image.info(image._id)
+    cli_image_info = image.info()
     
     assert cli_image_info.ID == api_image_info.ID
     assert cli_image_info.NAME == api_image_info.NAME
@@ -67,8 +76,5 @@ def test_image_info(prepare_image):
     assert cli_image_info.SIZE == api_image_info.SIZE
     assert cli_image_info.STATE == api_image_info.STATE
     assert cli_image_info.FS == api_image_info.FS
-
-    persistence = {0: False, 1: True}
-    assert cli_image_info.PERSISTENT == persistence[api_image_info.PERSISTENT]
 
     

@@ -1,49 +1,55 @@
 import pytest
 
 from api                import One
-from pyone              import OneServer, OneNoExistsException, OneActionException
+from pyone              import OneNoExistsException, OneActionException
 from utils              import get_user_auth
 from one_cli.image      import Image, create_image_by_tempalte
-
-from config             import API_URI, BRESTADM
-
-
-BRESTADM_AUTH       = get_user_auth(BRESTADM)
-BRESTADM_SESSION    = OneServer(API_URI, BRESTADM_AUTH)
+from one_cli.datastore  import Datastore, create_ds_by_tempalte
+from config             import BRESTADM
 
 
+BRESTADM_AUTH = get_user_auth(BRESTADM)
 
+
+@pytest.fixture(scope="module")
+def datastore():
+    datastore_template = """
+        NAME   = api_test_image_ds
+        TYPE   = IMAGE_DS
+        TM_MAD = ssh
+        DS_MAD = fs
+    """
+    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore    = Datastore(datastore_id)
+    yield datastore
+    datastore.delete()
 
 
 @pytest.fixture
-def prepare_image():
-    image_template = """
-        NAME = api_test_image
+def image(datastore: Datastore):
+    template = """
+        NAME = api_test_image_1
         TYPE = DATABLOCK
-        SIZE = 10
+        SIZE = 1
     """
-    image_id = create_image_by_tempalte(1, image_template, True)
+    image_id = create_image_by_tempalte(datastore._id, template)
     image    = Image(image_id)
-    
     yield image
-
     image.delete()
 
 
-
 @pytest.fixture
-def prepare_second_image():
-    image_template = """
+def image_2(datastore: Datastore):
+    template = """
         NAME = api_test_image_2
         TYPE = DATABLOCK
-        SIZE = 10
+        SIZE = 1
     """
-    image_id = create_image_by_tempalte(1, image_template, True)
+    image_id = create_image_by_tempalte(datastore._id, template)
     image    = Image(image_id)
-    
     yield image
-
     image.delete()
+
 
 
 
@@ -53,60 +59,60 @@ def prepare_second_image():
 
 
 
-
-def test_image_not_exist():
-    one = One(BRESTADM_SESSION)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.rename(99999, "GregoryVetkin")
 
 
 
-def test_change_image_name(prepare_image):
-    one      = One(BRESTADM_SESSION)
-    image    = prepare_image
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_change_image_name(one: One, image: Image):
     new_name = "api_test_image_new"
-
     one.image.rename(image._id, new_name)
-    assert image.info().NAME == new_name
+    image_new_name = image.info().NAME
+    assert new_name == image_new_name
 
 
-
-def test_image_name_collision(prepare_image, prepare_second_image):
-    one     = One(BRESTADM_SESSION)
-    image_1 = prepare_image
-    image_2 = prepare_second_image
-
-    image_1_old_info = image_1.info()
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_image_name_collision(one: One, image: Image, image_2: Image):
+    image_old_name = image.info().NAME
     with pytest.raises(OneActionException):
-        one.image.rename(image_1._id, image_2.info().NAME)
-    image_1_new_info = image_1.info()
-
-    assert image_1_new_info.NAME == image_1_old_info.NAME
-
+        one.image.rename(image._id, image_2.info().NAME)
+    image_new_name = image.info().NAME
+    assert image_old_name == image_new_name
 
 
-def test_empty_image_name(prepare_image):
-    one   = One(BRESTADM_SESSION)
-    image = prepare_image
 
-    image_old_info = image.info()
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_empty_image_name(one: One, image: Image):
+    image_old_name = image.info().NAME
     with pytest.raises(OneActionException):
         one.image.rename(image._id, "")
-    image_new_info = image.info()
-
-    assert image_old_info.NAME == image_new_info.NAME
-
+    image_new_name = image.info().NAME
+    assert image_old_name == image_new_name
 
 
-def test_unavailable_symbols_in_image_name(prepare_image):
-    one             = One(BRESTADM_SESSION)
-    image           = prepare_image
-    bad_symbols     = ["$", "#", "&", "\"", "\'", ">", "<", "/", "\\", "|"]
-    image_old_info  = image.info()
 
-    for symbol in bad_symbols:
-        with pytest.raises(OneActionException):
-            one.image.rename(image._id, "api_test_image_" + symbol)
+@pytest.mark.parametrize("bad_symbol", ["$", "#", "&", "\"", "\'", ">", "<", "/", "\\", "|"])
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_unavailable_symbols_in_image_name(one: One, image: Image, bad_symbol: str):
+    image_old_name = image.info().NAME
 
-        assert image.info().NAME == image_old_info.NAME
+    with pytest.raises(OneActionException):
+        one.image.rename(image._id, f"test{bad_symbol}")
+    assert image_old_name == image.info().NAME
 
+    with pytest.raises(OneActionException):
+        one.image.rename(image._id, f"{bad_symbol}test")
+    assert image_old_name == image.info().NAME
+
+    with pytest.raises(OneActionException):
+        one.image.rename(image._id, f"te{bad_symbol}st")
+    assert image_old_name == image.info().NAME
+
+    with pytest.raises(OneActionException):
+        one.image.rename(image._id, bad_symbol)
+    assert image_old_name == image.info().NAME
+
+    
