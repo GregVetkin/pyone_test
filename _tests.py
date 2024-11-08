@@ -143,3 +143,37 @@ TESTS["one"]["datastore"]["enable"]         = TestData(
                                                         xml_rpc_method  =   "one.datastore.enable",
                                                         test_file_path  =   f"{PROJECT_DIR}/tests/datastore/test_enable.py"
 )
+# =======================================================================================================================
+# one.hostpool
+TESTS["one"]["hostpool"] = {}
+TESTS["one"]["hostpool"]["info"]            = TestData(
+                                                        xml_rpc_method  =   "one.hostpool.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/hostpool/test_info.py"
+)
+# =======================================================================================================================
+# one.host
+TESTS["one"]["host"] = {}
+TESTS["one"]["host"]["allocate"]            = TestData(
+                                                        xml_rpc_method  =   "one.host.allocate",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/host/test_allocate.py"
+)
+TESTS["one"]["host"]["delete"]              = TestData(
+                                                        xml_rpc_method  =   "one.host.delete",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/host/test_delete.py"
+)
+TESTS["one"]["host"]["info"]                = TestData(
+                                                        xml_rpc_method  =   "one.host.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/host/test_info.py"                                    
+)
+TESTS["one"]["host"]["rename"]              = TestData(
+                                                        xml_rpc_method  =   "one.host.rename",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/host/test_rename.py"
+)
+TESTS["one"]["host"]["update"]              = TestData(
+                                                        xml_rpc_method  =   "one.host.update",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/host/test_update.py"
+)
+TESTS["one"]["host"]["status"]              = TestData(
+                                                        xml_rpc_method  =   "one.host.status",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/host/test_status.py"                                    
+)
