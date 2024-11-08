@@ -9,8 +9,7 @@ from one_cli.datastore  import create_ds_by_tempalte, Datastore
 from config             import BRESTADM
 
 
-BRESTADM_AUTH    = get_user_auth(BRESTADM)
-
+BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture

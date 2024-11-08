@@ -90,6 +90,14 @@ class Image:
         run_command(COMMAND_EXECUTOR + " " + f"oneimage enable {self._id}")
 
 
-
+    def update(self, template: str, append: bool = False) -> None:
+        file = "/tmp/test_file"
+        if "ssh" in COMMAND_EXECUTOR:
+            run_command(COMMAND_EXECUTOR + " " + f"\'cat <<EOF > {file}\n{template}\nEOF\'")
+        else:
+            run_command(COMMAND_EXECUTOR + " " + f"cat <<EOF > {file}\n{template}\nEOF")
+        append_flag = "-a" if append else ""
+        run_command(COMMAND_EXECUTOR + " " + f"oneimage update {self._id} {file} {append_flag}")
+        run_command(COMMAND_EXECUTOR + " " + f"rm -f {file}")
 
 

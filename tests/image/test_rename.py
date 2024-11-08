@@ -52,7 +52,6 @@ def image_2(datastore: Datastore):
 
 
 
-
 # =================================================================================================
 # TESTS
 # =================================================================================================
@@ -114,5 +113,3 @@ def test_unavailable_symbols_in_image_name(one: One, image: Image, bad_symbol: s
     with pytest.raises(OneActionException):
         one.image.rename(image._id, bad_symbol)
     assert image_old_name == image.info().NAME
-
-    

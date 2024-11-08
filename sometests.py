@@ -17,11 +17,11 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 # print(result)
 
-from one_cli.datastore import Datastore
+# from one_cli.datastore import Datastore
 
-ds = Datastore(321)
-templ = """
-TM_MAD = dummy
-d1 = HAHAHA
-"""
-ds.update(templ, False)
+# ds = Datastore(321)
+# templ = """
+# TM_MAD = dummy
+# d1 = HAHAHA
+# """
+# ds.update(templ, False)

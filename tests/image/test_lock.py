@@ -46,6 +46,7 @@ def image(datastore: Datastore):
 # =================================================================================================
 
 
+
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
@@ -85,5 +86,3 @@ def test_lock_locked_image(one: One, image: Image, init_lock_lvl, lock_level, lo
     else:
         one.image.lock(image._id, lock_level=lock_level, check_already_locked=lock_check)
         assert image.info().LOCK.LOCKED == lock_level
-
-

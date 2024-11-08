@@ -12,7 +12,6 @@ from config             import BRESTADM
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
-
 @pytest.fixture
 def image_datastore():
     datastore_template = """
@@ -80,6 +79,7 @@ def used_image(image_datastore: Datastore):
 # =================================================================================================
 # TESTS
 # =================================================================================================
+
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)

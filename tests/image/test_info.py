@@ -76,5 +76,3 @@ def test_image_info(one: One, image: Image):
     assert cli_image_info.SIZE == api_image_info.SIZE
     assert cli_image_info.STATE == api_image_info.STATE
     assert cli_image_info.FS == api_image_info.FS
-
-    

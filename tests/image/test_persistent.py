@@ -79,7 +79,6 @@ def used_image(image_datastore: Datastore):
     image.delete()
 
 
-
 @pytest.fixture
 def image_with_snapshot(image_datastore: Datastore, system_datastore: Datastore):
     image_template = """

@@ -132,4 +132,3 @@ def test_image_group_change(one: One, image: Image, group: Group):
 
     assert image_new_info.UID == image_old_info.UID
     assert image_new_info.GID == group._id
-

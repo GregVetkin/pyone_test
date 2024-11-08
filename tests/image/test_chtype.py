@@ -17,7 +17,6 @@ FILE_TYPES    = {3: "KERNEL",
                  5: "CONTEXT"}
 
 
-
 @pytest.fixture
 def image_datastore():
     datastore_template = """
@@ -79,6 +78,7 @@ def context_image(file_datastore: Datastore):
 # =================================================================================================
 # TESTS
 # =================================================================================================
+
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
