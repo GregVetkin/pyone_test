@@ -1,10 +1,11 @@
-from one_cli.image._image   import Image, create_image_by_tempalte, image_exist
+from one_cli.image._image  import Image, create_image, image_exist, wait_image_ready
 
 
 
 
 __all__ = [
     "Image",
-    "create_image_by_tempalte",
+    "create_image",
     "image_exist",
+    "wait_image_ready"
 ]

@@ -3,8 +3,8 @@ import time
 from api                import One
 from pyone              import OneActionException, OneNoExistsException
 from utils              import get_user_auth
-from one_cli.datastore  import Datastore, create_ds_by_tempalte, datastore_exist
-from one_cli.image      import Image, create_image_by_tempalte, image_exist
+from one_cli.datastore  import Datastore, create_datastore, datastore_exist
+from one_cli.image      import Image, create_image, image_exist
 from config             import BRESTADM
 
 
@@ -18,7 +18,7 @@ def empty_datastore():
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
     yield datastore
 
@@ -34,7 +34,7 @@ def not_empty_datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
 
     image_template = """
@@ -42,7 +42,7 @@ def not_empty_datastore():
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(datastore._id, image_template, True)
+    image_id = create_image(datastore._id, image_template, True)
     image    = Image(image_id)
 
     yield datastore

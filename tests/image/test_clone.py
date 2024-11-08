@@ -3,8 +3,8 @@ import pytest
 from api                import One
 from pyone              import OneActionException, OneNoExistsException, OneException
 from utils              import get_user_auth
-from one_cli.image      import create_image_by_tempalte, Image
-from one_cli.datastore  import create_ds_by_tempalte, Datastore
+from one_cli.image      import Image, create_image
+from one_cli.datastore  import Datastore, create_datastore
 from one_cli.user       import get_user_id_by_name
 from config             import BRESTADM
 
@@ -20,7 +20,7 @@ def datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -34,7 +34,7 @@ def datastore_2():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -47,7 +47,7 @@ def system_datastore():
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -60,7 +60,7 @@ def image(datastore: Datastore):
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(datastore._id, template)
+    image_id = create_image(datastore._id, template)
     image    = Image(image_id)
     yield image
     image.delete()

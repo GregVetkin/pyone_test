@@ -9,8 +9,8 @@ def datastore_exist(datastore_id: int) -> bool:
     return _exist("onedatastore", datastore_id)
 
 
-def create_ds_by_tempalte(ds_template: str) -> int:
-    return _create("onedatastore", ds_template)
+def create_datastore(datastore_template: str) -> int:
+    return _create("onedatastore", datastore_template)
 
 
 

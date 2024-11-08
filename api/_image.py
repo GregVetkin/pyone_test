@@ -46,11 +46,11 @@ class OneImage:
         return self._one_image.enable(image_id, False)
     
 
-    def make_persistent(self, image_id: int) -> int:
+    def persistent(self, image_id: int) -> int:
         return self._one_image.persistent(image_id, True)
     
 
-    def make_nonpersistent(self, image_id: int) -> int:
+    def nonpersistent(self, image_id: int) -> int:
         return self._one_image.persistent(image_id, False)
     
     

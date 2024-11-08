@@ -2,8 +2,8 @@ import pytest
 from typing             import List
 from api                import One
 from utils              import get_user_auth
-from one_cli.image      import Image, create_image_by_tempalte
-from one_cli.datastore  import Datastore, create_ds_by_tempalte
+from one_cli.image      import Image, create_image
+from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 
 
@@ -18,7 +18,7 @@ def datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -33,7 +33,7 @@ def images(datastore: Datastore):
             TYPE = DATABLOCK
             SIZE = 1
         """
-        image_id = create_image_by_tempalte(datastore._id, template, False)
+        image_id = create_image(datastore._id, template, False)
         image    = Image(image_id)
         image_list.append(image)
 

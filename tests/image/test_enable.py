@@ -3,9 +3,9 @@ import pytest
 from api                import One
 from pyone              import OneInternalException, OneNoExistsException
 from utils              import get_user_auth
-from one_cli.image      import create_image_by_tempalte, Image
-from one_cli.vm         import create_vm_by_tempalte, VirtualMachine
-from one_cli.datastore  import create_ds_by_tempalte, Datastore
+from one_cli.image      import Image, create_image, wait_image_ready
+from one_cli.vm         import VirtualMachine, create_vm
+from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 
 
@@ -23,7 +23,7 @@ def image_datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -36,7 +36,7 @@ def image(image_datastore: Datastore):
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, template)
+    image_id = create_image(image_datastore._id, template)
     image    = Image(image_id)
 
     yield image
@@ -54,7 +54,7 @@ def used_image(image_datastore: Datastore):
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, image_template, True)
+    image_id = create_image(image_datastore._id, image_template, True)
     image    = Image(image_id)
 
     vm_tempalte = f"""
@@ -65,30 +65,16 @@ def used_image(image_datastore: Datastore):
             IMAGE_ID = {image_id}
         ]
     """
-    vm_id = create_vm_by_tempalte(vm_tempalte, await_vm_offline=False)
+    vm_id = create_vm(vm_tempalte, await_vm_offline=False)
     vm    = VirtualMachine(vm_id)
 
     yield image
 
     vm.terminate()
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     image.delete()
 
 
-@pytest.fixture
-def prepare_image():
-    image_template  = """
-        NAME = api_test_image
-        TYPE = DATABLOCK
-        SIZE = 10
-    """
-    image_id = create_image_by_tempalte(1, image_template, True)
-    image    = Image(image_id)
-
-    yield image
-
-    image.delete()
-    
 
 
 

@@ -4,9 +4,9 @@ import random
 from api                import One
 from pyone              import OneNoExistsException, OneActionException
 from utils              import get_user_auth
-from one_cli.vm         import VirtualMachine, create_vm_by_tempalte, wait_vm_offline
-from one_cli.image      import Image, create_image_by_tempalte
-from one_cli.datastore  import Datastore, create_ds_by_tempalte
+from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
+from one_cli.image      import Image, create_image, wait_image_ready
+from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 
 
@@ -22,7 +22,7 @@ def image_datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(template)
+    datastore_id = create_datastore(template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -35,7 +35,7 @@ def system_datastore():
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
-    datastore_id = create_ds_by_tempalte(template)
+    datastore_id = create_datastore(template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -48,10 +48,10 @@ def image(image_datastore: Datastore):
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, template)
+    image_id = create_image(image_datastore._id, template)
     image    = Image(image_id)
     yield image
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     image.delete()
     
 
@@ -62,9 +62,9 @@ def image_with_snapshots(image_datastore: Datastore, system_datastore: Datastore
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, image_template, True)
+    image_id = create_image(image_datastore._id, image_template, True)
     image    = Image(image_id)
-    image.make_persistent()
+    image.persistent()
     vm_tempalte = f"""
         NAME    = apt_test_vm
         CPU     = 1
@@ -73,15 +73,15 @@ def image_with_snapshots(image_datastore: Datastore, system_datastore: Datastore
             IMAGE_ID = {image_id}
         ]
     """
-    vm_id = create_vm_by_tempalte(vm_tempalte, await_vm_offline=True)
+    vm_id = create_vm(vm_tempalte, await_vm_offline=True)
     vm    = VirtualMachine(vm_id)
     for _ in range(5):
         vm.create_disk_snapshot(0, f"api_test_disk_snap_{_}")
         wait_vm_offline(vm_id)
     vm.terminate()
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     yield image
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     image.delete()
 
 

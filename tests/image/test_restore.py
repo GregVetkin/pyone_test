@@ -3,9 +3,9 @@ import time
 from api                import One
 from pyone              import OneNoExistsException, OneException
 from utils              import get_user_auth
-from one_cli.image      import Image, create_image_by_tempalte, image_exist
-from one_cli.datastore  import Datastore, create_ds_by_tempalte
-from one_cli.vm         import VirtualMachine, create_vm_by_tempalte, vm_exist
+from one_cli.image      import Image, create_image, image_exist, wait_image_ready
+from one_cli.datastore  import Datastore, create_datastore
+from one_cli.vm         import VirtualMachine, create_vm, vm_exist
 from config             import BRESTADM
 
 
@@ -20,7 +20,7 @@ def image_datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(template)
+    datastore_id = create_datastore(template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -34,7 +34,7 @@ def file_datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(template)
+    datastore_id = create_datastore(template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -47,7 +47,7 @@ def system_datastore():
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
-    datastore_id = create_ds_by_tempalte(template)
+    datastore_id = create_datastore(template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -60,7 +60,7 @@ def image(image_datastore: Datastore):
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, template)
+    image_id = create_image(image_datastore._id, template)
     image    = Image(image_id)
     yield image
     image.delete()
@@ -73,7 +73,7 @@ def backup_image(image_datastore: Datastore, system_datastore: Datastore, file_d
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, image_template, True)
+    image_id = create_image(image_datastore._id, image_template, True)
     image    = Image(image_id)
     vm_tempalte = f"""
         NAME    = apt_test_vm
@@ -83,7 +83,7 @@ def backup_image(image_datastore: Datastore, system_datastore: Datastore, file_d
             IMAGE_ID = {image_id}
         ]
     """
-    vm_id = create_vm_by_tempalte(vm_tempalte, await_vm_offline=True)
+    vm_id = create_vm(vm_tempalte, await_vm_offline=True)
     vm    = VirtualMachine(vm_id)
     vm.backup()
     backup_id = image_id + 2 # +2 Потому что, видимо, сначала делается клон образа, а потом бекап из клона. Клон удаляется
@@ -92,7 +92,7 @@ def backup_image(image_datastore: Datastore, system_datastore: Datastore, file_d
         time.sleep(5)
 
     vm.terminate()
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     image.delete()
     backup = Image(backup_id)
 
@@ -103,7 +103,7 @@ def backup_image(image_datastore: Datastore, system_datastore: Datastore, file_d
         vm  = VirtualMachine(vm_id+1)
         img = Image(backup_id+1)
         vm.terminate()
-        img.wait_ready_status()
+        wait_image_ready(backup_id+1)
         img.delete()
     except Exception as _:
         pass
@@ -147,9 +147,9 @@ def test_restore_backup_image_into(one: One, backup_image: Image, image_datastor
     backup_info = backup_image.info()
     assert backup_info.TYPE == 6
 
-    backuped_vm_id = int(backup_info.TEMPLATE["ONEVMID"])
-    restored_vm_id = backuped_vm_id + 1
-    restored_image_id = backup_image._id + 1
+    backuped_vm_id      = int(backup_info.TEMPLATE["ONEVMID"])
+    restored_vm_id      = backuped_vm_id + 1
+    restored_image_id   = backup_image._id + 1
 
     one.image.restore(backup_image._id, image_datastore._id)
     time.sleep(30)

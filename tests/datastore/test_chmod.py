@@ -3,7 +3,7 @@ import pytest
 from api                import One
 from pyone              import OneNoExistsException
 from utils              import get_user_auth
-from one_cli.datastore  import Datastore, create_ds_by_tempalte
+from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 
 
@@ -20,7 +20,7 @@ def datastore():
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
 
     datastore.chmod("000")

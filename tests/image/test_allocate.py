@@ -4,7 +4,7 @@ from api                import One
 from pyone              import OneActionException, OneNoExistsException, OneException
 from utils              import get_user_auth, create_temp_file, delete_temp_file
 from one_cli.image      import Image, image_exist
-from one_cli.datastore  import Datastore, create_ds_by_tempalte
+from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 
 
@@ -19,7 +19,7 @@ def image_datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -33,7 +33,7 @@ def system_datastore():
         TYPE   = system_DS
         TM_MAD = ssh
     """
-    datastore_id = create_ds_by_tempalte(datastore_template)
+    datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()

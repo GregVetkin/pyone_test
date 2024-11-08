@@ -10,7 +10,7 @@ def vm_exist(vm_id: int) -> bool:
 
 
 
-def create_vm_by_tempalte(vm_template: str, await_vm_offline: bool = True) -> int:
+def create_vm(vm_template: str, await_vm_offline: bool = True) -> int:
     vm_id = _create("onevm", vm_template)
 
     if await_vm_offline:

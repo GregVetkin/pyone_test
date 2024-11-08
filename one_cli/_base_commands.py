@@ -54,3 +54,32 @@ def _update(function_name: str, object_id: int, template: str, append: bool = Fa
     run_command(COMMAND_EXECUTOR + " " + f"rm -f {file}")
 
 
+def _lock(function_name: str, object_id: int, lock_level: int = 4) -> None:
+    lock_flag = {
+            1: "--use",
+            2: "--manage",
+            3: "--admin",
+            4: "--all",
+        }
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} lock {object_id} {lock_flag[lock_level]}")
+
+
+def _unlock(function_name: str, object_id: int) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} unlock {object_id}")
+
+
+def _disable(function_name: str, object_id: int) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} disable {object_id}")
+
+
+def _enable(function_name: str, object_id: int) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} enable {object_id}")
+
+
+def _persistent(function_name: str, object_id: int) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} persistent {object_id}")
+
+
+def _nonpersistent(function_name: str, object_id: int) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} nonpersistent {object_id}")
+

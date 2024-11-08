@@ -2,7 +2,7 @@ from time                   import sleep
 from config                 import COMMAND_EXECUTOR
 from utils                  import run_command
 from one_cli.image._common  import ImageInfo, parse_image_info_from_xml
-from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist
+from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist, _lock, _unlock, _enable, _disable, _persistent, _nonpersistent
 
 
 
@@ -11,7 +11,7 @@ def image_exist(image_id: int) -> bool:
 
 
 
-def create_image_by_tempalte(datastore_id: int, image_template: str, await_image_rdy: bool = True) -> int:
+def create_image(datastore_id: int, image_template: str, await_image_rdy: bool = True) -> int:
     template_file_path  = "/tmp/test_template_file"
 
     if "ssh" in COMMAND_EXECUTOR:
@@ -23,27 +23,30 @@ def create_image_by_tempalte(datastore_id: int, image_template: str, await_image
     image_id = int(run_command(COMMAND_EXECUTOR + " " + f"oneimage create -d {datastore_id} {template_file_path}" + " | awk '{print $2}'"))
 
     if await_image_rdy:
-        Image(image_id).wait_ready_status()
+        wait_image_ready(image_id)
 
     run_command(COMMAND_EXECUTOR + " " + f"rm -f {template_file_path}")
     return image_id
 
 
 
+def _get_image_state(image_id: int) -> int:
+    return Image(image_id).info().STATE
+
+def _wait_image_state(image_id: int, state_code: int, interval: float = 1.) -> None:
+    while _get_image_state(image_id) != state_code:
+        sleep(interval)
+
+def wait_image_ready(image_id: int, interval: float = 1.) -> None:
+    _wait_image_state(image_id, 1, interval)
+
 
 
 
 class Image:
     def __init__(self, image_id: int) -> None:
-        self._id            = image_id
-        self._function      = "oneimage"
-        self._exec_command  = COMMAND_EXECUTOR + f" {self._function} "
-        self._lock_levels   = {
-            1: "--use",
-            2: "--manage",
-            3: "--admin",
-            4: "--all",
-        }
+        self._id       = image_id
+        self._function = "oneimage"
 
 
     def info(self) -> ImageInfo:
@@ -54,11 +57,6 @@ class Image:
         _delete(self._function, self._id)
 
 
-    def wait_ready_status(self, interval: float = 1.) -> None:
-        while self.info().STATE != 1:
-            sleep(interval)
-
-
     def chown(self, user_id: int, group_id: int = -1) -> None:
         _chown(self._function, self._id, user_id, group_id)
 
@@ -66,34 +64,30 @@ class Image:
     def chmod(self, octet: str) -> None:
         _chmod(self._function, self._id, octet)
 
+
     def update(self, template: str, append: bool = False) -> None:
         _update(self._function, self._id, template, append)
 
 
-    def make_persistent(self) -> None:
-        run_command(self._exec_command + f"persistent {self._id}")
-
-
-    def make_nonpersistent(self) -> None:
-        run_command(self._exec_command + f"nonpersistent {self._id}")
-
-
     def lock(self, lock_level: int = 4) -> None:
-        run_command(self._exec_command + f"lock {self._id} {self._lock_levels[lock_level]}")
+        _lock(self._function, self._id, lock_level)
 
 
     def unlock(self) -> None:
-        run_command(self._exec_command + f"unlock {self._id}")
+        _unlock(self._function, self._id)
 
 
     def disable(self) -> None:
-        run_command(self._exec_command + f"disable {self._id}")
+        _disable(self._function, self._id)
 
 
     def enable(self) -> None:
-        run_command(self._exec_command + f"enable {self._id}")
+        _enable(self._function, self._id)
 
 
-    
+    def persistent(self) -> None:
+        _persistent(self._function, self._id)
 
 
+    def nonpersistent(self) -> None:
+        _nonpersistent(self._function, self._id)

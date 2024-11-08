@@ -3,9 +3,9 @@ import pytest
 from api                import One
 from pyone              import OneInternalException, OneNoExistsException
 from utils              import get_user_auth
-from one_cli.image      import Image, create_image_by_tempalte
-from one_cli.vm         import VirtualMachine, create_vm_by_tempalte, wait_vm_offline
-from one_cli.datastore  import Datastore, create_ds_by_tempalte
+from one_cli.image      import Image, create_image, wait_image_ready
+from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
+from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 
 
@@ -21,7 +21,7 @@ def image_datastore():
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = create_ds_by_tempalte(template)
+    datastore_id = create_datastore(template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -34,7 +34,7 @@ def system_datastore():
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
-    datastore_id = create_ds_by_tempalte(template)
+    datastore_id = create_datastore(template)
     datastore    = Datastore(datastore_id)
     yield datastore
     datastore.delete()
@@ -47,10 +47,10 @@ def image(image_datastore: Datastore):
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, template)
+    image_id = create_image(image_datastore._id, template)
     image    = Image(image_id)
     yield image
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     image.delete()
     
 
@@ -61,7 +61,7 @@ def used_image(image_datastore: Datastore):
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, image_template, True)
+    image_id = create_image(image_datastore._id, image_template, True)
     image    = Image(image_id)
     vm_tempalte = f"""
         NAME    = apt_test_vm
@@ -71,11 +71,11 @@ def used_image(image_datastore: Datastore):
             IMAGE_ID = {image_id}
         ]
     """
-    vm_id = create_vm_by_tempalte(vm_tempalte, await_vm_offline=False)
+    vm_id = create_vm(vm_tempalte, await_vm_offline=False)
     vm    = VirtualMachine(vm_id)
     yield image
     vm.terminate()
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     image.delete()
 
 
@@ -86,9 +86,9 @@ def image_with_snapshot(image_datastore: Datastore, system_datastore: Datastore)
         TYPE = DATABLOCK
         SIZE = 1
     """
-    image_id = create_image_by_tempalte(image_datastore._id, image_template, True)
+    image_id = create_image(image_datastore._id, image_template, True)
     image    = Image(image_id)
-    image.make_persistent()
+    image.persistent()
     vm_tempalte = f"""
         NAME    = apt_test_vm
         CPU     = 1
@@ -97,14 +97,14 @@ def image_with_snapshot(image_datastore: Datastore, system_datastore: Datastore)
             IMAGE_ID = {image_id}
         ]
     """
-    vm_id = create_vm_by_tempalte(vm_tempalte, await_vm_offline=True)
+    vm_id = create_vm(vm_tempalte, await_vm_offline=True)
     vm    = VirtualMachine(vm_id)
     vm.create_disk_snapshot(0, "api_test_snapshot")
     wait_vm_offline(vm_id)
     vm.terminate()
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     yield image
-    image.wait_ready_status()
+    wait_image_ready(image_id)
     image.delete()
 
 
@@ -119,9 +119,9 @@ def image_with_snapshot(image_datastore: Datastore, system_datastore: Datastore)
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
-        one.image.make_persistent(999999)
+        one.image.persistent(999999)
     with pytest.raises(OneNoExistsException):
-        one.image.make_nonpersistent(999999)
+        one.image.nonpersistent(999999)
 
 
 
@@ -132,11 +132,11 @@ def test_used_image_persistencte(one: One, used_image: Image):
     start_image_persistence = image_info.PERSISTENT
     
     with pytest.raises(OneInternalException):
-        one.image.make_persistent(used_image._id)
+        one.image.persistent(used_image._id)
     assert used_image.info().PERSISTENT == start_image_persistence
 
     with pytest.raises(OneInternalException):
-        one.image.make_nonpersistent(used_image._id)
+        one.image.nonpersistent(used_image._id)
     assert used_image.info().PERSISTENT == start_image_persistence
 
 
@@ -146,15 +146,15 @@ def test_used_image_persistencte(one: One, used_image: Image):
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_persistent_image(one: One, image: Image, start_persistent: bool, target_persistence: bool):
     if start_persistent:
-        image.make_persistent()
+        image.persistent()
     else:
-        image.make_nonpersistent()
+        image.nonpersistent()
     assert image.info().PERSISTENT == start_persistent
 
     if target_persistence:
-        one.image.make_persistent(image._id)
+        one.image.persistent(image._id)
     else:
-        one.image.make_nonpersistent(image._id)
+        one.image.nonpersistent(image._id)
     assert image.info().PERSISTENT == target_persistence
 
 
@@ -163,5 +163,5 @@ def test_persistent_image(one: One, image: Image, start_persistent: bool, target
 def test_make_nonpers_image_with_snapshots(one: One, image_with_snapshot: Image):
     assert image_with_snapshot.info().SNAPSHOTS
     with pytest.raises(OneInternalException):
-        one.image.make_nonpersistent(image_with_snapshot._id)
+        one.image.nonpersistent(image_with_snapshot._id)
     assert image_with_snapshot.info().PERSISTENT
