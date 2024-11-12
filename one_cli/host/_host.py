@@ -1,7 +1,7 @@
 from config                 import COMMAND_EXECUTOR
 from utils                  import run_command
 from one_cli._base_commands import _delete, _info, _update, _exist, _rename, _enable, _disable, _offline
-
+from one_cli.host._common   import HostInfo, parse_host_info_from_xml
 
 
 
@@ -44,4 +44,6 @@ class Host:
     def update(self, template: str, append: bool = False) -> None:
         _update(self._function, self._id, template, append)
 
-    
+
+    def info(self) -> HostInfo:
+        return parse_host_info_from_xml(_info(self._function, self._id, xml=True))
