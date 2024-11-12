@@ -39,6 +39,7 @@ def test_host_info(one: One, host: Host):
     api_host_info  = one.host.info(host._id)
     cli_host_info  = host.info()
     
-    assert cli_host_info.ID    == api_host_info.ID
-    assert cli_host_info.NAME  == api_host_info.NAME
-    assert cli_host_info.STATE == api_host_info.STATE
+    assert cli_host_info.ID     == api_host_info.ID
+    assert cli_host_info.NAME   == api_host_info.NAME
+    assert cli_host_info.IM_MAD == api_host_info.IM_MAD
+    assert cli_host_info.VM_MAD == api_host_info.VM_MAD
