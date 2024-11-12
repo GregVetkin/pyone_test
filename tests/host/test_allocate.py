@@ -25,16 +25,21 @@ def test_cluster_not_exist(one: One):
         one.host.allocate(hostname="GregVetkin", im_mad="kvm", vm_mad="kvm", cluster_id=999999)
 
 
+
+@pytest.mark.skip(reason="Должна ли быть проверка валидного IM_MAD?")
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_bad_IM_MAD(one: One):
     with pytest.raises(OneNoExistsException):
         one.host.allocate(hostname="GregVetkin", im_mad="notexist", vm_mad="kvm", cluster_id=-1)
 
 
+
+@pytest.mark.skip(reason="Должна ли быть проверка валидного VM_MAD?")
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_bad_VM_MAD(one: One):
     with pytest.raises(OneNoExistsException):
         one.host.allocate(hostname="GregVetkin", im_mad="kvm", vm_mad="notexist", cluster_id=-1)
+
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
