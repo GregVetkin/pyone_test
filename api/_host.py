@@ -17,8 +17,8 @@ class OneHost:
         return self._one_host.delete(host_id)
     
 
-    def status(self, host_id: int, status_id: int) -> int:
-        return self._one_host.status(host_id, status_id)
+    def status(self, host_id: int, status_code: int) -> int:
+        return self._one_host.status(host_id, status_code)
     
     def enable(self, host_id: int) -> int:
         return self.status(host_id, 0)
