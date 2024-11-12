@@ -17,7 +17,7 @@ def hosts(one: One):
     host_list = []
     for _ in range(5):
         host_name = f"api_test_host_{_}"
-        host_id   = one.host.
+        host_id   = one.host.allocate(host_name)
         host      = Host(host_id)
         host_list.append(host)
 
@@ -38,7 +38,7 @@ def hosts(one: One):
 @pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
 def test_show_all_hosts(one: One, hosts: List[Host]):
     host_ids     = [host.info().ID for host in hosts]
-    hostpool     = one.hostpool.info().DATASTORE
+    hostpool     = one.hostpool.info().HOST
     hostpool_ids = [host.ID for host in hostpool]
     assert set(host_ids).issubset(hostpool_ids)
 
