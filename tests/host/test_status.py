@@ -10,7 +10,7 @@ from config             import BRESTADM
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
-@pytest.fixture(scope="module")
+@pytest.fixture()
 @pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
 def host(one: One):
     host_id = one.host.allocate("api_test_host_status")
