@@ -1,7 +1,7 @@
 import pytest
 
 from api                import One
-from pyone              import OneNoExistsException
+from pyone              import OneNoExistsException, OneInternalException
 from utils              import get_user_auth
 from one_cli.host       import Host, host_exist
 from config             import BRESTADM
@@ -29,7 +29,7 @@ def test_cluster_not_exist(one: One):
 @pytest.mark.skip(reason="Должна ли быть проверка валидного IM_MAD?")
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_bad_IM_MAD(one: One):
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(OneInternalException):
         one.host.allocate(hostname="GregVetkin", im_mad="notexist", vm_mad="kvm", cluster_id=-1)
 
 
@@ -37,7 +37,7 @@ def test_bad_IM_MAD(one: One):
 @pytest.mark.skip(reason="Должна ли быть проверка валидного VM_MAD?")
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_bad_VM_MAD(one: One):
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(OneInternalException):
         one.host.allocate(hostname="GregVetkin", im_mad="kvm", vm_mad="notexist", cluster_id=-1)
 
 
