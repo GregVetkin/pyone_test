@@ -83,3 +83,18 @@ def _persistent(function_name: str, object_id: int) -> None:
 def _nonpersistent(function_name: str, object_id: int) -> None:
     run_command(COMMAND_EXECUTOR + " " + f"{function_name} nonpersistent {object_id}")
 
+
+def _rename(function_name: str, object_id: int, new_name: str) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} rename {object_id} {new_name}")
+
+
+def _enable(function_name: str, object_id: int) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} enable {object_id}")
+
+
+def _disable(function_name: str, object_id: int) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} disable {object_id}")
+
+
+def _offline(function_name: str, object_id: int) -> None:
+    run_command(COMMAND_EXECUTOR + " " + f"{function_name} offline {object_id}")
