@@ -1,11 +1,10 @@
 import pytest
 
-from api                import One
-from pyone              import OneNoExistsException
-from utils              import get_user_auth
-from one_cli.host       import Host, create_host, host_exist
-from config             import BRESTADM
-
+from api                        import One
+from utils                      import get_user_auth
+from one_cli.host               import Host, create_host, host_exist
+from config                     import BRESTADM
+from tests._common_tests.delete import delete__test, delete_if_not_exist__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -27,18 +26,13 @@ def host(one: One):
 # =================================================================================================
 
 
-
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_host_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.host.delete(999999)
-
-
+   delete_if_not_exist__test(one.host)
+   
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_delete_host(one: One, host: Host):
-    assert host_exist(host._id)
-    one.host.delete(host._id)
-    assert not host_exist(host._id)
+    delete__test(one.host, host)
 
 

@@ -1,11 +1,12 @@
 import pytest
 import time
-from api                import One
-from pyone              import OneActionException, OneNoExistsException
-from utils              import get_user_auth
-from one_cli.datastore  import Datastore, create_datastore, datastore_exist
-from one_cli.image      import Image, create_image, image_exist
-from config             import BRESTADM
+from api                        import One
+from pyone                      import OneActionException, OneNoExistsException
+from utils                      import get_user_auth
+from one_cli.datastore          import Datastore, create_datastore, datastore_exist
+from one_cli.image              import Image, create_image, image_exist
+from config                     import BRESTADM
+from tests._common_tests.delete import delete__test, delete_if_not_exist__test, delete_undeletable__test
 
 
 BRESTADM_AUTH    = get_user_auth(BRESTADM)
@@ -64,20 +65,16 @@ def not_empty_datastore():
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.datastore.delete(999999)
+    delete_if_not_exist__test(one.datastore)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_delete_empty_datastore(one: One, empty_datastore: Datastore):
-    one.datastore.delete(empty_datastore._id)
-    assert not datastore_exist(empty_datastore._id)
+    delete__test(one.datastore, empty_datastore)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_delete_not_empty_datastore(one: One, not_empty_datastore: Datastore):
-    with pytest.raises(OneActionException):
-        one.datastore.delete(not_empty_datastore._id)
-    assert datastore_exist(not_empty_datastore._id)
+    delete_undeletable__test(one.datastore, not_empty_datastore)
