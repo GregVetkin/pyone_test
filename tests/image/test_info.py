@@ -11,7 +11,7 @@ from config             import BRESTADM
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def datastore():
     template = """
         NAME   = api_test_image_ds

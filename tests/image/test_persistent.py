@@ -13,7 +13,7 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def image_datastore():
     template = """
         NAME   = api_test_image_ds
@@ -27,7 +27,7 @@ def image_datastore():
     datastore.delete()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def system_datastore():
     template = """
         NAME   = api_test_system_ds

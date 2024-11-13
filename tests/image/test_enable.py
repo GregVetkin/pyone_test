@@ -15,7 +15,7 @@ IMAGE_STATES = {1: "ГОТОВО",
                 3: "Отключен",} 
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def image_datastore():
     datastore_template = """
         NAME   = api_test_image_ds

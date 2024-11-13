@@ -10,7 +10,7 @@ from tests._common_tests.chmod  import chmod__test, chmod_if_not_exist__test
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def datastore():
     datastore_template = """
         NAME   = api_test_image_ds

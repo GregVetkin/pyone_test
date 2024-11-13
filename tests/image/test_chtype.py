@@ -17,7 +17,7 @@ FILE_TYPES    = {3: "KERNEL",
                  5: "CONTEXT"}
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def image_datastore():
     datastore_template = """
         NAME   = api_test_image_ds
@@ -31,7 +31,7 @@ def image_datastore():
     datastore.delete()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def file_datastore():
     datastore_template = """
         NAME   = api_test_file_ds

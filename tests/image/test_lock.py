@@ -12,7 +12,7 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 IMAGE_LOCK_LEVELS = [1, 2, 3, 4]
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def datastore():
     template = """
         NAME   = api_test_image_ds
