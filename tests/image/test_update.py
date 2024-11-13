@@ -10,7 +10,7 @@ from config             import BRESTADM
 
 from tests._common_tests.update import update_and_merge__test
 from tests._common_tests.update import update_and_replace__test
-from tests._common_tests.update import update_if_not_exist_test
+from tests._common_tests.update import update_if_not_exist__test
 
 
 
@@ -54,7 +54,7 @@ def image(datastore: Datastore):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
-    update_if_not_exist_test(one.image)
+    update_if_not_exist__test(one.image)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)

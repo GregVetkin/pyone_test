@@ -5,7 +5,7 @@ from pyone      import OneNoExistsException
 
 
 
-def update_if_not_exist_test(api_method):
+def update_if_not_exist__test(api_method):
     with pytest.raises(OneNoExistsException):
         api_method.update(999999, template="", replace=True)
 

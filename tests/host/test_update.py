@@ -7,7 +7,7 @@ from config          import BRESTADM
 
 from tests._common_tests.update import update_and_merge__test
 from tests._common_tests.update import update_and_replace__test
-from tests._common_tests.update import update_if_not_exist_test
+from tests._common_tests.update import update_if_not_exist__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -32,7 +32,7 @@ def host(one: One):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_host_not_exist(one: One):
-    update_if_not_exist_test(one.host)
+    update_if_not_exist__test(one.host)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
