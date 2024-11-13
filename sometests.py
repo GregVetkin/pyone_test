@@ -13,17 +13,9 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
-# result = One(client).datastore.update(321, "TM_MAD = dev", replace=True)
+result = One(client).host.info(0)
 
-# print(result)
 
-# from one_cli.datastore import Datastore
 
-# ds = Datastore(321)
-# templ = """
-# TM_MAD = dummy
-# d1 = HAHAHA
-# """
-# ds.update(templ, False)
-res = client.zone.raftstatus()
-print(res)
+
+print(result.get_STATE())

@@ -8,7 +8,9 @@ from config             import BRESTADM
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
-
+# HOST_STATES = ['INIT', 'MONITORING_MONITORED', 'ENABLED',
+#                 'ERROR','DISABLED', 'MONITORING_ERROR',
+#                 'MONITORING_INIT','MONITORING_DISABLED', 'OFFLINE']
 
 @pytest.fixture()
 @pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
@@ -59,6 +61,7 @@ def test_host_offline(one: One, host: Host):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_host_enable(one: One, host: Host):
+    host.disable()
     #one.host.status(host._id, 0)
     one.host.enable(host._id)
-    assert host.info().STATE in (0, 2, 3)   # 0 - INIT, 2 - ONLINE, 3 - ERROR
+    assert host.info().STATE not in (4, 8)

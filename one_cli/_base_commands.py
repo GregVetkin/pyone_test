@@ -18,8 +18,9 @@ def _create(function_name: str, template: str) -> int:
 
 
 def _exist(function_name: str, object_id: int) -> bool:
-    exec_code = int(run_command(COMMAND_EXECUTOR + " " + f"{function_name} show {object_id} &>/dev/null; echo $?"))
-    return True if exec_code == 0 else False
+    exec_code_show = int(run_command(COMMAND_EXECUTOR + " " + f"{function_name} show {object_id} &>/dev/null; echo $?"))
+    exec_code_list = int(run_command(COMMAND_EXECUTOR + " " + f"{function_name} list | " + "awk '{print $1}' | " + f" grep {object_id} &>/dev/null; echo $?"))
+    return True if exec_code_show == 0 and exec_code_list == 0 else False
 
 
 def _chown(function_name: str, object_id: int, user_id: int, group_id: int = -1) -> None:
