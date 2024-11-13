@@ -6,6 +6,8 @@ from api._datastore         import OneDatastore
 from api._datastorepool     import OneDatastorepool
 from api._host              import OneHost
 from api._hostpool          import OneHostpool
+from api._template          import OneTemplate
+from api._templatepool      import OneTemplatepool
 
 
 
@@ -23,4 +25,7 @@ class One():
 
         self.host           = OneHost(self._one_api)
         self.hostpool       = OneHostpool(self._one_api)
+
+        self.template       = OneTemplate(self._one_api)
+        self.templatepool   = OneTemplatepool(self._one_api)
 

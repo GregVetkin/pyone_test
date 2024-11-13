@@ -9,13 +9,19 @@ auth_token  = "145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b913faf6e4ff085d2"
 
 
 client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
+one = One(client)
+
+
+templ = """
+NAME    = test
+CPU     = 1
+VCPU    = 2
+MEMORY  = 4096
+DISK    = [IMAGE_ID = 1195]
+"""
+
+result = one.template.chmod(4, 1, 1, 1, 1, 1, 1, 1, 1, 1, True)
 
 
 
-
-result = One(client).hostpool.info().HOST
-
-
-
-
-print(result.get_STATE())
+print(result)

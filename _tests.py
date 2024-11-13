@@ -538,60 +538,60 @@ TESTS["one"]["host"]["status"]              = TestData(
 #                                                         xml_rpc_method  =   "one.secgrouppoll.info",
 #                                                         test_file_path  =   f"{PROJECT_DIR}/tests/secgrouppoll/test_info.py"
 # )
-# # =======================================================================================================================
-# # one.template
-# TESTS["one"]["template"] = {}
-# TESTS["one"]["template"]["allocate"]        = TestData(
-#                                                         xml_rpc_method  =   "one.template.allocate",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_allocate.py"
-# )
-# TESTS["one"]["template"]["chmod"]           = TestData(
-#                                                         xml_rpc_method  =   "one.template.chmod",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_chmod.py"
-# )
-# TESTS["one"]["template"]["chown"]           = TestData(
-#                                                         xml_rpc_method  =   "one.template.chown",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_chown.py"
-# )
-# TESTS["one"]["template"]["clone"]           = TestData(
-#                                                         xml_rpc_method  =   "one.template.clone",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_clone.py"
-# )
-# TESTS["one"]["template"]["delete"]          = TestData(
-#                                                         xml_rpc_method  =   "one.template.delete",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_delete.py"
-# )
-# TESTS["one"]["template"]["info"]            = TestData(
-#                                                         xml_rpc_method  =   "one.template.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_info.py"
-# )
-# TESTS["one"]["template"]["instantiate"]     = TestData(
-#                                                         xml_rpc_method  =   "one.template.instantiate",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_instantiate.py"
-# )
-# TESTS["one"]["template"]["lock"]            = TestData(
-#                                                         xml_rpc_method  =   "one.template.lock",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_lock.py"
-# )
-# TESTS["one"]["template"]["rename"]          = TestData(
-#                                                         xml_rpc_method  =   "one.template.rename",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_rename.py"
-# )
-# TESTS["one"]["template"]["unlock"]          = TestData(
-#                                                         xml_rpc_method  =   "one.template.unlock",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_unlock.py"
-# )
-# TESTS["one"]["template"]["update"]          = TestData(
-#                                                         xml_rpc_method  =   "one.template.update",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/template/test_update.py"
-# )
-# # =======================================================================================================================
-# # one.templatepool
-# TESTS["one"]["templatepool"] = {}
-# TESTS["one"]["templatepool"]["info"]        = TestData(
-#                                                         xml_rpc_method  =   "one.templatepool.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/templatepool/test_info.py"
-# )
+# =======================================================================================================================
+# one.template
+TESTS["one"]["template"] = {}
+TESTS["one"]["template"]["allocate"]        = TestData(
+                                                        xml_rpc_method  =   "one.template.allocate",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_allocate.py"
+)
+TESTS["one"]["template"]["chmod"]           = TestData(
+                                                        xml_rpc_method  =   "one.template.chmod",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_chmod.py"
+)
+TESTS["one"]["template"]["chown"]           = TestData(
+                                                        xml_rpc_method  =   "one.template.chown",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_chown.py"
+)
+TESTS["one"]["template"]["clone"]           = TestData(
+                                                        xml_rpc_method  =   "one.template.clone",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_clone.py"
+)
+TESTS["one"]["template"]["delete"]          = TestData(
+                                                        xml_rpc_method  =   "one.template.delete",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_delete.py"
+)
+TESTS["one"]["template"]["info"]            = TestData(
+                                                        xml_rpc_method  =   "one.template.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_info.py"
+)
+TESTS["one"]["template"]["instantiate"]     = TestData(
+                                                        xml_rpc_method  =   "one.template.instantiate",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_instantiate.py"
+)
+TESTS["one"]["template"]["lock"]            = TestData(
+                                                        xml_rpc_method  =   "one.template.lock",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_lock.py"
+)
+TESTS["one"]["template"]["rename"]          = TestData(
+                                                        xml_rpc_method  =   "one.template.rename",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_rename.py"
+)
+TESTS["one"]["template"]["unlock"]          = TestData(
+                                                        xml_rpc_method  =   "one.template.unlock",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_unlock.py"
+)
+TESTS["one"]["template"]["update"]          = TestData(
+                                                        xml_rpc_method  =   "one.template.update",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/template/test_update.py"
+)
+# =======================================================================================================================
+# one.templatepool
+TESTS["one"]["templatepool"] = {}
+TESTS["one"]["templatepool"]["info"]        = TestData(
+                                                        xml_rpc_method  =   "one.templatepool.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/templatepool/test_info.py"
+)
 # # =======================================================================================================================
 # # one.user
 # TESTS["one"]["user"] = {}
