@@ -7,14 +7,14 @@ from pyone      import OneNoExistsException
 
 def update_if_not_exist_test(api_method):
     with pytest.raises(OneNoExistsException):
-        api_method.update(99999, template="", replace=True)
+        api_method.update(999999, template="", replace=True)
 
     with pytest.raises(OneNoExistsException):
-        api_method.update(99999, template="", replace=False)
+        api_method.update(999999, template="", replace=False)
 
 
 
-def test_update_and_replace_test(api_method, one_object):
+def update_and_replace__test(api_method, one_object):
     # Создание стартовых атрибутов в шаблоне объекта, которые будут проверяться
     start_attributes = [f"START_ATTR_{_}" for _ in range(3)]
     start_template   = "".join(f"{attr} = {_}\n" for _, attr in enumerate(start_attributes))
@@ -38,7 +38,7 @@ def test_update_and_replace_test(api_method, one_object):
 
 
 
-def test_update_and_merge_test(api_method, one_object):
+def update_and_merge__test(api_method, one_object):
     # Создание стартовых атрибутов в шаблоне объекта, которые будут проверяться
     start_attributes = [f"START_ATTR_{_}" for _ in range(3)]
     start_template   = "".join(f"{attr} = {_}\n" for _, attr in enumerate(start_attributes))

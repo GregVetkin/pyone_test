@@ -1,12 +1,17 @@
 import pytest
-import random
 
 from api                import One
-from pyone              import OneNoExistsException, OneAuthorizationException
+from pyone              import OneAuthorizationException
 from utils              import get_user_auth
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
+
+
+from tests._common_tests.update import update_and_merge__test
+from tests._common_tests.update import update_and_replace__test
+from tests._common_tests.update import update_if_not_exist_test
+
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -49,12 +54,18 @@ def image(datastore: Datastore):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.image.update(99999, template="", replace=True)
+    update_if_not_exist_test(one.image)
 
-    with pytest.raises(OneNoExistsException):
-        one.image.update(99999, template="", replace=False)
 
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_update_image__replace(one: Image, image: Image):
+    update_and_replace__test(one.image, image)
+
+
+
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_update_image__merge(one: Image, image: Image):
+    update_and_merge__test(one.image, image)
 
 
 #@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
@@ -67,41 +78,3 @@ def test_update_locked_image(one: Image, image: Image, lock_level):
     with pytest.raises(OneAuthorizationException):
         one.image.update(image._id, template=f"{new_attribute_name} = TEST_DATA")
     assert new_attribute_name not in image.info().TEMPLATE
-
-
-
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_update_image__replace(one: Image, image: Image):
-    start_attribute_name = "START_ATTRIBUTE"
-    image.update(f"{start_attribute_name} = TEST", append=True)
-
-    new_attibutes = [f"ATTR_{_}" for _ in range(1, 6)]
-    attr_template = "".join(f"{attr} = {_}\n" for _, attr in enumerate(new_attibutes))
-    
-    one.image.update(image._id, attr_template, replace=True)
-    image_new_template = image.info().TEMPLATE
-
-    for new_attribute in image_new_template:
-        assert new_attribute in image_new_template
-
-    assert start_attribute_name not in image_new_template
-
-
-
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_update_image__merge(one: Image, image: Image):
-    start_attribute_name      = "START_ATTRIBUTE"
-    image.update(f"{start_attribute_name} = TEST", append=True)
-    start_attribute_new_value = "new_attr_value"
-
-    new_attibutes  = [f"ATTR_{_}" for _ in range(1, 6)]
-    attr_template  = "".join(f"{attr} = {_}\n" for _, attr in enumerate(new_attibutes))
-    attr_template += f"{start_attribute_name} = {start_attribute_new_value}\n"
-
-    one.image.update(image._id, attr_template, replace=False)
-    image_new_template = image.info().TEMPLATE
-
-    for new_attribute in image_new_template:
-        assert new_attribute in image_new_template
-
-    assert image_new_template[start_attribute_name] == start_attribute_new_value
