@@ -1,12 +1,19 @@
 import pytest
 
 from api                import One
-from pyone              import OneNoExistsException
 from utils              import get_user_auth
 from one_cli.datastore  import Datastore, create_datastore
 from one_cli.user       import User, create_user
 from one_cli.group      import Group, create_group
 from config             import BRESTADM
+
+from tests._common_tests.chown  import chown_object_not_exist__test
+from tests._common_tests.chown  import chown_user_not_exist__test
+from tests._common_tests.chown  import chown_group_not_exist__test
+from tests._common_tests.chown  import chown_user_and_group_change__test
+from tests._common_tests.chown  import chown_user_and_group_not_changed__test
+from tests._common_tests.chown  import chown_user_change__test
+from tests._common_tests.chown  import chown_group_change__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -50,71 +57,41 @@ def group():
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.datastore.chown(999999)
+    chown_object_not_exist__test(one.datastore)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_user_not_exist(one: One, datastore: Datastore):
-    datastore_old_info = datastore.info()
-    with pytest.raises(OneNoExistsException):
-        one.datastore.chown(datastore._id, user_id=999999)
-    datastore_new_info = datastore.info()
-
-    assert datastore_old_info.UID == datastore_new_info.UID
+    chown_user_not_exist__test(one.datastore, datastore)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_group_not_exist(one: One, datastore: Datastore):
-    datastore_old_info = datastore.info()
-    with pytest.raises(OneNoExistsException):
-        one.datastore.chown(datastore._id, group_id=999999)
-    datastore_new_info = datastore.info()
-
-    assert datastore_old_info.GID == datastore_new_info.GID
+    chown_group_not_exist__test(one.datastore, datastore)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_user_and_group_change(one: One, datastore: Datastore, user: User, group: Group):
-    one.datastore.chown(datastore._id, user._id, group._id)
-    datastore_new_info = datastore.info()
-
-    assert user._id  == datastore_new_info.UID
-    assert group._id == datastore_new_info.GID
+    chown_user_and_group_change__test(one.datastore, datastore, user, group)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_user_and_group_not_changed(one: One, datastore: Datastore):
-    datastore_old_info = datastore.info()
-    one.datastore.chown(datastore._id)
-    datastore_new_info = datastore.info()
-
-    assert datastore_old_info.UNAME == datastore_new_info.UNAME
-    assert datastore_old_info.GNAME == datastore_new_info.GNAME
+    chown_user_and_group_not_changed__test(one.datastore, datastore)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_user_change(one: One, datastore: Datastore, user: User):
-    datastore_old_info = datastore.info()
-    one.datastore.chown(datastore._id, user._id)
-    datastore_new_info = datastore.info()
-
-    assert datastore_new_info.UID == user._id
-    assert datastore_new_info.GID == datastore_old_info.GID
+    chown_user_change__test(one.datastore, datastore, user)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_group_change(one: One, datastore: Datastore, group: Group):
-    datastore_old_info = datastore.info()
-    one.datastore.chown(datastore._id, group_id=group._id)
-    datastore_new_info = datastore.info()
-
-    assert datastore_new_info.UID == datastore_old_info.UID
-    assert datastore_new_info.GID == group._id
+    chown_group_change__test(one.datastore, datastore, group)
 

@@ -13,7 +13,7 @@ client = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
 
 
 
-result = One(client).host.info(0)
+result = One(client).hostpool.info().HOST
 
 
 

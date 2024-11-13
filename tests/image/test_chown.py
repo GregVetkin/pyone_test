@@ -9,6 +9,14 @@ from one_cli.user       import User, create_user
 from one_cli.group      import Group, create_group
 from config             import BRESTADM
 
+from tests._common_tests.chown  import chown_object_not_exist__test
+from tests._common_tests.chown  import chown_user_not_exist__test
+from tests._common_tests.chown  import chown_group_not_exist__test
+from tests._common_tests.chown  import chown_user_and_group_change__test
+from tests._common_tests.chown  import chown_user_and_group_not_changed__test
+from tests._common_tests.chown  import chown_user_change__test
+from tests._common_tests.chown  import chown_group_change__test
+
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
@@ -65,70 +73,40 @@ def group():
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.image.chown(999999)
+    chown_object_not_exist__test(one.image)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_user_not_exist(one: One, image: Image):
-    image_old_info  = image.info()
-    with pytest.raises(OneNoExistsException):
-        one.image.chown(image._id, user_id=999999)
-    image_new_info  = image.info()
-
-    assert image_old_info.UID == image_new_info.UID
+    chown_user_not_exist__test(one.image, image)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_group_not_exist(one: One, image: Image):
-    image_old_info  = image.info()
-    with pytest.raises(OneNoExistsException):
-        one.image.chown(image._id, group_id=999999)
-    image_new_info  = image.info()
-
-    assert image_old_info.GID == image_new_info.GID
+    chown_group_not_exist__test(one.image, image)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_user_and_group_change(one: One, image: Image, user: User, group: Group):
-    one.image.chown(image._id, user._id, group._id)
-    image_new_info = image.info()
-
-    assert user._id  == image_new_info.UID
-    assert group._id == image_new_info.GID
+    chown_user_and_group_change__test(one.image, image, user, group)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_user_and_group_not_changed(one: One, image: Image):
-    image_old_info = image.info()
-    one.image.chown(image._id)
-    image_new_info = image.info()
-    
-    assert image_old_info.UID == image_new_info.UID
-    assert image_old_info.GID == image_new_info.GID
+    chown_user_and_group_not_changed__test(one.image, image)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_user_change(one: One, image: Image, user: User):
-    image_old_info = image.info()
-    one.image.chown(image._id, user_id=user._id)
-    image_new_info = image.info()
-
-    assert image_new_info.UID == user._id
-    assert image_new_info.GID == image_old_info.GID
+    chown_user_change__test(one.image, image, user)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_group_change(one: One, image: Image, group: Group):
-    image_old_info = image.info()
-    one.image.chown(image._id, group_id=group._id)
-    image_new_info = image.info()
-
-    assert image_new_info.UID == image_old_info.UID
-    assert image_new_info.GID == group._id
+    chown_group_change__test(one.image, image, group)
