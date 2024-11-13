@@ -1,12 +1,15 @@
 import pytest
 import time
-from api                        import One
-from pyone                      import OneActionException, OneNoExistsException
-from utils                      import get_user_auth
-from one_cli.datastore          import Datastore, create_datastore, datastore_exist
-from one_cli.image              import Image, create_image, image_exist
-from config                     import BRESTADM
-from tests._common_tests.delete import delete__test, delete_if_not_exist__test, delete_undeletable__test
+
+from api                import One
+from utils              import get_user_auth
+from one_cli.datastore  import Datastore, create_datastore, datastore_exist
+from one_cli.image      import Image, create_image, image_exist
+from config             import BRESTADM
+
+from tests._common_tests.delete import delete__test
+from tests._common_tests.delete import delete_if_not_exist__test
+from tests._common_tests.delete import delete_undeletable__test
 
 
 BRESTADM_AUTH    = get_user_auth(BRESTADM)

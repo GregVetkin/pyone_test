@@ -12,7 +12,6 @@ def delete_if_not_exist__test(api_method) -> None:
 
 
 
-
 def delete__test(api_method, one_object) -> None:
     assert _exist(one_object._function, one_object._id)
     api_method.delete(one_object._id)

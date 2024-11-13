@@ -1,18 +1,21 @@
 import pytest
 
 from api                import One
-from pyone              import OneActionException, OneNoExistsException, OneAuthorizationException
+from pyone              import OneAuthorizationException
 from utils              import get_user_auth
 from one_cli.vm         import VirtualMachine, create_vm
 from one_cli.image      import Image, create_image, wait_image_ready, image_exist
 from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 
+from tests._common_tests.delete import delete__test
+from tests._common_tests.delete import delete_if_not_exist__test
+from tests._common_tests.delete import delete_undeletable__test
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def image_datastore():
     datastore_template = """
         NAME   = api_test_image_ds
@@ -84,24 +87,17 @@ def used_image(image_datastore: Datastore):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.image.delete(999999)
-
+    delete_if_not_exist__test(one.image)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_delete(one: One, image: Image):
-    one.image.delete(image._id)
-    assert not image_exist(image._id)
-
+    delete__test(one.image, image)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_used_image_delete(one: One, used_image: Image):
-    with pytest.raises(OneActionException):
-        one.image.delete(used_image._id)
-    assert image_exist(used_image._id)
-
+    delete_undeletable__test(one.image, used_image)
 
 
 #@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")

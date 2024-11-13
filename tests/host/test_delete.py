@@ -1,11 +1,13 @@
 import pytest
 
-from api                        import One
-from utils                      import get_user_auth
-from one_cli.host               import Host, create_host, host_exist
-from config                     import BRESTADM
-from tests._common_tests.delete import delete__test, delete_if_not_exist__test
+from api           import One
+from utils         import get_user_auth
+from one_cli.host  import Host, create_host, host_exist
+from config        import BRESTADM
 
+from tests._common_tests.delete import delete__test
+from tests._common_tests.delete import delete_if_not_exist__test
+from tests._common_tests.delete import delete_undeletable__test
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
@@ -36,3 +38,7 @@ def test_delete_host(one: One, host: Host):
     delete__test(one.host, host)
 
 
+@pytest.mark.skip(reason="Сделать тест(фикстуру хоста с вм). Добавить классу вм метод миграции. Проверить возможна ли миграция на хост в статусе err")
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_delete_host_with_vm(one: One, host: Host):
+    delete_undeletable__test(one.host, host)
