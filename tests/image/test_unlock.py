@@ -1,11 +1,15 @@
 import pytest
 
 from api                import One
-from pyone              import OneNoExistsException
 from utils              import get_user_auth
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import BRESTADM, LOCK_LEVELS
+
+from tests._common_tests.unlock   import unlock_locked__test
+from tests._common_tests.unlock   import unlock_unlocked__test
+from tests._common_tests.unlock   import unlock_if_not_exist__test
+
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
@@ -45,23 +49,16 @@ def image(datastore: Datastore):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.image.unlock(99999)
+    unlock_if_not_exist__test(one.image)
 
 
-
-@pytest.mark.parametrize("lock_level", [1, 2, 3, 4])
+@pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_unlock_locked_image(one: One, image: Image, lock_level):
     image.lock(lock_level)
-    assert image.info().LOCK.LOCKED == lock_level
-    one.image.unlock(image._id)
-    assert image.info().LOCK == None
-
+    unlock_locked__test(one.image, image)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_unlock_unlocked_image(one: One, image: Image):
-    assert image.info().LOCK == None
-    one.image.unlock(image._id)
-    assert image.info().LOCK == None
+    unlock_unlocked__test(one.image, image)

@@ -1,30 +1,21 @@
 import pyone
-from api import One
+
+from api            import One
+from config         import BRESTADM, API_URI
+from utils.users    import get_user_auth
+
+one  = One(pyone.OneServer(API_URI, get_user_auth(BRESTADM)))
 
 
 
-auth_url    = "http://bufn1.brest.local:2633/RPC2"
-auth_user   = "brestadm"
-auth_token  = "145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b913faf6e4ff085d2"
-
-
-server  = pyone.OneServer(auth_url, session=auth_user + ':' + auth_token)
-one     = One(server)
-
-
-# templ = """
-#     NAME    = test2222
-#     CPU     = 1
-#     VCPU    = 2
-#     MEMORY  = 4096
-#     DISK    = [IMAGE_ID = 1195]
-# """
+templ = """
+    NAME = test2222
+"""
 
 
 
-# result = one.template.chmod(4, 1, 1, 1, 1, 1, 1, 1, 1, 1, True)
+result = one.template.instantiate(80, "testing", extra_template="MEMORY=32\nCPU=0.1")
 
 
-# print(result)
+print(result)
 
-assert {54, 55, 56} == set([54, 55, 56])
