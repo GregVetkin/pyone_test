@@ -1,6 +1,6 @@
 import xml.etree.ElementTree as xmlTree
 from dataclasses    import dataclass
-
+from typing         import Optional
 
 
 @dataclass
@@ -51,3 +51,16 @@ def parse_permissions_from_xml(raw_xml: str) -> Permissions:
             GROUP=  group_permissions,
             OTHER=  other_permissions,
         )
+
+
+def parse_lock_from_xml(raw_xml: str) -> Optional[LockStatus]:
+    xml  = xmlTree.fromstring(raw_xml)
+    lock = None
+    if xml.find('LOCK'):
+        lock = LockStatus(
+            LOCKED=     int(xml.find('LOCK/LOCKED').text),
+            OWNER=      int(xml.find('LOCK/OWNER').text),
+            TIME=       int(xml.find('LOCK/TIME').text),
+            REQ_ID=     int(xml.find('LOCK/REQ_ID').text)
+        )
+    return lock
