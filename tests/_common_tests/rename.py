@@ -6,20 +6,20 @@ from config     import BAD_SYMBOLS
 
 
 
-def rename_if_not_exist_test(api_method) -> None:
+def rename_if_not_exist__test(api_method) -> None:
     with pytest.raises(OneNoExistsException):
         api_method.rename(999999, "GregVetkin")
 
 
 
-def rename_test(api_method, one_object) -> None:
+def rename__test(api_method, one_object) -> None:
     new_name = "GregVetkin"
     api_method.rename(one_object._id, new_name)
     assert new_name == one_object.info().NAME
 
 
 
-def rename_collision_test(api_method, one_object_1, one_object_2) -> None:
+def rename_collision__test(api_method, one_object_1, one_object_2) -> None:
     old_name = one_object_1.info().NAME
     with pytest.raises(OneActionException):
         api_method.rename(one_object_1._id, one_object_2.info().NAME)
@@ -28,7 +28,7 @@ def rename_collision_test(api_method, one_object_1, one_object_2) -> None:
 
 
 
-def rename_empty_name_test(api_method, one_object):
+def rename_empty_name__test(api_method, one_object):
     old_name = one_object.info().NAME
     with pytest.raises(OneActionException):
         api_method.rename(one_object._id, "")
@@ -38,7 +38,7 @@ def rename_empty_name_test(api_method, one_object):
 
 
 @pytest.mark.parametrize("bad_symbol", BAD_SYMBOLS)
-def rename_unavailable_symbols_test(api_method, one_object, bad_symbol):
+def rename_unavailable_symbols__test(api_method, one_object, bad_symbol):
     old_name = one_object.info().NAME
 
     with pytest.raises(OneActionException):

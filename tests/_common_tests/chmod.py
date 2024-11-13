@@ -18,14 +18,15 @@ def _rights_as_bool_tuples(one_object):
 
 
 
-def test_chmod_if_not_exist(api_method):
+def chmod_if_not_exist__test(api_method):
     with pytest.raises(OneNoExistsException):
         api_method.chmod(999999)
 
 
 
 
-def test_chmod(api_method, one_object):
+def chmod__test(api_method, one_object):
+    one_object.chmod("000")
 
     api_method.chmod(one_object._id, user_use=1)
     assert _rights_as_bool_tuples(one_object) == (  (True, False, False), 

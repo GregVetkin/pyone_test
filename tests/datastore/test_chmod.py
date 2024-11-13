@@ -1,15 +1,12 @@
 import pytest
-
-from api                import One
-from pyone              import OneNoExistsException
-from utils              import get_user_auth
-from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
-
+from api                        import One
+from utils                      import get_user_auth
+from one_cli.datastore          import Datastore, create_datastore
+from config                     import BRESTADM
+from tests._common_tests.chmod  import chmod__test, chmod_if_not_exist__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
-
 
 
 
@@ -29,16 +26,6 @@ def datastore():
 
 
 
-
-def datastore_rights(datastore_id: int):
-    rights = Datastore(datastore_id).info().PERMISSIONS
-
-    return ((rights.OWNER.USE, rights.OWNER.MANAGE, rights.OWNER.ADMIN),
-            (rights.GROUP.USE, rights.GROUP.MANAGE, rights.GROUP.ADMIN),
-            (rights.OTHER.USE, rights.OTHER.MANAGE, rights.OTHER.ADMIN))
-    
-
-
 # =================================================================================================
 # TESTS
 # =================================================================================================
@@ -46,106 +33,10 @@ def datastore_rights(datastore_id: int):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.datastore.chmod(999999)
-
+    chmod_if_not_exist__test(one.datastore)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_change_datastore_rights(one: One, datastore: Datastore):
-    datastore_id = datastore._id
+    chmod__test(one.datastore, datastore)
 
-    
-    one.datastore.chmod(datastore_id, user_use=1)
-    assert datastore_rights(datastore_id) == (  (True, False, False), 
-                                                (False, False, False), 
-                                                (False, False, False))
-
-    one.datastore.chmod(datastore_id, user_manage=1)
-    assert datastore_rights(datastore_id) == (  (True, True, False), 
-                                                (False, False, False), 
-                                                (False, False, False))
-
-    one.datastore.chmod(datastore_id, user_admin=1)
-    assert datastore_rights(datastore_id) == (  (True, True, True), 
-                                                (False, False, False), 
-                                                (False, False, False))
-
-    one.datastore.chmod(datastore_id, user_admin=0)
-    assert datastore_rights(datastore_id) == (  (True, True, False), 
-                                                (False, False, False), 
-                                                (False, False, False))
-
-    one.datastore.chmod(datastore_id, user_manage=0)
-    assert datastore_rights(datastore_id) == (  (True, False, False), 
-                                                (False, False, False), 
-                                                (False, False, False))
-    
-    one.datastore.chmod(datastore_id, user_use=0)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (False, False, False), 
-                                                (False, False, False))
-
-
-
-    one.datastore.chmod(datastore_id, group_use=1)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (True, False, False), 
-                                                (False, False, False))
-
-    one.datastore.chmod(datastore_id, group_manage=1)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (True, True, False), 
-                                                (False, False, False))
-
-    one.datastore.chmod(datastore_id, group_admin=1)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (True, True, True), 
-                                                (False, False, False))
-
-    one.datastore.chmod(datastore_id, group_admin=0)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (True, True, False), 
-                                                (False, False, False))
-
-    one.datastore.chmod(datastore_id, group_manage=0)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (True, False, False), 
-                                                (False, False, False))
-    
-    one.datastore.chmod(datastore_id, group_use=0)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (False, False, False), 
-                                                (False, False, False))
-
-
-
-    one.datastore.chmod(datastore_id, other_use=1)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (False, False, False), 
-                                                (True, False, False))
-
-    one.datastore.chmod(datastore_id, other_manage=1)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (False, False, False), 
-                                                (True, True, False))
-
-    one.datastore.chmod(datastore_id, other_admin=1)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (False, False, False), 
-                                                (True, True, True))
-
-    one.datastore.chmod(datastore_id, other_admin=0)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (False, False, False), 
-                                                (True, True, False))
-
-    one.datastore.chmod(datastore_id, other_manage=0)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (False, False, False), 
-                                                (True, False, False))
-    
-    one.datastore.chmod(datastore_id, other_use=0)
-    assert datastore_rights(datastore_id) == (  (False, False, False), 
-                                                (False, False, False), 
-                                                (False, False, False))
