@@ -1,10 +1,15 @@
 import pytest
 
-from api                import One
-from pyone              import OneNoExistsException, OneActionException
-from utils              import get_user_auth
-from one_cli.host       import Host, create_host, host_exist
-from config             import BRESTADM
+from api                        import One
+from utils                      import get_user_auth
+from one_cli.host               import Host, create_host, host_exist
+from config                     import BRESTADM, BAD_SYMBOLS
+
+from tests._common_tests.rename import rename__test
+from tests._common_tests.rename import rename_if_not_exist__test
+from tests._common_tests.rename import rename_unavailable_symbol__test
+from tests._common_tests.rename import rename_empty_name__test
+from tests._common_tests.rename import rename_collision__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -40,55 +45,26 @@ def host_2(one: One):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_host_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.host.rename(99999, "GregoryVetkin")
-
+    rename_if_not_exist__test(one.host)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_rename_host(one: One, host: Host):
-    new_name = "api_test_new_host_name"
-    one.host.rename(host._id, new_name)
-    assert host.info().NAME == new_name
-
+    rename__test(one.host, host)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_host_name_collision(one: One, host: Host, host_2: Host):
-    host_old_name = host.info().NAME
-    with pytest.raises(OneActionException):
-        one.host.rename(host._id, host_2.info().NAME)
-    host_new_name = host.info().NAME
-    assert host_old_name == host_new_name
-
+    rename_collision__test(one.host, host, host_2)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_empty_host_name(one: One, host: Host):
-    host_old_name = host.info().NAME
-    with pytest.raises(OneActionException):
-        one.host.rename(host._id, "")
-    host_new_name = host.info().NAME
-    assert host_old_name == host_new_name
+    rename_empty_name__test(one.host, host)
 
 
-
-@pytest.mark.parametrize("symbol", ["$", "#", "&", "\"", "\'", ">", "<", "/", "\\", "|"])
+@pytest.mark.parametrize("bad_symbol", BAD_SYMBOLS)
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_unavailable_symbols_in_host_name(one: One, host: Host, symbol: str):
-    host_old_name = host.info().NAME
-
-    with pytest.raises(OneActionException):
-        one.host.rename(host._id, f"test{symbol}")
-
-    with pytest.raises(OneActionException):
-        one.host.rename(host._id, f"{symbol}test")
-    
-    with pytest.raises(OneActionException):
-        one.host.rename(host._id, f"te{symbol}st")
-    
-    with pytest.raises(OneActionException):
-        one.host.rename(host._id, f"{symbol}")
-
-    assert host.info().NAME == host_old_name
+def test_unavailable_symbols_in_host_name(one: One, host: Host, bad_symbol: str):
+    rename_unavailable_symbol__test(one.host, host, bad_symbol)
 

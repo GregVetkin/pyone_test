@@ -37,8 +37,7 @@ def rename_empty_name__test(api_method, one_object):
 
 
 
-@pytest.mark.parametrize("bad_symbol", BAD_SYMBOLS)
-def rename_unavailable_symbols__test(api_method, one_object, bad_symbol):
+def rename_unavailable_symbol__test(api_method, one_object, bad_symbol):
     old_name = one_object.info().NAME
 
     with pytest.raises(OneActionException):

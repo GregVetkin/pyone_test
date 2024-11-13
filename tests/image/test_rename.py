@@ -1,11 +1,17 @@
 import pytest
 
-from api                import One
-from pyone              import OneNoExistsException, OneActionException
-from utils              import get_user_auth
-from one_cli.image      import Image, create_image
-from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from api                        import One
+from utils                      import get_user_auth
+from one_cli.image              import Image, create_image
+from one_cli.datastore          import Datastore, create_datastore
+from config                     import BRESTADM, BAD_SYMBOLS
+
+from tests._common_tests.rename import rename__test
+from tests._common_tests.rename import rename_if_not_exist__test
+from tests._common_tests.rename import rename_unavailable_symbol__test
+from tests._common_tests.rename import rename_empty_name__test
+from tests._common_tests.rename import rename_collision__test
+
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -60,56 +66,25 @@ def image_2(datastore: Datastore):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.image.rename(99999, "GregoryVetkin")
-
+    rename_if_not_exist__test(one.image)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_change_image_name(one: One, image: Image):
-    new_name = "api_test_image_new"
-    one.image.rename(image._id, new_name)
-    image_new_name = image.info().NAME
-    assert new_name == image_new_name
+    rename__test(one.image, image)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_name_collision(one: One, image: Image, image_2: Image):
-    image_old_name = image.info().NAME
-    with pytest.raises(OneActionException):
-        one.image.rename(image._id, image_2.info().NAME)
-    image_new_name = image.info().NAME
-    assert image_old_name == image_new_name
-
+    rename_collision__test(one.image, image, image_2)
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_empty_image_name(one: One, image: Image):
-    image_old_name = image.info().NAME
-    with pytest.raises(OneActionException):
-        one.image.rename(image._id, "")
-    image_new_name = image.info().NAME
-    assert image_old_name == image_new_name
+    rename_empty_name__test(one.image, image)
 
 
-
-@pytest.mark.parametrize("bad_symbol", ["$", "#", "&", "\"", "\'", ">", "<", "/", "\\", "|"])
+@pytest.mark.parametrize("bad_symbol", BAD_SYMBOLS)
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_unavailable_symbols_in_image_name(one: One, image: Image, bad_symbol: str):
-    image_old_name = image.info().NAME
-
-    with pytest.raises(OneActionException):
-        one.image.rename(image._id, f"test{bad_symbol}")
-    assert image_old_name == image.info().NAME
-
-    with pytest.raises(OneActionException):
-        one.image.rename(image._id, f"{bad_symbol}test")
-    assert image_old_name == image.info().NAME
-
-    with pytest.raises(OneActionException):
-        one.image.rename(image._id, f"te{bad_symbol}st")
-    assert image_old_name == image.info().NAME
-
-    with pytest.raises(OneActionException):
-        one.image.rename(image._id, bad_symbol)
-    assert image_old_name == image.info().NAME
+    rename_unavailable_symbol__test(one.image, image, bad_symbol)
