@@ -1,7 +1,7 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.datastore  import Datastore, create_datastore
 from one_cli.user       import User, create_user
 from one_cli.group      import Group, create_group
@@ -21,8 +21,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture
 def datastore():
-    datastore_template = """
-        NAME   = api_test_system_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
@@ -34,7 +34,7 @@ def datastore():
     
 @pytest.fixture
 def user():
-    user_id = create_user("api_test_user")
+    user_id = create_user(get_unic_name())
     user    = User(user_id)
     yield user
     user.delete()
@@ -42,7 +42,7 @@ def user():
 
 @pytest.fixture
 def group():
-    group_id = create_group("api_test_group")
+    group_id = create_group(get_unic_name())
     group    = Group(group_id)
     yield group
     group.delete()

@@ -2,7 +2,7 @@ import pytest
 
 from api                import One
 from pyone              import OneActionException, OneNoExistsException, OneException
-from utils              import get_user_auth, create_temp_file, delete_temp_file
+from utils              import get_user_auth, create_temp_file, delete_temp_file, get_unic_name
 from one_cli.image      import Image, image_exist
 from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
@@ -13,8 +13,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture(scope="module")
 def image_datastore():
-    datastore_template = """
-        NAME   = api_test_image_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -28,8 +28,8 @@ def image_datastore():
 
 @pytest.fixture(scope="module")
 def system_datastore():
-    datastore_template = """
-        NAME   = api_test_system_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = system_DS
         TM_MAD = ssh
     """
@@ -47,8 +47,8 @@ def system_datastore():
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_not_exist(one: One):
-    template = """
-        NAME = api_test_image_0
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -59,8 +59,8 @@ def test_datastore_not_exist(one: One):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_dont_check_capacity(one: One, image_datastore: Datastore):
-    template = """
-        NAME = api_test_image_1
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1024000
     """
@@ -73,8 +73,8 @@ def test_dont_check_capacity(one: One, image_datastore: Datastore):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_check_capacity(one: One, image_datastore: Datastore):
-    template = """
-        NAME = api_test_image_2
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1024000
     """
@@ -85,8 +85,8 @@ def test_check_capacity(one: One, image_datastore: Datastore):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_wrong_image_type_for_datastore(one: One, system_datastore: Datastore):
-    template = """
-        NAME = api_test_image_3
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -100,7 +100,7 @@ def test_image_with_localfile_load(one: One, image_datastore: Datastore):
     file_path = "/tmp/testfile"
     create_temp_file(1, file_path)
     template  = f"""
-        NAME = api_test_image_4
+        NAME = {get_unic_name()}
         TYPE = OS
         PATH = {file_path}
     """

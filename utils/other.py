@@ -28,5 +28,5 @@ def delete_temp_file(file_path: str):
     run_command(COMMAND_EXECUTOR + " " + f"rm -f {file_path}")
 
 
-def create_unic_name(prefix: str = "api_test_", postfix: str = ""):
+def get_unic_name(prefix: str = "api_test_", postfix: str = ""):
     return f"{prefix}{time_ns()}{postfix}"

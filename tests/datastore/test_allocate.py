@@ -2,7 +2,7 @@ import pytest
 
 from api                import One
 from pyone              import OneNoExistsException
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.datastore  import Datastore, datastore_exist
 from config             import BRESTADM
 
@@ -10,20 +10,20 @@ from config             import BRESTADM
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
-IMAGE_DS_TEMPLATE = """
-    NAME   = api_test_image_ds
+IMAGE_DS_TEMPLATE = f"""
+    NAME   = {get_unic_name()}
     TYPE   = IMAGE_DS
     TM_MAD = ssh
     DS_MAD = fs
 """
-FILE_DS_TEMPLATE = """
-    NAME   = api_test_file_ds
+FILE_DS_TEMPLATE = f"""
+    NAME   = {get_unic_name()}
     TYPE   = FILE_DS
     TM_MAD = ssh
     DS_MAD = fs
 """
-SYSTEM_DS_TEMPLATE = """
-    NAME   = api_test_system_ds
+SYSTEM_DS_TEMPLATE = f"""
+    NAME   = {get_unic_name()}
     TYPE   = SYSTEM_DS
     TM_MAD = ssh
 """

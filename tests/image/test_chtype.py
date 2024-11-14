@@ -2,7 +2,7 @@ import pytest
 
 from api                import One
 from pyone              import OneActionException, OneNoExistsException
-from utils              import get_user_auth, create_temp_file, delete_temp_file
+from utils              import get_user_auth, create_temp_file, delete_temp_file, get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
@@ -19,8 +19,8 @@ FILE_TYPES    = {3: "KERNEL",
 
 @pytest.fixture(scope="module")
 def image_datastore():
-    datastore_template = """
-        NAME   = api_test_image_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -33,8 +33,8 @@ def image_datastore():
 
 @pytest.fixture(scope="module")
 def file_datastore():
-    datastore_template = """
-        NAME   = api_test_file_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = FILE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -47,8 +47,8 @@ def file_datastore():
 
 @pytest.fixture
 def datablock_image(image_datastore: Datastore):
-    template = """
-        NAME = api_test_image
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -62,7 +62,7 @@ def datablock_image(image_datastore: Datastore):
 def context_image(file_datastore: Datastore):
     file_path       = "/var/tmp/test_file"
     image_template  = f"""
-        NAME = api_test_file
+        NAME = {get_unic_name()}
         TYPE = CONTEXT
         PATH = {file_path}
     """

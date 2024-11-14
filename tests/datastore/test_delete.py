@@ -2,7 +2,7 @@ import pytest
 import time
 
 from api                import One
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.datastore  import Datastore, create_datastore, datastore_exist
 from one_cli.image      import Image, create_image, image_exist
 from config             import BRESTADM
@@ -17,8 +17,8 @@ BRESTADM_AUTH    = get_user_auth(BRESTADM)
 
 @pytest.fixture
 def empty_datastore():
-    datastore_template = """
-        NAME   = api_test_system_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
@@ -32,8 +32,8 @@ def empty_datastore():
 
 @pytest.fixture
 def not_empty_datastore():
-    datastore_template = """
-        NAME   = api_test_system_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -41,8 +41,8 @@ def not_empty_datastore():
     datastore_id = create_datastore(datastore_template)
     datastore    = Datastore(datastore_id)
 
-    image_template = """
-        NAME = api_test_datablock
+    image_template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """

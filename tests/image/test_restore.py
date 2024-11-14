@@ -2,7 +2,7 @@ import pytest
 import time
 from api                import One
 from pyone              import OneNoExistsException, OneException
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.image      import Image, create_image, image_exist, wait_image_ready
 from one_cli.datastore  import Datastore, create_datastore
 from one_cli.vm         import VirtualMachine, create_vm, vm_exist
@@ -14,8 +14,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture(scope="module")
 def image_datastore():
-    template = """
-        NAME   = api_test_image_ds
+    template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -28,8 +28,8 @@ def image_datastore():
 
 @pytest.fixture(scope="module")
 def file_datastore():
-    template = """
-        NAME   = api_test_file_ds
+    template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = FILE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -42,8 +42,8 @@ def file_datastore():
 
 @pytest.fixture(scope="module")
 def system_datastore():
-    template = """
-        NAME   = api_test_system_ds
+    template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
@@ -55,8 +55,8 @@ def system_datastore():
 
 @pytest.fixture
 def image(image_datastore: Datastore):
-    template = """
-        NAME = api_test_image
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -68,15 +68,15 @@ def image(image_datastore: Datastore):
 
 @pytest.fixture
 def backup_image(image_datastore: Datastore, system_datastore: Datastore, file_datastore: Datastore):
-    image_template = """
-        NAME = api_test_image
+    image_template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
     image_id = create_image(image_datastore._id, image_template, True)
     image    = Image(image_id)
     vm_tempalte = f"""
-        NAME    = apt_test_vm
+        NAME    = {get_unic_name()}
         CPU     = 1
         MEMORY  = 32
         DISK    = [

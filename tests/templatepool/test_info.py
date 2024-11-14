@@ -1,7 +1,7 @@
 import pytest
 from typing             import List
 from api                import One
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.template   import Template, create_template
 from config             import BRESTADM
 
@@ -15,7 +15,7 @@ def vmtemplates():
     vmtemplate_list = []
     for _ in range(5):
         template = f"""
-            NAME    = api_test_template_{_}
+            NAME    = {get_unic_name()}
             CPU     = 0.1
             VCPU    = 1
             MEMORY  = 32

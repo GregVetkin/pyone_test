@@ -1,7 +1,7 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 
@@ -14,8 +14,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture
 def datastore():
-    datastore_template = """
-        NAME   = api_test_system_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """

@@ -1,7 +1,7 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM
 from typing             import List
@@ -16,7 +16,7 @@ def datastores():
     datastore_list = []
     for _ in range(5):
         template = f"""
-            NAME   = api_test_ds_{_}
+            NAME   = {get_unic_name()}
             TYPE   = IMAGE_DS
             TM_MAD = ssh
             DS_MAD = fs

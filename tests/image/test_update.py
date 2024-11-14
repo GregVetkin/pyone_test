@@ -1,17 +1,16 @@
 import pytest
 
 from api                import One
-from pyone              import OneAuthorizationException
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import BRESTADM, LOCK_LEVELS
 
 
 from tests._common_tests.update import update_and_merge__test
 from tests._common_tests.update import update_and_replace__test
 from tests._common_tests.update import update_if_not_exist__test
-
+from tests._common_tests.update import update_cant_be_updated__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -19,8 +18,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture(scope="module")
 def datastore():
-    datastore_template = """
-        NAME   = api_test_image_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -33,8 +32,8 @@ def datastore():
 
 @pytest.fixture
 def image(datastore: Datastore):
-    template = """
-        NAME = api_test_image
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -69,12 +68,8 @@ def test_update_image__merge(one: One, image: Image):
 
 
 #@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
-@pytest.mark.parametrize("lock_level", [1, 2, 3, 4])
+@pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_update_locked_image(one: One, image: Image, lock_level):
     image.lock(lock_level)
-    assert lock_level == image.info().LOCK.LOCKED
-    new_attribute_name = "TEST_ATTR"
-    with pytest.raises(OneAuthorizationException):
-        one.image.update(image._id, template=f"{new_attribute_name} = TEST_DATA")
-    assert new_attribute_name not in image.info().TEMPLATE
+    update_cant_be_updated__test(one.image, image)

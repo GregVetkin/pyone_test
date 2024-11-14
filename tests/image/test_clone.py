@@ -2,7 +2,7 @@ import pytest
 
 from api                import One
 from pyone              import OneActionException, OneNoExistsException, OneException
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
 from one_cli.user       import get_user_id_by_name
@@ -14,8 +14,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture(scope="module")
 def datastore():
-    datastore_template = """
-        NAME   = api_test_image_ds_1
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -28,8 +28,8 @@ def datastore():
 
 @pytest.fixture(scope="module")
 def datastore_2():
-    datastore_template = """
-        NAME   = api_test_image_ds_2
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -42,8 +42,8 @@ def datastore_2():
 
 @pytest.fixture(scope="module")
 def system_datastore():
-    datastore_template = """
-        NAME   = api_test_system_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
@@ -55,8 +55,8 @@ def system_datastore():
 
 @pytest.fixture
 def image(datastore: Datastore):
-    template = """
-        NAME = api_test_image_1
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -75,14 +75,14 @@ def image(datastore: Datastore):
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
-        one.image.clone(999999, "GregVetkin")
+        one.image.clone(999999, get_unic_name())
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_datastore_not_exist(one: One, image: Image):
     with pytest.raises(OneNoExistsException):
-        one.image.clone(image._id, "GregVetkin", 999999)
+        one.image.clone(image._id, get_unic_name(), 999999)
 
 
 
@@ -106,7 +106,7 @@ def test_only_same_datastore_support(one: One, image: Image, system_datastore: D
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_clone_into_the_same_datastore(one: One, image: Image):
-    clone_id = one.image.clone(image._id, "GregVetkin")
+    clone_id = one.image.clone(image._id, get_unic_name())
     clone    = Image(clone_id)
     assert clone.info().DATASTORE_ID == image.info().DATASTORE_ID
     clone.delete()
@@ -115,7 +115,7 @@ def test_clone_into_the_same_datastore(one: One, image: Image):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_clone_into_another_datastore(one: One, image: Image, datastore_2: Datastore):
-    clone_id = one.image.clone(image._id, "GregVetkin", datastore_2._id)
+    clone_id = one.image.clone(image._id, get_unic_name(), datastore_2._id)
     clone    = Image(clone_id)
     assert clone.info().DATASTORE_ID == datastore_2._id
     clone.delete()

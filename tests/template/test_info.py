@@ -1,7 +1,7 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.template   import Template, create_template
 from config             import BRESTADM
 
@@ -14,8 +14,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture
 def vmtemplate():
-    template = """
-        NAME    = api_test_template_1
+    template = f"""
+        NAME    = {get_unic_name()}
         CPU     = 1
         VCPU    = 2
         MEMORY  = 1024

@@ -1,4 +1,4 @@
-from utils.other    import run_command, create_temp_file, delete_temp_file
+from utils.other    import run_command, create_temp_file, delete_temp_file, get_unic_name
 from utils.users    import get_user_auth
 
 
@@ -8,4 +8,5 @@ __all__ = [
     "get_user_auth",
     "create_temp_file",
     "delete_temp_file",
+    "get_unic_name",
 ]

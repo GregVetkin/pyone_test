@@ -1,7 +1,7 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.host       import Host, create_host
 from config             import BRESTADM
 from typing             import List
@@ -16,7 +16,7 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 def hosts(one: One):
     host_list = []
     for _ in range(5):
-        host_name = f"api_test_host_{_}"
+        host_name = f"{get_unic_name()}"
         host_id   = one.host.allocate(host_name)
         host      = Host(host_id)
         host_list.append(host)

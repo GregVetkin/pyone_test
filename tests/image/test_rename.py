@@ -1,7 +1,7 @@
 import pytest
 
 from api                        import One
-from utils                      import get_user_auth
+from utils                      import get_user_auth, get_unic_name
 from one_cli.image              import Image, create_image
 from one_cli.datastore          import Datastore, create_datastore
 from config                     import BRESTADM, BAD_SYMBOLS
@@ -19,8 +19,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture(scope="module")
 def datastore():
-    datastore_template = """
-        NAME   = api_test_image_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -33,8 +33,8 @@ def datastore():
 
 @pytest.fixture
 def image(datastore: Datastore):
-    template = """
-        NAME = api_test_image_1
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -46,8 +46,8 @@ def image(datastore: Datastore):
 
 @pytest.fixture
 def image_2(datastore: Datastore):
-    template = """
-        NAME = api_test_image_2
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """

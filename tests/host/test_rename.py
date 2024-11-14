@@ -1,7 +1,7 @@
 import pytest
 
 from api                        import One
-from utils                      import get_user_auth
+from utils                      import get_user_auth, get_unic_name
 from one_cli.host               import Host, create_host, host_exist
 from config                     import BRESTADM, BAD_SYMBOLS
 
@@ -18,7 +18,7 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 @pytest.fixture
 @pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
 def host(one: One):
-    host_id = one.host.allocate("api_test_host_rename")
+    host_id = one.host.allocate(f"{get_unic_name()}")
     host    = Host(host_id)
     yield host
     if host_exist(host_id):
@@ -29,7 +29,7 @@ def host(one: One):
 @pytest.fixture
 @pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
 def host_2(one: One):
-    host_id = one.host.allocate("api_test_host_rename_collision")
+    host_id = one.host.allocate(f"{get_unic_name()}")
     host    = Host(host_id)
     yield host
     if host_exist(host_id):

@@ -2,7 +2,7 @@ import pytest
 
 from api                import One
 from pyone              import OneAuthorizationException
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.vm         import VirtualMachine, create_vm
 from one_cli.image      import Image, create_image, wait_image_ready, image_exist
 from one_cli.datastore  import Datastore, create_datastore
@@ -17,8 +17,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture(scope="module")
 def image_datastore():
-    datastore_template = """
-        NAME   = api_test_image_ds
+    datastore_template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -31,8 +31,8 @@ def image_datastore():
 
 @pytest.fixture
 def image(image_datastore: Datastore):
-    template = """
-        NAME = api_test_image_1
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -52,8 +52,8 @@ def image(image_datastore: Datastore):
 
 @pytest.fixture
 def used_image(image_datastore: Datastore):
-    image_template = """
-        NAME = api_test_image
+    image_template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -61,7 +61,7 @@ def used_image(image_datastore: Datastore):
     image    = Image(image_id)
 
     vm_tempalte = f"""
-        NAME    = apt_test_vm
+        NAME    = {get_unic_name()}
         CPU     = 1
         MEMORY  = 32
         DISK    = [
@@ -105,7 +105,5 @@ def test_used_image_delete(one: One, used_image: Image):
 @pytest.mark.parametrize("lock_level", [1, 2, 3, 4])
 def test_delete_locked_image(one: One, image: Image, lock_level: int):
     image.lock(lock_level)
-    with pytest.raises(OneAuthorizationException):
-        one.image.delete(image._id)
-    assert image_exist(image._id)
+    delete_undeletable__test(one.image, image)
 

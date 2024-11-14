@@ -3,7 +3,7 @@ import random
 
 from api                import One
 from pyone              import OneNoExistsException, OneActionException
-from utils              import get_user_auth
+from utils              import get_user_auth, get_unic_name
 from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
 from one_cli.image      import Image, create_image, wait_image_ready
 from one_cli.datastore  import Datastore, create_datastore
@@ -16,8 +16,8 @@ BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 @pytest.fixture(scope="module")
 def image_datastore():
-    template = """
-        NAME   = api_test_image_ds
+    template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = IMAGE_DS
         TM_MAD = ssh
         DS_MAD = fs
@@ -30,8 +30,8 @@ def image_datastore():
 
 @pytest.fixture(scope="module")
 def system_datastore():
-    template = """
-        NAME   = api_test_system_ds
+    template = f"""
+        NAME   = {get_unic_name()}
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
@@ -43,8 +43,8 @@ def system_datastore():
 
 @pytest.fixture
 def image(image_datastore: Datastore):
-    template = """
-        NAME = api_test_datablock
+    template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -57,8 +57,8 @@ def image(image_datastore: Datastore):
 
 @pytest.fixture
 def image_with_snapshots(image_datastore: Datastore, system_datastore: Datastore):
-    image_template = """
-        NAME = api_test_datablock_with_snaps
+    image_template = f"""
+        NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
@@ -66,7 +66,7 @@ def image_with_snapshots(image_datastore: Datastore, system_datastore: Datastore
     image    = Image(image_id)
     image.persistent()
     vm_tempalte = f"""
-        NAME    = apt_test_vm
+        NAME    = {get_unic_name()}
         CPU     = 1
         MEMORY  = 32
         DISK    = [
@@ -76,7 +76,7 @@ def image_with_snapshots(image_datastore: Datastore, system_datastore: Datastore
     vm_id = create_vm(vm_tempalte, await_vm_offline=True)
     vm    = VirtualMachine(vm_id)
     for _ in range(5):
-        vm.create_disk_snapshot(0, f"api_test_disk_snap_{_}")
+        vm.create_disk_snapshot(0, get_unic_name())
         wait_vm_offline(vm_id)
     vm.terminate()
     wait_image_ready(image_id)
