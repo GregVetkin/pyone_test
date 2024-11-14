@@ -52,13 +52,16 @@ def test_image_not_exist(one: One):
     unlock_if_not_exist__test(one.image)
 
 
+
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_unlock_unlocked_image(one: One, image: Image):
+    unlock_unlocked__test(one.image, image)
+
+
+
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_unlock_locked_image(one: One, image: Image, lock_level):
     image.lock(lock_level)
     unlock_locked__test(one.image, image)
 
-
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_unlock_unlocked_image(one: One, image: Image):
-    unlock_unlocked__test(one.image, image)

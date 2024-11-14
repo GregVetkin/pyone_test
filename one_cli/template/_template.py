@@ -1,4 +1,4 @@
-from one_cli._base_commands     import _delete, _info, _update, _exist, _rename, _enable, _disable, _offline, _create
+from one_cli._base_commands     import _delete, _info, _update, _exist, _rename, _enable, _disable, _offline, _create, _lock, _unlock
 from one_cli.template._common   import TemplateInfo, parse_template_info_from_xml
 
 
@@ -32,3 +32,11 @@ class Template:
 
     def info(self) -> TemplateInfo:
         return parse_template_info_from_xml(_info(self._function, self._id, xml=True))
+    
+
+    def lock(self, lock_level: int = 4) -> None:
+        _lock(self._function, self._id, lock_level)
+
+
+    def unlock(self) -> None:
+        _unlock(self._function, self._id)
