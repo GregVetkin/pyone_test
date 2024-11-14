@@ -1,6 +1,6 @@
 import pytest
 import random
-from pyone      import OneNoExistsException
+from pyone      import OneNoExistsException, OneAuthorizationException, OneActionException
 
 
 
@@ -68,3 +68,11 @@ def update_and_merge__test(api_method, one_object):
     
     # Проверка, что выбранный атрибут изменил свое значение
     assert one_object_new_template[attribute_name] == new_attribute_value
+
+
+
+def update_cant_be_updated__test(api_method, one_object):
+    attribute_name = "TEST_ATTR"
+    with pytest.raises((OneAuthorizationException, OneActionException)):
+        api_method.update(one_object._id, template=f"{attribute_name} = TEST_DATA")
+    assert attribute_name not in one_object.info().TEMPLATE

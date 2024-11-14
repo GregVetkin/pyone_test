@@ -19,7 +19,7 @@ class TemplateInfo:
     PERMISSIONS:        Permissions
     REGTIME:            int
     LOCK:               Optional[LockStatus] = None
-
+    TEMPLATE:           Dict[str, str]       = field(default_factory=dict)
 
 
 
@@ -40,6 +40,7 @@ def parse_template_info_from_xml(raw_template_xml: str) -> TemplateInfo:
                 REGTIME=            int(xml.find('REGTIME').text),
                 PERMISSIONS=        permissions,
                 LOCK=               lock,
+                TEMPLATE=           {attribulte.tag: attribulte.text or "" for attribulte in xml.find('TEMPLATE')},
                 )
 
     return template_info

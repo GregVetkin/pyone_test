@@ -1,4 +1,4 @@
-from one_cli._base_commands     import _delete, _info, _update, _exist, _rename, _enable, _disable, _offline, _create, _lock, _unlock
+from one_cli._base_commands     import _delete, _info, _update, _exist, _rename, _create, _lock, _unlock, _chmod, _chown
 from one_cli.template._common   import TemplateInfo, parse_template_info_from_xml
 
 
@@ -40,3 +40,19 @@ class Template:
 
     def unlock(self) -> None:
         _unlock(self._function, self._id)
+
+
+    def chown(self, user_id: int, group_id: int = -1) -> None:
+        _chown(self._function, self._id, user_id, group_id)
+
+
+    def chmod(self, octet: str) -> None:
+        _chmod(self._function, self._id, octet)
+
+
+    def update(self, template: str, append: bool = False) -> None:
+        _update(self._function, self._id, template, append)
+
+
+
+

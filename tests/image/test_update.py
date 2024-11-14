@@ -58,20 +58,20 @@ def test_image_not_exist(one: One):
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_update_image__replace(one: Image, image: Image):
+def test_update_image__replace(one: One, image: Image):
     update_and_replace__test(one.image, image)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_update_image__merge(one: Image, image: Image):
+def test_update_image__merge(one: One, image: Image):
     update_and_merge__test(one.image, image)
 
 
 #@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
 @pytest.mark.parametrize("lock_level", [1, 2, 3, 4])
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_update_locked_image(one: Image, image: Image, lock_level):
+def test_update_locked_image(one: One, image: Image, lock_level):
     image.lock(lock_level)
     assert lock_level == image.info().LOCK.LOCKED
     new_attribute_name = "TEST_ATTR"
