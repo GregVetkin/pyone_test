@@ -1,6 +1,6 @@
 import subprocess
 from config import COMMAND_EXECUTOR
-
+from time import time_ns
 
 def run_command(command: str) -> str:
     try:
@@ -26,3 +26,7 @@ def create_temp_file(size_mb: int, file_path: str):
 
 def delete_temp_file(file_path: str):
     run_command(COMMAND_EXECUTOR + " " + f"rm -f {file_path}")
+
+
+def create_unic_name(prefix: str = "api_test_", postfix: str = ""):
+    return f"{prefix}{time_ns()}{postfix}"
