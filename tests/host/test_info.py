@@ -1,10 +1,12 @@
 import pytest
 
 from api                import One
-from pyone              import OneNoExistsException
 from utils              import get_user_auth
 from one_cli.host       import Host, create_host, host_exist
 from config             import BRESTADM
+
+from tests._common_tests.info import info_if_not_exist__test
+from tests._common_tests.info import info__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -29,17 +31,10 @@ def host(one: One):
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_host_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.host.info(999999)
+    info_if_not_exist__test(one.host)
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_host_info(one: One, host: Host):
-    api_host_info  = one.host.info(host._id)
-    cli_host_info  = host.info()
-    
-    assert cli_host_info.ID     == api_host_info.ID
-    assert cli_host_info.NAME   == api_host_info.NAME
-    assert cli_host_info.IM_MAD == api_host_info.IM_MAD
-    assert cli_host_info.VM_MAD == api_host_info.VM_MAD
+    info__test(one.host, host)
