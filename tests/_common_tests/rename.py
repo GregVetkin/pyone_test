@@ -1,6 +1,5 @@
 import pytest
 from pyone      import OneNoExistsException, OneActionException
-from config     import BAD_SYMBOLS
 from utils      import get_unic_name
 
 

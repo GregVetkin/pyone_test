@@ -1,11 +1,15 @@
 import pytest
 
 from api                import One
-from pyone              import OneNoExistsException, OneActionException
 from utils              import get_user_auth, get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
 from config             import BRESTADM, LOCK_LEVELS
+
+from tests._common_tests.lock import lock_if_not_exist__test
+from tests._common_tests.lock import lock_unlocked__test
+from tests._common_tests.lock import lock_locked__test
+
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -45,28 +49,17 @@ def image(datastore: Datastore):
 # =================================================================================================
 
 
-
+@pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_image_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.image.lock(999999, lock_level=4)
-
-
-
-@pytest.mark.parametrize("bad_lock_level", [5, 1024, -55])
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_bad_lock_level(one: One, image: Image, bad_lock_level):
-    with pytest.raises(OneActionException):
-        one.image.lock(image._id, bad_lock_level)
+def test_image_not_exist(one: One, lock_level):
+    lock_if_not_exist__test(one.image, lock_level)
 
 
 
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_lock_unlocked_image(one: One, image: Image, lock_level):
-    assert image.info().LOCK == None
-    one.image.lock(image._id, lock_level)
-    assert image.info().LOCK.LOCKED == lock_level
+    lock_unlocked__test(one.image, image, lock_level)
 
 
 
@@ -76,12 +69,5 @@ def test_lock_unlocked_image(one: One, image: Image, lock_level):
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_lock_locked_image(one: One, image: Image, init_lock_lvl, lock_level, lock_check):
     image.lock(init_lock_lvl)
-    assert image.info().LOCK.LOCKED == init_lock_lvl
-    
-    if lock_check:
-        with pytest.raises(OneActionException):
-            one.image.lock(image._id, lock_level=lock_level, check_already_locked=lock_check)
-        assert image.info().LOCK.LOCKED == init_lock_lvl
-    else:
-        one.image.lock(image._id, lock_level=lock_level, check_already_locked=lock_check)
-        assert image.info().LOCK.LOCKED == lock_level
+    lock_locked__test(one.image, image, lock_level, lock_check)
+
