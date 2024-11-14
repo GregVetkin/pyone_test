@@ -1,8 +1,39 @@
 import xml.etree.ElementTree as xmlTree
 
 from dataclasses        import dataclass, field
-from typing             import List, Dict, Optional
+from typing             import List, Dict, Union, Optional
 from one_cli._common    import Permissions, parse_permissions_from_xml, Permissions, LockStatus, parse_lock_from_xml
+
+
+def __convert(text: str) -> Union[str, int, float]:
+    try:
+        return int(text)
+    except ValueError:
+        pass
+    
+    try:
+        return float(text)
+    except ValueError:
+        pass
+
+    return text
+
+
+def __parse_template(raw_template_xml):
+    template = {}
+    xml = xmlTree.fromstring(raw_template_xml)
+    template_element = xml.find(f'TEMPLATE')
+    
+    for element in template_element:
+        if len(element) == 0:
+            template[element.tag] = __convert(element.text)
+        else:
+            if element.tag in template:
+                template[element.tag].append({_.tag: __convert(_.text) or "" for _ in template_element.find(element.tag)})
+            else:
+                template[element.tag] = [{_.tag: __convert(_.text) or "" for _ in template_element.find(element.tag)}]
+
+    return template
 
 
 
@@ -19,16 +50,16 @@ class TemplateInfo:
     PERMISSIONS:        Permissions
     REGTIME:            int
     LOCK:               Optional[LockStatus] = None
-    TEMPLATE:           Dict[str, str]       = field(default_factory=dict)
+    TEMPLATE:           Dict[str, List[Dict[str, str]]] = field(default_factory=dict)
 
 
 
 
 def parse_template_info_from_xml(raw_template_xml: str) -> TemplateInfo:
-    xml = xmlTree.fromstring(raw_template_xml)
+    xml         = xmlTree.fromstring(raw_template_xml)
     permissions = parse_permissions_from_xml(raw_template_xml)
-    lock = parse_lock_from_xml(raw_template_xml)
-
+    lock        = parse_lock_from_xml(raw_template_xml)
+    template    = __parse_template(raw_template_xml)
     
     template_info = TemplateInfo(
                 ID=                 int(xml.find('ID').text),
@@ -40,7 +71,7 @@ def parse_template_info_from_xml(raw_template_xml: str) -> TemplateInfo:
                 REGTIME=            int(xml.find('REGTIME').text),
                 PERMISSIONS=        permissions,
                 LOCK=               lock,
-                TEMPLATE=           {attribulte.tag: attribulte.text or "" for attribulte in xml.find('TEMPLATE')},
+                TEMPLATE=           template,
                 )
 
     return template_info
