@@ -1,7 +1,7 @@
 import pytest
 from pyone      import OneNoExistsException, OneActionException
 from config     import BAD_SYMBOLS
-
+from utils      import get_unic_name
 
 
 
@@ -13,7 +13,7 @@ def rename_if_not_exist__test(api_method) -> None:
 
 
 def rename__test(api_method, one_object) -> None:
-    new_name = "GregVetkin"
+    new_name = get_unic_name()
     api_method.rename(one_object._id, new_name)
     assert new_name == one_object.info().NAME
 
