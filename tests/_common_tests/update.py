@@ -14,6 +14,14 @@ def update_if_not_exist__test(api_method):
 
 
 
+def cant_be_updated__test(api_method, one_object):
+    attribute_name = "TEST_ATTR"
+    with pytest.raises((OneAuthorizationException, OneActionException)):
+        api_method.update(one_object._id, template=f"{attribute_name} = TEST_DATA")
+    assert attribute_name not in one_object.info().TEMPLATE
+
+
+
 def update_and_replace__test(api_method, one_object):
     # Создание стартовых атрибутов в шаблоне объекта, которые будут проверяться
     start_attributes = [f"START_ATTR_{_}" for _ in range(3)]
@@ -71,8 +79,3 @@ def update_and_merge__test(api_method, one_object):
 
 
 
-def update_cant_be_updated__test(api_method, one_object):
-    attribute_name = "TEST_ATTR"
-    with pytest.raises((OneAuthorizationException, OneActionException)):
-        api_method.update(one_object._id, template=f"{attribute_name} = TEST_DATA")
-    assert attribute_name not in one_object.info().TEMPLATE

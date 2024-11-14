@@ -10,7 +10,7 @@ from config             import BRESTADM, LOCK_LEVELS
 from tests._common_tests.update import update_and_merge__test
 from tests._common_tests.update import update_and_replace__test
 from tests._common_tests.update import update_if_not_exist__test
-from tests._common_tests.update import update_cant_be_updated__test
+from tests._common_tests.update import cant_be_updated__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -72,4 +72,4 @@ def test_update_image__merge(one: One, image: Image):
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_update_locked_image(one: One, image: Image, lock_level):
     image.lock(lock_level)
-    update_cant_be_updated__test(one.image, image)
+    cant_be_updated__test(one.image, image)
