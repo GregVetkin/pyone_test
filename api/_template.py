@@ -54,7 +54,7 @@ class OneTemplate:
         return self._one_template.info(template_id, extended, decrypt_secrets)
     
 
-    def lock(self, template_id: int, lock_level: int = 4, check_already_locked: bool = False) -> int:
+    def lock(self, template_id: int, lock_level: int = 1, check_already_locked: bool = False) -> int:
         return self._one_template.lock(template_id, lock_level, check_already_locked)
 
 

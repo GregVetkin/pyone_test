@@ -55,7 +55,7 @@ def _update(function_name: str, object_id: int, template: str, append: bool = Fa
     run_command(COMMAND_EXECUTOR + " " + f"rm -f {file}")
 
 
-def _lock(function_name: str, object_id: int, lock_level: int = 4) -> None:
+def _lock(function_name: str, object_id: int, lock_level: int = 1) -> None:
     lock_flag = {
             1: "--use",
             2: "--manage",
@@ -99,3 +99,4 @@ def _disable(function_name: str, object_id: int) -> None:
 
 def _offline(function_name: str, object_id: int) -> None:
     run_command(COMMAND_EXECUTOR + " " + f"{function_name} offline {object_id}")
+
