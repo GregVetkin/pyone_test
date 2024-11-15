@@ -3,8 +3,8 @@ from api                        import One
 from utils                      import get_user_auth, get_unic_name
 from one_cli.image              import Image, create_image
 from one_cli.datastore          import Datastore, create_datastore
-from config                     import BRESTADM
-from tests._common_tests.chmod  import chmod__test, chmod_if_not_exist__test
+from config                     import BRESTADM, LOCK_LEVELS
+from tests._common_tests.chmod  import chmod__test, chmod_if_not_exist__test, _rights_tuples_list, chmod_cant_be_changed__test
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
@@ -33,8 +33,9 @@ def image(datastore: Datastore):
     """
     image_id = create_image(datastore._id, image_template)
     image    = Image(image_id)
-    image.chmod("000")
     yield image
+    if image.info().LOCK is not None:
+        image.unlock()
     image.delete()
 
 
@@ -50,7 +51,18 @@ def test_image_not_exist(one: One):
     chmod_if_not_exist__test(one.image)
 
 
+
+@pytest.mark.parametrize("rights", _rights_tuples_list())
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_change_image_rights(one: One, image: Datastore):
-    chmod__test(one.image, image)
+def test_change_image_rights(one: One, image: Image, rights):
+    chmod__test(one.image, image, rights)
+
+
+
+@pytest.mark.skip(reason="Требует уточнения")
+@pytest.mark.parametrize("lock_level", LOCK_LEVELS)
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_change_locked_image_rights(one: One, image: Image, lock_level):
+    image.lock(lock_level)
+    chmod_cant_be_changed__test(one.image, image, (0,0,0,0,0,0,0,0,0))
 

@@ -22,4 +22,7 @@ templ = """
 
 # one.template.allocate(templ)
 
-print(one.template.info(299, True).TEMPLATE["DISK"])
+
+
+
+

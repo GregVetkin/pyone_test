@@ -1,20 +1,28 @@
 import pytest
 import random
-from pyone      import OneNoExistsException
+from pyone      import OneNoExistsException, OneActionException, OneAuthorizationException
+from typing     import Tuple
 
 
 
-
-def _rights_as_bool_tuples(one_object):
-    rights = one_object.info().PERMISSIONS
-
-    return ((rights.OWNER.USE, rights.OWNER.MANAGE, rights.OWNER.ADMIN),
-            (rights.GROUP.USE, rights.GROUP.MANAGE, rights.GROUP.ADMIN),
-            (rights.OTHER.USE, rights.OTHER.MANAGE, rights.OTHER.ADMIN))
+def _rights_as_tuple(one_object):
+    _ = one_object.info().PERMISSIONS
+    return (_.OWNER_U, _.OWNER_M, _.OWNER_A, _.GROUP_U, _.GROUP_M, _.GROUP_A, _.OTHER_U, _.OTHER_M, _.OTHER_A)
 
 
 
+def _rights_tuples_list(n: int = 9):
+    result = []
 
+    for i in range(1, n + 1):
+        t = tuple(1 if _ < i else 0 for _ in range(n))
+        result.append(t)
+
+    for i in range(n + 1):
+        t = tuple(0 if _ < i else 1 for _ in range(n))
+        result.append(t)
+
+    return result
 
 
 
@@ -23,97 +31,16 @@ def chmod_if_not_exist__test(api_method):
         api_method.chmod(999999)
 
 
+def chmod__test(api_method, one_object, rights: Tuple[int]):
+    api_method.chmod(one_object._id, *rights)
+    assert _rights_as_tuple(one_object) == rights
 
 
-def chmod__test(api_method, one_object):
-    one_object.chmod("000")
 
-    api_method.chmod(one_object._id, user_use=1)
-    assert _rights_as_bool_tuples(one_object) == (  (True, False, False), 
-                                                    (False, False, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, user_manage=1)
-    assert _rights_as_bool_tuples(one_object) == (  (True, True, False), 
-                                                    (False, False, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, user_admin=1)
-    assert _rights_as_bool_tuples(one_object) == (  (True, True, True), 
-                                                    (False, False, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, user_admin=0)
-    assert _rights_as_bool_tuples(one_object) == (  (True, True, False), 
-                                                    (False, False, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, user_manage=0)
-    assert _rights_as_bool_tuples(one_object) == (  (True, False, False), 
-                                                    (False, False, False), 
-                                                    (False, False, False))
+def chmod_cant_be_changed__test(api_method, one_object, rights: Tuple[int]):
+    old_rights = _rights_as_tuple(one_object)
+    with pytest.raises((OneActionException, OneAuthorizationException)):
+        api_method.chmod(one_object._id, *rights)
+    new_rights = _rights_as_tuple(one_object)
+    assert old_rights == new_rights
     
-    api_method.chmod(one_object._id, user_use=0)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (False, False, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, group_use=1)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (True, False, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, group_manage=1)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (True, True, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, group_admin=1)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (True, True, True), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, group_admin=0)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (True, True, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, group_manage=0)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (True, False, False), 
-                                                    (False, False, False))
-    
-    api_method.chmod(one_object._id, group_use=0)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (False, False, False), 
-                                                    (False, False, False))
-
-    api_method.chmod(one_object._id, other_use=1)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (False, False, False), 
-                                                    (True, False, False))
-
-    api_method.chmod(one_object._id, other_manage=1)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (False, False, False), 
-                                                    (True, True, False))
-
-    api_method.chmod(one_object._id, other_admin=1)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (False, False, False), 
-                                                    (True, True, True))
-
-    api_method.chmod(one_object._id, other_admin=0)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (False, False, False), 
-                                                    (True, True, False))
-
-    api_method.chmod(one_object._id, other_manage=0)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (False, False, False), 
-                                                    (True, False, False))
-    
-    api_method.chmod(one_object._id, other_use=0)
-    assert _rights_as_bool_tuples(one_object) == (  (False, False, False), 
-                                                    (False, False, False), 
-                                                    (False, False, False))
