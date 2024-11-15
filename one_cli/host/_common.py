@@ -18,9 +18,9 @@ class HostInfo:
     CLUSTER_ID:         int
     CLUSTER:            str
 #   HOST_SHARE:
-#   VMS:
+    VMS:                List[int] = field(default_factory=list)
 #   MONITORING:
-    TEMPLATE:           Dict[str, str]       = field(default_factory=dict)
+    TEMPLATE:           Dict[str, str] = field(default_factory=dict)
 
     
 
@@ -39,6 +39,7 @@ def parse_host_info_from_xml(raw_host_xml: str) -> HostInfo:
             CLUSTER=            xml.find('CLUSTER').text,
             IM_MAD=             xml.find('IM_MAD').text,
             VM_MAD=             xml.find('VM_MAD').text,
+            VMS=                [int(vm_id.text) for vm_id in xml.find('VMS').findall('ID')],
             TEMPLATE=           {attribulte.tag: attribulte.text or "" for attribulte in xml.find('TEMPLATE')},
             )
 

@@ -3,22 +3,21 @@ from utils                  import run_command
 from time                   import sleep   
 from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist, _create
 
+FUNCTION_NAME = "onevm"
+
 
 
 def vm_exist(vm_id: int) -> bool:
-    return _exist("onevm", vm_id)
-
+    return _exist(FUNCTION_NAME, vm_id)
 
 
 def create_vm(vm_template: str, await_vm_offline: bool = True) -> int:
-    vm_id = _create("onevm", vm_template)
+    vm_id = _create(FUNCTION_NAME, vm_template)
 
     if await_vm_offline:
         wait_vm_offline(vm_id)
 
     return vm_id
-
-
 
 
 
@@ -31,7 +30,7 @@ def wait_vm_offline(vm_id: int, check_interval: float = 1.0) -> None:
 
 
 def get_vm_state(vm_id: int) -> str:
-    command = COMMAND_EXECUTOR + " " + f"onevm show {vm_id} | grep STATE | head -n 1 " + " | awk '{print $3}'"
+    command = COMMAND_EXECUTOR + " " + f"{FUNCTION_NAME} show {vm_id} | grep STATE | head -n 1 " + " | awk '{print $3}'"
     return run_command(command)
 
 
@@ -41,7 +40,7 @@ def get_vm_state(vm_id: int) -> str:
 class VirtualMachine:
     def __init__(self, vm_id: int) -> None:
         self._id            = vm_id
-        self._function      = "onevm"
+        self._function      = FUNCTION_NAME
         self._exec_command  = COMMAND_EXECUTOR + f" {self._function} "
     
 
