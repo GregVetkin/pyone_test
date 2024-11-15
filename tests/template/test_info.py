@@ -1,17 +1,16 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.template   import Template, create_template, template_exist
 from one_cli.image      import Image, create_image, image_exist
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 from tests._common_tests.info import info_if_not_exist__test
 from tests._common_tests.info import info__test
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture
@@ -90,19 +89,19 @@ def vmtemplate_with_image(image: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_not_exist(one: One):
     info_if_not_exist__test(one.template)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_info(one: One, vmtemplate: Template):
     info__test(one.template, vmtemplate)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_extended_template_info(one: One, vmtemplate_with_image: Template):
     template  = one.template.info(vmtemplate_with_image._id, extended=True).TEMPLATE
     disk_info = template["DISK"] if isinstance(template["DISK"], dict) else template["DISK"][0]

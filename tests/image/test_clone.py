@@ -2,14 +2,12 @@ import pytest
 
 from api                import One
 from pyone              import OneActionException, OneNoExistsException, OneException
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
 from one_cli.user       import get_user_id_by_name
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture(scope="module")
@@ -72,21 +70,21 @@ def image(datastore: Datastore):
 # =================================================================================================
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.clone(999999, get_unic_name())
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_datastore_not_exist(one: One, image: Image):
     with pytest.raises(OneNoExistsException):
         one.image.clone(image._id, get_unic_name(), 999999)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_name_is_taken(one: One, image: Image):
     brestadm_id = get_user_id_by_name("brestadm")
     if image.info().UID != brestadm_id:
@@ -97,14 +95,14 @@ def test_name_is_taken(one: One, image: Image):
     
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_only_same_datastore_support(one: One, image: Image, system_datastore: Datastore):
     with pytest.raises(OneActionException):
         one.image.clone(image._id, "GregVetkin", system_datastore._id)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_clone_into_the_same_datastore(one: One, image: Image):
     clone_id = one.image.clone(image._id, get_unic_name())
     clone    = Image(clone_id)
@@ -113,7 +111,7 @@ def test_clone_into_the_same_datastore(one: One, image: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_clone_into_another_datastore(one: One, image: Image, datastore_2: Datastore):
     clone_id = one.image.clone(image._id, get_unic_name(), datastore_2._id)
     clone    = Image(clone_id)

@@ -1,14 +1,14 @@
 import pytest
 
 from api                import One
-from pyone              import OneNoExistsException, OneInternalException
-from utils              import get_user_auth, get_unic_name
+from pyone              import OneNoExistsException
+from utils              import get_unic_name
 from one_cli.cluster    import Cluster, create_cluster
 from one_cli.host       import Host, host_exist
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
+
 
 
 @pytest.fixture
@@ -27,14 +27,14 @@ def cluster():
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_cluster_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.host.allocate(hostname=f"{get_unic_name()}", im_mad="kvm", vm_mad="kvm", cluster_id=999999)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_allocate_host_kvm_kvm(one: One):
     _id  = one.host.allocate(hostname=f"{get_unic_name()}", im_mad="kvm", vm_mad="kvm", cluster_id=-1)
     assert host_exist(_id)
@@ -42,7 +42,7 @@ def test_allocate_host_kvm_kvm(one: One):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_create_host_with_certain_cluster(one: One, cluster: Cluster):
     _id  = one.host.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs", cluster_id=cluster._id)
     host = Host(_id)

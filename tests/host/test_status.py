@@ -2,18 +2,18 @@ import pytest
 
 from api                import One
 from pyone              import OneNoExistsException, OneInternalException
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.host       import Host, create_host, host_exist
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
+
 # HOST_STATES = ['INIT', 'MONITORING_MONITORED', 'ENABLED',
 #                 'ERROR','DISABLED', 'MONITORING_ERROR',
 #                 'MONITORING_INIT','MONITORING_DISABLED', 'OFFLINE']
 
 @pytest.fixture()
-@pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def host(one: One):
     host_id = one.host.allocate(f"{get_unic_name()}")
     host    = Host(host_id)
@@ -29,21 +29,21 @@ def host(one: One):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_host_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.host.status(99999, 0)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_wrong_status_code(one: One, host: Host):
     with pytest.raises(OneInternalException):
         one.host.status(host._id, 9999)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_host_disable(one: One, host: Host):
     #one.host.status(host._id, 1)
     one.host.disable(host._id)
@@ -51,7 +51,7 @@ def test_host_disable(one: One, host: Host):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_host_offline(one: One, host: Host):
     #one.host.status(host._id, 2)
     one.host.offline(host._id)
@@ -59,7 +59,7 @@ def test_host_offline(one: One, host: Host):
     
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_host_enable(one: One, host: Host):
     host.disable()
     #one.host.status(host._id, 0)

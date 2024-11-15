@@ -1,17 +1,16 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.vm         import VirtualMachine, create_vm
 from one_cli.image      import Image, create_image, wait_image_ready, image_exist
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM, LOCK_LEVELS
+from config             import ADMIN_NAME, LOCK_LEVELS
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
 from tests._common_tests.delete import delete_undeletable__test
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture(scope="module")
@@ -84,23 +83,23 @@ def used_image(image_datastore: Datastore):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     delete_if_not_exist__test(one.image)
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_delete(one: One, image: Image):
     delete__test(one.image, image)
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_used_image_delete(one: One, used_image: Image):
     delete_undeletable__test(one.image, used_image)
 
 
 #@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 def test_delete_locked_image(one: One, image: Image, lock_level: int):
     image.lock(lock_level)

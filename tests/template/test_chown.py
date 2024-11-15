@@ -1,11 +1,11 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.template   import Template, create_template
 from one_cli.user       import User, create_user
 from one_cli.group      import Group, create_group
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 from tests._common_tests.chown  import chown_object_not_exist__test
 from tests._common_tests.chown  import chown_user_not_exist__test
@@ -15,8 +15,6 @@ from tests._common_tests.chown  import chown_user_and_group_not_changed__test
 from tests._common_tests.chown  import chown_user_change__test
 from tests._common_tests.chown  import chown_group_change__test
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 
@@ -60,42 +58,42 @@ def vmtemplate():
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_not_exist(one: One):
     chown_object_not_exist__test(one.template)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_user_not_exist(one: One, vmtemplate: Template):
     chown_user_not_exist__test(one.template, vmtemplate)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_group_not_exist(one: One, vmtemplate: Template):
     chown_group_not_exist__test(one.template, vmtemplate)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_user_and_group_change(one: One, vmtemplate: Template, user: User, group: Group):
     chown_user_and_group_change__test(one.template, vmtemplate, user, group)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_user_and_group_not_changed(one: One, vmtemplate: Template):
     chown_user_and_group_not_changed__test(one.template, vmtemplate)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_user_change(one: One, vmtemplate: Template, user: User):
     chown_user_change__test(one.template, vmtemplate, user)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_group_change(one: One, vmtemplate: Template, group: Group):
     chown_group_change__test(one.template, vmtemplate, group)

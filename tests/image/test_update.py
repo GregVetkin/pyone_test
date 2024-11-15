@@ -1,10 +1,10 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM, LOCK_LEVELS
+from config             import ADMIN_NAME, LOCK_LEVELS
 
 
 from tests._common_tests.update import update_and_merge__test
@@ -12,8 +12,6 @@ from tests._common_tests.update import update_and_replace__test
 from tests._common_tests.update import update_if_not_exist__test
 from tests._common_tests.update import cant_be_updated__test
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture(scope="module")
@@ -51,25 +49,25 @@ def image(datastore: Datastore):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     update_if_not_exist__test(one.image)
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_update_image__replace(one: One, image: Image):
     update_and_replace__test(one.image, image)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_update_image__merge(one: One, image: Image):
     update_and_merge__test(one.image, image)
 
 
 #@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_update_locked_image(one: One, image: Image, lock_level):
     image.lock(lock_level)
     cant_be_updated__test(one.image, image)

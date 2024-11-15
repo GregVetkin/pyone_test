@@ -1,18 +1,18 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.host       import Host, create_host
-from config             import BRESTADM
+from config             import ADMIN_NAME
 from typing             import List
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
+
 
 
 
 @pytest.fixture
-@pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def hosts(one: One):
     host_list = []
     for _ in range(5):
@@ -35,7 +35,7 @@ def hosts(one: One):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_show_all_hosts(one: One, hosts: List[Host]):
     host_ids     = [host.info().ID for host in hosts]
     hostpool     = one.hostpool.info().HOST

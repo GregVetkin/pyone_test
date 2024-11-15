@@ -2,13 +2,13 @@ import pytest
 
 from api                import One
 from pyone              import OneActionException, OneNoExistsException, OneException
-from utils              import get_user_auth, create_temp_file, delete_temp_file, get_unic_name
+from utils              import create_temp_file, delete_temp_file, get_unic_name
 from one_cli.image      import Image, image_exist
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
+
 
 
 @pytest.fixture(scope="module")
@@ -45,7 +45,7 @@ def system_datastore():
 # =================================================================================================
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_datastore_not_exist(one: One):
     template = f"""
         NAME = {get_unic_name()}
@@ -57,7 +57,7 @@ def test_datastore_not_exist(one: One):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_dont_check_capacity(one: One, image_datastore: Datastore):
     template = f"""
         NAME = {get_unic_name()}
@@ -71,7 +71,7 @@ def test_dont_check_capacity(one: One, image_datastore: Datastore):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_check_capacity(one: One, image_datastore: Datastore):
     template = f"""
         NAME = {get_unic_name()}
@@ -83,7 +83,7 @@ def test_check_capacity(one: One, image_datastore: Datastore):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_wrong_image_type_for_datastore(one: One, system_datastore: Datastore):
     template = f"""
         NAME = {get_unic_name()}
@@ -95,7 +95,7 @@ def test_wrong_image_type_for_datastore(one: One, system_datastore: Datastore):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_with_localfile_load(one: One, image_datastore: Datastore):
     file_path = "/tmp/testfile"
     create_temp_file(1, file_path)
@@ -109,3 +109,4 @@ def test_image_with_localfile_load(one: One, image_datastore: Datastore):
     assert image_exist(image_id)
     image.delete()
     delete_temp_file(file_path)
+

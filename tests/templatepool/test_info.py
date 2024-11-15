@@ -1,12 +1,10 @@
 import pytest
 from typing             import List
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.template   import Template, create_template
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 
@@ -38,7 +36,7 @@ def vmtemplates():
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_show_all_templates(one: One, vmtemplates: List[Template]):
     ids      = [vmtemplate._id for vmtemplate in vmtemplates]
     pool     = one.templatepool.info().VMTEMPLATE
@@ -48,7 +46,7 @@ def test_show_all_templates(one: One, vmtemplates: List[Template]):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_filter_start_id(one: One, vmtemplates: List[Template]):
     ids      = [vmtemplate._id for vmtemplate in vmtemplates]
     ids.sort()
@@ -60,7 +58,7 @@ def test_filter_start_id(one: One, vmtemplates: List[Template]):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_filter_end_id(one: One, vmtemplates: List[Template]):
     ids      = [vmtemplate._id for vmtemplate in vmtemplates]
     ids.sort()

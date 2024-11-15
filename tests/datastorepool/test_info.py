@@ -1,13 +1,13 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import ADMIN_NAME
 from typing             import List
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
+
 
 
 
@@ -39,7 +39,7 @@ def datastores():
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH,], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_show_all_datastores(one: One, datastores: List[Datastore]):
     datastore_ids       = [datastore.info().ID for datastore in datastores]
     datastorepool       = one.datastorepool.info().DATASTORE

@@ -1,18 +1,16 @@
 import pytest
 
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM, LOCK_LEVELS
+from config             import ADMIN_NAME, LOCK_LEVELS
 
 from tests._common_tests.lock import lock_if_not_exist__test
 from tests._common_tests.lock import lock_unlocked__test
 from tests._common_tests.lock import lock_locked__test
 
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture(scope="module")
@@ -50,14 +48,14 @@ def image(datastore: Datastore):
 
 
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One, lock_level):
     lock_if_not_exist__test(one.image, lock_level)
 
 
 
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_lock_unlocked_image(one: One, image: Image, lock_level):
     lock_unlocked__test(one.image, image, lock_level)
 
@@ -66,7 +64,7 @@ def test_lock_unlocked_image(one: One, image: Image, lock_level):
 @pytest.mark.parametrize("lock_check", [True, False])
 @pytest.mark.parametrize("init_lock_lvl", LOCK_LEVELS)
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_lock_locked_image(one: One, image: Image, init_lock_lvl, lock_level, lock_check):
     image.lock(init_lock_lvl)
     lock_locked__test(one.image, image, lock_level, lock_check)

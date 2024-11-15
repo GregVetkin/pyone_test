@@ -1,19 +1,17 @@
 import pytest
 from pyone              import OneActionException
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.image      import Image, create_image, image_exist
 from one_cli.datastore  import Datastore, create_datastore 
 from one_cli.template   import Template, create_template, template_exist
-from config             import BRESTADM, LOCK_LEVELS
+from config             import ADMIN_NAME, LOCK_LEVELS
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
 from tests._common_tests.delete import delete_undeletable__test
 
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 
@@ -136,12 +134,12 @@ def vmtemplate_with_2_images(image: Image, image_2: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     delete_if_not_exist__test(one.template)
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_delete(one: One, vmtemplate: Template):
     delete__test(one.template, vmtemplate)
 
@@ -149,14 +147,14 @@ def test_template_delete(one: One, vmtemplate: Template):
 
 #@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_delete_locked_template(one: One, vmtemplate: Template, lock_level: int):
     vmtemplate.lock(lock_level)
     delete_undeletable__test(one.template, vmtemplate)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_delete_template_with_image(one: One, vmtemplate_with_image: Template, image: Image):
     one.template.delete(vmtemplate_with_image._id, delete_images=True)
     assert not template_exist(vmtemplate_with_image._id)
@@ -164,7 +162,7 @@ def test_delete_template_with_image(one: One, vmtemplate_with_image: Template, i
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_delete_template_with_many_images(one: One, vmtemplate_with_2_images: Template):
     vmtemplate_tempalte = vmtemplate_with_2_images.info().TEMPLATE
     assert "DISK" in vmtemplate_tempalte
@@ -180,7 +178,7 @@ def test_delete_template_with_many_images(one: One, vmtemplate_with_2_images: Te
 
 @pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_delete_template_with_locked_image(one: One, vmtemplate_with_image: Template, lock_level):
     image.lock(lock_level)
 
@@ -189,7 +187,5 @@ def test_delete_template_with_locked_image(one: One, vmtemplate_with_image: Temp
 
     assert not template_exist(vmtemplate_with_image._id)
     assert image_exist(image._id)
-
-
 
 

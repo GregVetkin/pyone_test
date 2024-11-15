@@ -2,14 +2,13 @@ import pytest
 
 from api                import One
 from pyone              import OneInternalException, OneNoExistsException
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.image      import Image, create_image, wait_image_ready
 from one_cli.vm         import VirtualMachine, create_vm
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 IMAGE_STATES = {1: "ГОТОВО",
                 2: "ИСПОЛЬЗУЕТСЯ",
                 3: "Отключен",} 
@@ -84,7 +83,7 @@ def used_image(image_datastore: Datastore):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.enable(999999)
@@ -93,7 +92,7 @@ def test_image_not_exist(one: One):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_enable_and_disable_used_image(one: One, used_image: Image):
     assert used_image.info().STATE == 2
 
@@ -107,7 +106,7 @@ def test_enable_and_disable_used_image(one: One, used_image: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_enable_enabled_image(one: One, image: Image):
     assert image.info().STATE == 1
     one.image.enable(image._id)
@@ -115,7 +114,7 @@ def test_enable_enabled_image(one: One, image: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_enable_disabled_image(one: One, image: Image):
     image.disable()
     assert image.info().STATE == 3
@@ -124,7 +123,7 @@ def test_enable_disabled_image(one: One, image: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_disable_disabled_image(one: One, image: Image):
     image.disable()
     assert image.info().STATE == 3
@@ -133,7 +132,7 @@ def test_disable_disabled_image(one: One, image: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_disable_enabled_image(one: One, image: Image):
     assert image.info().STATE == 1
     one.image.disable(image._id)

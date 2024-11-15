@@ -3,15 +3,13 @@ import random
 
 from api                import One
 from pyone              import OneNoExistsException, OneActionException
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
 from one_cli.image      import Image, create_image, wait_image_ready
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture(scope="module")
@@ -92,21 +90,21 @@ def image_with_snapshots(image_datastore: Datastore, system_datastore: Datastore
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.snapshotrevert(99999, 0)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_snapshot_not_exist(one: One, image: Image):
     with pytest.raises(OneActionException):
         one.image.snapshotrevert(image._id, 99999)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_revert_image_snapshot(one: One, image_with_snapshots: Image):
     image_snapshots = image_with_snapshots.info().SNAPSHOTS
     assert len(image_snapshots) > 1

@@ -2,14 +2,12 @@ import pytest
 import time
 from api                import One
 from pyone              import OneNoExistsException, OneException
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.image      import Image, create_image, image_exist, wait_image_ready
 from one_cli.datastore  import Datastore, create_datastore
 from one_cli.vm         import VirtualMachine, create_vm, vm_exist
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture(scope="module")
@@ -116,14 +114,14 @@ def backup_image(image_datastore: Datastore, system_datastore: Datastore, file_d
 
 
     
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_backup_image_not_exist(one: One, image_datastore: Datastore):
     with pytest.raises(OneNoExistsException):
         one.image.restore(999999, image_datastore._id)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_not_backup_image_type(one: One, image: Image, image_datastore: Datastore):
     assert image.info().TYPE != 6
     with pytest.raises(OneException):
@@ -131,7 +129,7 @@ def test_not_backup_image_type(one: One, image: Image, image_datastore: Datastor
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_datastore_not_exist(one: One, backup_image: Image):
     assert backup_image.info().TYPE == 6
     with pytest.raises(OneNoExistsException):
@@ -142,7 +140,7 @@ def test_datastore_not_exist(one: One, backup_image: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_restore_backup_image_into(one: One, backup_image: Image, image_datastore: Datastore):
     backup_info = backup_image.info()
     assert backup_info.TYPE == 6

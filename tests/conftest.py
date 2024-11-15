@@ -3,7 +3,7 @@ import pytest
 from pyone      import OneServer
 from api        import One
 from config     import API_URI
-
+from utils      import get_user_auth
 
 
 
@@ -11,13 +11,13 @@ from config     import API_URI
 
 @pytest.fixture
 def one(request):
-    user_auth = request.param
-    server    = OneServer(API_URI, user_auth)
+    username  = request.param
+    server    = OneServer(API_URI, get_user_auth(username))
     one       = One(server)
     
     yield one
 
-    #one._one_api.server_close()
+    one._one_api.server_close()
 
 
 

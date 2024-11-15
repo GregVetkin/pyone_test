@@ -1,13 +1,11 @@
 import pytest
 from typing             import List
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture(scope="module")
@@ -51,7 +49,7 @@ def images(datastore: Datastore):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_show_all_images(one: One, images: List[Image]):
     image_ids     = [image._id for image in images]
     imagepool     = one.imagepool.info().IMAGE
@@ -61,7 +59,7 @@ def test_show_all_images(one: One, images: List[Image]):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_filter_start_id(one: One, images: List[Image]):
     image_ids     = [image._id for image in images]
     image_ids.sort()
@@ -73,7 +71,7 @@ def test_filter_start_id(one: One, images: List[Image]):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_filter_end_id(one: One, images: List[Image]):
     image_ids     = [image._id for image in images]
     image_ids.sort()
@@ -82,3 +80,4 @@ def test_filter_end_id(one: One, images: List[Image]):
     
     assert image_ids[-1] not in imagepool_ids
     assert set(image_ids[:-2]).issubset(imagepool_ids)
+

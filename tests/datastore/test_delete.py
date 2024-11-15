@@ -2,17 +2,16 @@ import pytest
 import time
 
 from api                import One
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.datastore  import Datastore, create_datastore, datastore_exist
 from one_cli.image      import Image, create_image, image_exist
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
 from tests._common_tests.delete import delete_undeletable__test
 
 
-BRESTADM_AUTH    = get_user_auth(BRESTADM)
 
 
 @pytest.fixture
@@ -66,18 +65,19 @@ def not_empty_datastore():
 # =================================================================================================
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_datastore_not_exist(one: One):
     delete_if_not_exist__test(one.datastore)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_delete_empty_datastore(one: One, empty_datastore: Datastore):
     delete__test(one.datastore, empty_datastore)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_delete_not_empty_datastore(one: One, not_empty_datastore: Datastore):
     delete_undeletable__test(one.datastore, not_empty_datastore)
+

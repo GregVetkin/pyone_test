@@ -1,14 +1,13 @@
 import pytest
 from api                        import One
-from utils                      import get_user_auth, get_unic_name
+from utils                      import get_unic_name
 from one_cli.template           import Template, create_template, template_exist
 from one_cli.image              import Image, create_image, image_exist
 from one_cli.datastore          import Datastore, create_datastore
-from config                     import BRESTADM
+from config                     import ADMIN_NAME
 from tests._common_tests.chmod  import chmod__test, chmod_if_not_exist__test, _rights_tuples_list, _rights_as_tuple
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 @pytest.fixture(scope="module")
@@ -108,21 +107,21 @@ def vmtemplate_with_many_images(image: Image, image_2: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_not_exist(one: One):
     chmod_if_not_exist__test(one.template)
 
 
 
 @pytest.mark.parametrize("rights", _rights_tuples_list())
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_change_template_rights(one: One, vmtemplate: Template, rights):
     chmod__test(one.template, vmtemplate, rights)
 
 
 
 @pytest.mark.parametrize("rights", _rights_tuples_list())
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_change_template_rights_and_its_images(one: One, vmtemplate_with_many_images: Template, rights):
     vmtemplate_disks = vmtemplate_with_many_images.info().TEMPLATE["DISK"]
     image_ids = [vmtemplate_disks[i]["IMAGE_ID"] for i, _ in enumerate(vmtemplate_disks)]

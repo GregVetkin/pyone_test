@@ -2,13 +2,12 @@ import pytest
 
 from api                import One
 from pyone              import OneActionException, OneNoExistsException
-from utils              import get_user_auth, create_temp_file, delete_temp_file, get_unic_name
+from utils              import create_temp_file, delete_temp_file, get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
 
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 IMAGE_TYPES   = {0: "OS",
                  1: "CDROM",
                  2: "DATABLOCK"}
@@ -81,14 +80,14 @@ def context_image(file_datastore: Datastore):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.chtype(999999, "VetkinType")
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 @pytest.mark.parametrize("file_type_id", list(FILE_TYPES.keys()))
 def test_incompatible_type_for_image_datastore(one: One, datablock_image: Image, file_type_id):
     image_old_type = datablock_image.info().TYPE
@@ -99,7 +98,7 @@ def test_incompatible_type_for_image_datastore(one: One, datablock_image: Image,
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 @pytest.mark.parametrize("image_type_id", list(IMAGE_TYPES.keys()))
 def test_incompatible_type_for_file_datastore(one: One, context_image: Image, image_type_id):
     image_old_type = context_image.info().TYPE
@@ -110,7 +109,7 @@ def test_incompatible_type_for_file_datastore(one: One, context_image: Image, im
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 @pytest.mark.parametrize("image_type_id", list(IMAGE_TYPES.keys()))
 def test_available_image_types(one: One, datablock_image: Image, image_type_id):
     one.image.chtype(datablock_image._id, IMAGE_TYPES[image_type_id])
@@ -118,7 +117,7 @@ def test_available_image_types(one: One, datablock_image: Image, image_type_id):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 @pytest.mark.parametrize("file_type_id", list(FILE_TYPES.keys()))
 def test_available_file_types(one: One, context_image: Image, file_type_id):
     one.image.chtype(context_image._id, FILE_TYPES[file_type_id])

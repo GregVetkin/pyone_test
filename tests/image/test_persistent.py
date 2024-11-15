@@ -2,14 +2,12 @@ import pytest
 
 from api                import One
 from pyone              import OneInternalException, OneNoExistsException
-from utils              import get_user_auth, get_unic_name
+from utils              import get_unic_name
 from one_cli.image      import Image, create_image, wait_image_ready
 from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
 from one_cli.datastore  import Datastore, create_datastore
-from config             import BRESTADM
+from config             import ADMIN_NAME
 
-
-BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
 
@@ -116,7 +114,7 @@ def image_with_snapshot(image_datastore: Datastore, system_datastore: Datastore)
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
         one.image.persistent(999999)
@@ -125,7 +123,7 @@ def test_image_not_exist(one: One):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_used_image_persistencte(one: One, used_image: Image):
     image_info = used_image.info()
     assert image_info.STATE == 2
@@ -143,7 +141,7 @@ def test_used_image_persistencte(one: One, used_image: Image):
 
 @pytest.mark.parametrize("start_persistent", [True, False])
 @pytest.mark.parametrize("target_persistence", [True, False])
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_persistent_image(one: One, image: Image, start_persistent: bool, target_persistence: bool):
     if start_persistent:
         image.persistent()
@@ -159,7 +157,7 @@ def test_persistent_image(one: One, image: Image, start_persistent: bool, target
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_make_nonpers_image_with_snapshots(one: One, image_with_snapshot: Image):
     assert image_with_snapshot.info().SNAPSHOTS
     with pytest.raises(OneInternalException):
