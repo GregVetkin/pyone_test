@@ -116,7 +116,7 @@ def test_revert_image_snapshot(one: One, image_with_snapshots: Image):
 
 
 
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_snapshtod_already_active(one: One, image_with_snapshots: Image):
     image_snapshots = image_with_snapshots.info().SNAPSHOTS
     assert len(image_snapshots) > 1
