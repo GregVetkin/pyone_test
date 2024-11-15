@@ -47,7 +47,7 @@ def image(datastore: Datastore):
     image.delete()
     
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def user():
     user_id = create_user(get_unic_name())
     user    = User(user_id)
@@ -55,7 +55,7 @@ def user():
     user.delete()
 
 
-@pytest.fixture
+@pytest.fixture(scope="module")
 def group():
     group_id = create_group(get_unic_name())
     group    = Group(group_id)
