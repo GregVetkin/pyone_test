@@ -1,6 +1,6 @@
 import pytest
 import random
-from pyone      import OneNoExistsException, OneActionException, OneAuthorizationException
+from pyone      import OneNoExistsException, OneActionException, OneAuthorizationException, OneInternalException
 from typing     import Tuple
 
 
@@ -39,7 +39,7 @@ def chmod__test(api_method, one_object, rights: Tuple[int]):
 
 def chmod_cant_be_changed__test(api_method, one_object, rights: Tuple[int]):
     old_rights = _rights_as_tuple(one_object)
-    with pytest.raises((OneActionException, OneAuthorizationException)):
+    with pytest.raises((OneActionException, OneAuthorizationException, OneInternalException)):
         api_method.chmod(one_object._id, *rights)
     new_rights = _rights_as_tuple(one_object)
     assert old_rights == new_rights

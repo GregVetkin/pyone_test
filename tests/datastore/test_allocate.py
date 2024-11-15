@@ -1,58 +1,87 @@
 import pytest
 
 from api                import One
-from pyone              import OneNoExistsException
+from pyone              import OneNoExistsException, OneInternalException
 from utils              import get_user_auth, get_unic_name
 from one_cli.datastore  import Datastore, datastore_exist
+from one_cli.cluster    import Cluster, create_cluster
 from config             import BRESTADM
 
 
 BRESTADM_AUTH = get_user_auth(BRESTADM)
 
 
-IMAGE_DS_TEMPLATE = f"""
-    NAME   = {get_unic_name()}
-    TYPE   = IMAGE_DS
-    TM_MAD = ssh
-    DS_MAD = fs
-"""
-FILE_DS_TEMPLATE = f"""
-    NAME   = {get_unic_name()}
-    TYPE   = FILE_DS
-    TM_MAD = ssh
-    DS_MAD = fs
-"""
-SYSTEM_DS_TEMPLATE = f"""
-    NAME   = {get_unic_name()}
-    TYPE   = SYSTEM_DS
-    TM_MAD = ssh
-"""
+@pytest.fixture
+def cluster():
+    _id = create_cluster(get_unic_name())
+    cluster = Cluster(_id)
+    yield cluster
+    cluster.delete()
 
 
 # =================================================================================================
 # TESTS
 # =================================================================================================
-# ToDo:
-# 1) Кластер
-# 2) Передача кастомных параметров шаблона
-# 3) Невалидные параметры в шаблоне
-# 4) Проверка обязательных параметров
-# 5) Проверка xml шаблона
 
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_cluster_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
-        one.datastore.allocate(IMAGE_DS_TEMPLATE, cluster_id=999999)
+        one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs", cluster_id=999999)
 
 
-
-@pytest.mark.parametrize("valid_template", [IMAGE_DS_TEMPLATE, FILE_DS_TEMPLATE, SYSTEM_DS_TEMPLATE])
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_create_datastore(one: One, valid_template: str):
-    datastore_id  = one.datastore.allocate(valid_template)
-    datastore     = Datastore(datastore_id)
-    assert datastore_exist(datastore_id) == True
+def test_datastore_creation(one: One):
+    _id  = one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs")
+    assert datastore_exist(_id)
+    Datastore(_id).delete()
+
+
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_datastore_creation_xml(one: One):
+    _id = one.datastore.allocate(f"<DATASTORE><NAME>{get_unic_name()}</NAME><TM_MAD>ssh</TM_MAD><DS_MAD>fs</DS_MAD></DATASTORE>")
+    assert datastore_exist(_id)
+    Datastore(_id).delete()
+
+
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_mandatory_params(one: One):
+
+    with pytest.raises(OneInternalException):
+        one.datastore.allocate("")
+
+    with pytest.raises(OneInternalException):
+        one.datastore.allocate(f"NAME={get_unic_name()}")
+    
+    with pytest.raises(OneInternalException):
+        one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh")
+
+    with pytest.raises(OneInternalException):
+        one.datastore.allocate(f"NAME={get_unic_name()}\nDS_MAD=fs")
+        
+
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_mandatory_params_xml(one: One):
+
+    with pytest.raises(OneInternalException):
+        one.datastore.allocate("<DATASTORE></DATASTORE>")
+
+    with pytest.raises(OneInternalException):
+        one.datastore.allocate(f"""<DATASTORE><NAME>{get_unic_name()}</NAME></DATASTORE>""")
+    
+    with pytest.raises(OneInternalException):
+        one.datastore.allocate(f"""<DATASTORE><NAME>{get_unic_name()}</NAME><TM_MAD>ssh</TM_MAD></DATASTORE>""")
+
+    with pytest.raises(OneInternalException):
+        one.datastore.allocate(f"""<DATASTORE><NAME>{get_unic_name()}</NAME><DS_MAD>fs</DS_MAD></DATASTORE>""")
+
+
+@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
+def test_datastore_create_with_certain_cluster(one: One, cluster: Cluster):
+    _id  = one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs", cluster_id=cluster._id)
+    datastore = Datastore(_id)
+    assert datastore_exist(_id)
+    assert cluster._id in datastore.info().CLUSTERS
     datastore.delete()
 

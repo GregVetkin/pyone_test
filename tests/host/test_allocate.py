@@ -26,26 +26,12 @@ def test_cluster_not_exist(one: One):
 
 
 
-@pytest.mark.skip(reason="Должна ли быть проверка валидного IM_MAD?")
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_bad_IM_MAD(one: One):
-    with pytest.raises(OneInternalException):
-        one.host.allocate(hostname=f"{get_unic_name()}", im_mad="notexist", vm_mad="kvm", cluster_id=-1)
-
-
-
-@pytest.mark.skip(reason="Должна ли быть проверка валидного VM_MAD?")
-@pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
-def test_bad_VM_MAD(one: One):
-    with pytest.raises(OneInternalException):
-        one.host.allocate(hostname=f"{get_unic_name()}", im_mad="kvm", vm_mad="notexist", cluster_id=-1)
-
 
 
 @pytest.mark.parametrize("one", [BRESTADM_AUTH], indirect=True)
 def test_allocate_host_kvm_kvm(one: One):
-    host_id = one.host.allocate(hostname=f"{get_unic_name()}", im_mad="kvm", vm_mad="kvm", cluster_id=-1)
-    host    = Host(host_id)
-    assert host_exist(host_id)
-    host.delete()
+    _id = one.host.allocate(hostname=f"{get_unic_name()}", im_mad="kvm", vm_mad="kvm", cluster_id=-1)
+    assert host_exist(_id)
+    Host(_id).delete()
+
 

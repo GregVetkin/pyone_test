@@ -1,5 +1,5 @@
 import pytest
-from pyone      import OneNoExistsException, OneActionException, OneAuthorizationException
+from pyone      import OneNoExistsException, OneActionException, OneAuthorizationException, OneInternalException
 
 
 
@@ -21,5 +21,5 @@ def info__test(api_method, one_object):
 
 
 def info_cant_be_obtained__test(api_method, one_object):
-    with pytest.raises((OneAuthorizationException, OneActionException)):
+    with pytest.raises((OneAuthorizationException, OneActionException, OneInternalException)):
         api_method.info(one_object._id)

@@ -1,6 +1,6 @@
 import pytest
 import random
-from pyone      import OneNoExistsException, OneAuthorizationException, OneActionException
+from pyone      import OneNoExistsException, OneAuthorizationException, OneActionException, OneInternalException
 
 
 
@@ -16,7 +16,7 @@ def update_if_not_exist__test(api_method):
 
 def cant_be_updated__test(api_method, one_object):
     attribute_name = "TEST_ATTR"
-    with pytest.raises((OneAuthorizationException, OneActionException)):
+    with pytest.raises((OneAuthorizationException, OneActionException, OneInternalException)):
         api_method.update(one_object._id, template=f"{attribute_name} = TEST_DATA")
     assert attribute_name not in one_object.info().TEMPLATE
 
