@@ -9,6 +9,11 @@ from one_cli.user       import get_user_id_by_name
 from config             import ADMIN_NAME
 
 
+from tests._common_tests.clone import clone_if_not_exist__test
+from tests._common_tests.clone import clone_name_collision__test
+
+
+
 
 @pytest.fixture(scope="module")
 def datastore():
@@ -72,8 +77,7 @@ def image(datastore: Datastore):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.image.clone(999999, get_unic_name())
+    clone_if_not_exist__test(one.image)
 
 
 
@@ -86,12 +90,9 @@ def test_datastore_not_exist(one: One, image: Image):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_name_is_taken(one: One, image: Image):
-    brestadm_id = get_user_id_by_name("brestadm")
-    if image.info().UID != brestadm_id:
-        image.chown(brestadm_id)
-
-    with pytest.raises(OneException):
-        one.image.clone(image._id, image.info().NAME)
+    brestadm_id = get_user_id_by_name(ADMIN_NAME)
+    image.chown(brestadm_id)
+    clone_name_collision__test(one.image, image)
     
 
 

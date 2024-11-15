@@ -29,10 +29,10 @@ def __parse_template(raw_template_xml):
             template[element.tag] = __convert(element.text)
         else:
             if element.tag in template:
-                template[element.tag].append({_.tag: __convert(_.text) or "" for _ in template_element.find(element.tag)})
+                template[element.tag].append({_.tag: __convert(_.text) or "" for _ in element.iter() if _ is not element})
             else:
-                template[element.tag] = [{_.tag: __convert(_.text) or "" for _ in template_element.find(element.tag)}]
-
+                template[element.tag] = [{_.tag: __convert(_.text) or "" for _ in element.iter() if _ is not element}]
+                
     return template
 
 
