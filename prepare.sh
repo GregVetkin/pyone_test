@@ -15,7 +15,7 @@ function is_package_in_repos() {
 function install_package() {
     local PACKAGE_NAME="$1"
 
-    if sudo apt install "${PACKAGE_NAME}" -y &>/dev/null; then
+    if sudo apt install "${PACKAGE_NAME}" -y ; then
         return 0
     else
         return 1
@@ -26,7 +26,7 @@ function install_package() {
 function create_python_venv() {
     local VENV_PATH="$1"
 
-    python3 -m venv ${VENV_PATH}    &>/dev/null
+    python3 -m venv ${VENV_PATH}
 }
 
 
@@ -36,7 +36,7 @@ function install_python_packages_in_venv_with_pip() {
     local PACKAGES=("$@")
 
     source "${VENV_DIR}/bin/activate"
-    pip3 install "${PACKAGES[@]}" &>/dev/null
+    pip3 install "${PACKAGES[@]}"
     deactivate
 }
 
@@ -50,8 +50,8 @@ function add_base_repository() {
 
     local REPO_DATA="deb ${REPO}/${MAJOR}.${MINOR}/${MAJOR}.${MINOR}.${PATCH}/_REPO/base-repository ${MAJOR}.${MINOR}_x86-64 main contrib non-free"
 
-    echo "${REPO_DATA}" | sudo tee -a /etc/apt/sources.list &>/dev/null
-    sudo apt update &>/dev/null
+    echo "${REPO_DATA}" | sudo tee -a /etc/apt/sources.list
+    sudo apt update
 }
 
 
@@ -79,5 +79,6 @@ fi
 
 install_package "${PACKAGE}"
 create_python_venv $VENV_DIR
+source "${VENV_DIR}/bin/activate"; pip3 install --upgrade pip; deactivate
 install_python_packages_in_venv_with_pip $VENV_DIR "${PIP_PACKAGES[@]}"
 
