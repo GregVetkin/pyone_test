@@ -61,7 +61,7 @@ REPO="https://releases.devos.astralinux.ru/stable/"
 DIR=$(dirname "$(realpath "$0")")
 PACKAGE="python3-venv"
 VENV_DIR="${DIR}/.venv/"
-PIP_PACKAGES=("lxml==4.4.0" "pyone" "pytest")
+PIP_PACKAGES=("lxml==4.4.0" "pyone==6.10.0" "pytest")
 
 
 
