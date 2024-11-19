@@ -64,7 +64,7 @@ def test_instantiane_vm_with_extra_tempalte(one: One, vmtemplate: Template):
     extra_attribute = "TEST_ATTRIBUTE"
     vm_id = one.template.instantiate(vmtemplate._id, vm_name=get_unic_name(), extra_template=f"{extra_attribute} = TEST")
     vm    = VirtualMachine(vm_id)
-    assert extra_attribute in vm.info().USER_TEMPALTE
+    assert extra_attribute in vm.info().USER_TEMPLATE
     vm.terminate()
 
 
