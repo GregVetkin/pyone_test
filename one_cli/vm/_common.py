@@ -58,6 +58,7 @@ class VirtualMachineInfo:
     ETIME:              int
     DEPLOY_ID:          str
     TEMPLATE:           Dict[str, List[Dict[str, str]]] = field(default_factory=dict)
+    USER_TEMPLATE:      Dict[str, str]                  = field(default_factory=dict)
 
 
 
@@ -87,7 +88,8 @@ def parse_vm_info_from_xml(raw_vm_xml: str) -> VirtualMachineInfo:
             STIME=              int(xml.find('STIME').text),
             ETIME=              int(xml.find('ETIME').text),
             DEPLOY_ID=          xml.find('DEPLOY_ID').text,
-            TEMPLATE=           template
+            TEMPLATE=           template,
+            USER_TEMPLATE=      {attribulte.tag: attribulte.text or "" for attribulte in xml.find('USER_TEMPLATE')},
         )
     
     return vm_info

@@ -48,7 +48,7 @@ def test_instantiane_vm(one: One, vmtemplate: Template):
 
 
 
-@pytest.mark.skip(reason="Дописать метод info для vm")
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_instantiane_and_hold_vm(one: One, vmtemplate: Template):
     vm_id = one.template.instantiate(vmtemplate._id, vm_name=get_unic_name(), hold_vm=True)
@@ -58,13 +58,13 @@ def test_instantiane_and_hold_vm(one: One, vmtemplate: Template):
 
 
 
-@pytest.mark.skip(reason="Дописать метод info для vm")
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_instantiane_vm_with_extra_tempalte(one: One, vmtemplate: Template):
     extra_attribute = "TEST_ATTRIBUTE"
     vm_id = one.template.instantiate(vmtemplate._id, vm_name=get_unic_name(), extra_template=f"{extra_attribute} = TEST")
     vm    = VirtualMachine(vm_id)
-    assert extra_attribute in vm.info().TEMPLATE
+    assert extra_attribute in vm.info().USER_TEMPALTE
     vm.terminate()
 
 
