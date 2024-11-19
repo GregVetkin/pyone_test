@@ -1,7 +1,8 @@
 from config                 import COMMAND_EXECUTOR
 from utils                  import run_command
 from time                   import sleep   
-from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist, _create
+from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist, _create, _info
+from one_cli.vm._common     import VirtualMachineInfo, parse_vm_info_from_xml
 
 FUNCTION_NAME = "onevm"
 
@@ -57,4 +58,9 @@ class VirtualMachine:
         backup_name     = f"-n {backup_name}" if backup_name else ""
         datastore_id    = f"-d {datastore_id}" if datastore_id != -1 else ""
         run_command(self._exec_command + f"backup {self._id} {datastore_id} {backup_name}")
+
+    
+    def info(self) -> VirtualMachineInfo:
+        return parse_vm_info_from_xml(_info(self._function, self._id, xml=True))
+
     
