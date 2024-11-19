@@ -83,7 +83,7 @@ def parse_vm_info_from_xml(raw_vm_xml: str) -> VirtualMachineInfo:
             LCM_STATE=          int(xml.find('LCM_STATE').text),
             PREV_STATE=         int(xml.find('PREV_STATE').text),
             PREV_LCM_STATE=     int(xml.find('PREV_LCM_STATE').text),
-            RESHED=             int(xml.find('RESHED').text),
+            RESCHED=            int(xml.find('RESCHED').text),
             STIME=              int(xml.find('STIME').text),
             ETIME=              int(xml.find('ETIME').text),
             DEPLOY_ID=          xml.find('DEPLOY_ID').text,
