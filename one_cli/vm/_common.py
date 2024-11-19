@@ -53,7 +53,7 @@ class VirtualMachineInfo:
     LCM_STATE:          int
     PREV_STATE:         int
     PREV_LCM_STATE:     int
-    RESСHED:            int
+    RESCHED:            int
     STIME:              int
     ETIME:              int
     DEPLOY_ID:          str
