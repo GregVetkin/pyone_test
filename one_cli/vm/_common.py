@@ -8,12 +8,12 @@ from one_cli._common    import Permissions, parse_lock_from_xml, parse_permissio
 def __convert(text: str) -> Union[str, int, float]:
     try:
         return int(text)
-    except ValueError:
+    except Exception:
         pass
     
     try:
         return float(text)
-    except ValueError:
+    except Exception:
         pass
 
     return text
