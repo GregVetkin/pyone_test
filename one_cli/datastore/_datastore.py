@@ -1,7 +1,6 @@
-from config                     import COMMAND_EXECUTOR
-from utils                      import run_command
 from one_cli.datastore._common  import DatastoreInfo, parse_datastore_info_from_xml
 from one_cli._base_commands     import _chmod, _chown, _delete, _info, _update, _exist, _create
+from one_cli.image              import force_delete_image
 
 
 
@@ -12,6 +11,19 @@ def datastore_exist(datastore_id: int) -> bool:
 def create_datastore(datastore_template: str) -> int:
     return _create("onedatastore", datastore_template)
 
+
+
+def force_delete_datastore(datastore_id: int):
+    if not datastore_exist(datastore_id):
+        return
+
+    datastore = Datastore(datastore_id)
+    datastore_info = datastore.info()
+    
+    for image_id in datastore_info.IMAGES:
+        force_delete_image(image_id)
+
+    datastore.delete()
 
 
 
