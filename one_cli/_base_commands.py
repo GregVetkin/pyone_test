@@ -17,10 +17,27 @@ def _create(function_name: str, template: str) -> int:
     return _id
 
 
+def _exist_in_show(function_name: str, object_id: int) -> bool:
+    return not bool(int(run_command(COMMAND_EXECUTOR + " " + f"{function_name} show {object_id} &>/dev/null; echo $?")))
+
+def _exist_in_list(function_name: str, object_id: int) -> bool:
+    string_object_id = str(object_id)
+    list_result = run_command(COMMAND_EXECUTOR + " " + f"{function_name} list")
+    lines = list_result.splitlines()
+    IDs_id = next(col_number for col_number, col_name in enumerate(lines[0].split()) if col_name == "ID")
+    for line in lines:
+        if line.split()[IDs_id] == string_object_id:
+            return True
+    return False
+
+
 def _exist(function_name: str, object_id: int) -> bool:
-    exec_code_show = int(run_command(COMMAND_EXECUTOR + " " + f"{function_name} show {object_id} &>/dev/null; echo $?"))
-    exec_code_list = int(run_command(COMMAND_EXECUTOR + " " + f"{function_name} list | " + "awk '{print $1}' | " + f" grep {object_id} &>/dev/null; echo $?"))
-    return True if exec_code_show == 0 and exec_code_list == 0 else False
+    # exec_code_show = int(run_command(COMMAND_EXECUTOR + " " + f"{function_name} show {object_id} &>/dev/null; echo $?"))
+    # exec_code_list = int(run_command(COMMAND_EXECUTOR + " " + f"{function_name} list" + " | " + "awk '{print $1}' | " + f" grep {object_id} &>/dev/null; echo $?"))
+    # return True if exec_code_show == 0 and exec_code_list == 0 else False
+    return _exist_in_show(function_name, object_id) and _exist_in_list(function_name, object_id)
+    
+
 
 
 def _chown(function_name: str, object_id: int, user_id: int, group_id: int = -1) -> None:

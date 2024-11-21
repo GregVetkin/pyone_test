@@ -17,7 +17,7 @@ from tests._common_tests.delete import cant_be_deleted__test
 def zone():
     template = f"""
         NAME     = {get_unic_name()}
-        ENDPOINT = http://localhost:2633/RPC2"
+        ENDPOINT = http://localhost:2633/RPC2
     """
     _id = create_zone(template)
     zone = Zone(_id)
