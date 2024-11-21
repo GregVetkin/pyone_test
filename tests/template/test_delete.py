@@ -9,7 +9,7 @@ from config             import ADMIN_NAME, LOCK_LEVELS
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
-from tests._common_tests.delete import delete_undeletable__test
+from tests._common_tests.delete import cant_be_deleted__test
 
 
 
@@ -105,7 +105,7 @@ def image_2(datastore: Datastore):
 
 
 @pytest.fixture
-def vmtemplate_with_2_images(image: Image, image_2: Image):
+def vmtemplate_with_images(image: Image, image_2: Image):
     template = f"""
         NAME    = {get_unic_name()}
         CPU     = 1
@@ -153,7 +153,7 @@ def test_delete_locked_template(one: One, vmtemplate: Template, lock_level: int)
     if lock_level == 3:
         delete__test(one.template, vmtemplate)
     else:
-        delete_undeletable__test(one.template, vmtemplate)
+        cant_be_deleted__test(one.template, vmtemplate)
 
 
 
@@ -166,14 +166,14 @@ def test_delete_template_with_image(one: One, vmtemplate_with_image: Template, i
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_delete_template_with_many_images(one: One, vmtemplate_with_2_images: Template):
-    vmtemplate_tempalte = vmtemplate_with_2_images.info().TEMPLATE
+def test_delete_template_with_many_images(one: One, vmtemplate_with_images: Template):
+    vmtemplate_tempalte = vmtemplate_with_images.info().TEMPLATE
     assert "DISK" in vmtemplate_tempalte
     template_disks = vmtemplate_tempalte["DISK"]
     assert len(template_disks) > 1
 
-    one.template.delete(vmtemplate_with_2_images._id, delete_images=True)
-    assert not template_exist(vmtemplate_with_2_images._id)
+    one.template.delete(vmtemplate_with_images._id, delete_images=True)
+    assert not template_exist(vmtemplate_with_images._id)
     for disk in template_disks:
         assert not image_exist(disk["IMAGE_ID"])
 

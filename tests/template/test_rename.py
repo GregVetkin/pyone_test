@@ -6,9 +6,7 @@ from config             import ADMIN_NAME, BAD_SYMBOLS
 
 from tests._common_tests.rename import rename__test
 from tests._common_tests.rename import rename_if_not_exist__test
-from tests._common_tests.rename import rename_unavailable_symbol__test
-from tests._common_tests.rename import rename_empty_name__test
-from tests._common_tests.rename import rename_collision__test
+from tests._common_tests.rename import cant_be_renamed__test
 
 
 
@@ -60,17 +58,18 @@ def test_rename_template(one: One, vmtemplate: Template):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_template_name_collision(one: One, vmtemplate: Template, vmtemplate_2: Template):
-    rename_collision__test(one.template, vmtemplate, vmtemplate_2)
+    cant_be_renamed__test(one.template, vmtemplate, vmtemplate_2.info().NAME)
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_empty_template_name(one: One, vmtemplate: Template):
-    rename_empty_name__test(one.template, vmtemplate)
+    cant_be_renamed__test(one.template, vmtemplate, "")
 
 
 @pytest.mark.parametrize("bad_symbol", BAD_SYMBOLS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_unavailable_symbols_in_template_name(one: One, vmtemplate: Template, bad_symbol: str):
-    rename_unavailable_symbol__test(one.template, vmtemplate, bad_symbol)
-
-
+    cant_be_renamed__test(one.template, vmtemplate, f"{bad_symbol}")
+    cant_be_renamed__test(one.template, vmtemplate, f"Greg{bad_symbol}")
+    cant_be_renamed__test(one.template, vmtemplate, f"{bad_symbol}Vetkin")
+    cant_be_renamed__test(one.template, vmtemplate, f"Greg{bad_symbol}Vetkin")

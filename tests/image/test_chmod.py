@@ -4,7 +4,7 @@ from utils                      import get_unic_name
 from one_cli.image              import Image, create_image
 from one_cli.datastore          import Datastore, create_datastore
 from config                     import ADMIN_NAME, LOCK_LEVELS
-from tests._common_tests.chmod  import chmod__test, chmod_if_not_exist__test, _rights_tuples_list, chmod_cant_be_changed__test
+from tests._common_tests.chmod  import chmod__test, chmod_if_not_exist__test, _rights_tuples_list, cant_be_chmod___test
 
 
 
@@ -56,13 +56,18 @@ def test_image_not_exist(one: One):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_change_image_rights(one: One, image: Image, rights):
     chmod__test(one.image, image, rights)
+    
 
 
 
-@pytest.mark.skip(reason="Требует уточнения")
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_change_locked_image_rights(one: One, image: Image, lock_level):
     image.lock(lock_level)
-    chmod_cant_be_changed__test(one.image, image, (0,0,0,0,0,0,0,0,0))
 
+    if lock_level == 3:
+        chmod__test(one.image, image, (0,0,-1,0,0,-1,0,0,-1))
+        cant_be_chmod___test(one.image, image, (1,1,1,1,1,1,1,1,1))
+    else:
+        cant_be_chmod___test(one.image, image, (0,0,-1,0,0,-1,0,0,-1))
+        cant_be_chmod___test(one.image, image, (1,1,1,1,1,1,1,1,1))

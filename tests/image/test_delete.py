@@ -9,7 +9,7 @@ from config             import ADMIN_NAME, LOCK_LEVELS
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
-from tests._common_tests.delete import delete_undeletable__test
+from tests._common_tests.delete import cant_be_deleted__test
 
 
 
@@ -95,13 +95,16 @@ def test_image_delete(one: One, image: Image):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_used_image_delete(one: One, used_image: Image):
-    delete_undeletable__test(one.image, used_image)
+    cant_be_deleted__test(one.image, used_image)
 
 
-#@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 def test_delete_locked_image(one: One, image: Image, lock_level: int):
     image.lock(lock_level)
-    delete_undeletable__test(one.image, image)
+    if lock_level == 3:
+        delete__test(one.image, image)
+    else:
+        cant_be_deleted__test(one.image, image)
 

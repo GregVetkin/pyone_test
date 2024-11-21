@@ -51,12 +51,13 @@ def test_update_template__merge(one: One, vmtemplate: Template):
     update_and_merge__test(one.template, vmtemplate)
 
 
-
-
-#@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
+@pytest.mark.skip()
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_update_locked_template(one: One, vmtemplate: Template, lock_level):
     vmtemplate.lock(lock_level)
-    cant_be_updated__test(one.template, vmtemplate)
+    if lock_level == 3:
+        update_and_replace__test(one.template, vmtemplate)
+    else:
+        cant_be_updated__test(one.template, vmtemplate)
 

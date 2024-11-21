@@ -32,8 +32,11 @@ def chmod_if_not_exist__test(api_method):
 
 
 def chmod__test(api_method, one_object, rights: Tuple[int]):
+    old_rights = _rights_as_tuple(one_object)
+    analog_rights = tuple(old_rights[i] if _ == -1 else _ for i, _ in enumerate(rights))
+
     api_method.chmod(one_object._id, *rights)
-    assert _rights_as_tuple(one_object) == rights
+    assert _rights_as_tuple(one_object) == analog_rights
 
 
 

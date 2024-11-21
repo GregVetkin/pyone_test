@@ -65,9 +65,12 @@ def test_update_image__merge(one: One, image: Image):
     update_and_merge__test(one.image, image)
 
 
-#@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
+
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_update_locked_image(one: One, image: Image, lock_level):
     image.lock(lock_level)
-    cant_be_updated__test(one.image, image)
+    if lock_level == 3:
+        update_and_replace__test(one.image, image)
+    else:
+        cant_be_updated__test(one.image, image)

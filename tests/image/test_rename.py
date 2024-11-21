@@ -8,9 +8,8 @@ from config                     import ADMIN_NAME, BAD_SYMBOLS
 
 from tests._common_tests.rename import rename__test
 from tests._common_tests.rename import rename_if_not_exist__test
-from tests._common_tests.rename import rename_unavailable_symbol__test
-from tests._common_tests.rename import rename_empty_name__test
-from tests._common_tests.rename import rename_collision__test
+from tests._common_tests.rename import cant_be_renamed__test
+
 
 
 
@@ -74,15 +73,18 @@ def test_change_image_name(one: One, image: Image):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_name_collision(one: One, image: Image, image_2: Image):
-    rename_collision__test(one.image, image, image_2)
+    cant_be_renamed__test(one.image, image, image_2.info().NAME)
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_empty_image_name(one: One, image: Image):
-    rename_empty_name__test(one.image, image)
+    cant_be_renamed__test(one.image, image, "")
 
 
 @pytest.mark.parametrize("bad_symbol", BAD_SYMBOLS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_unavailable_symbols_in_image_name(one: One, image: Image, bad_symbol: str):
-    rename_unavailable_symbol__test(one.image, image, bad_symbol)
+    cant_be_renamed__test(one.image, image, f"{bad_symbol}")
+    cant_be_renamed__test(one.image, image, f"Greg{bad_symbol}")
+    cant_be_renamed__test(one.image, image, f"{bad_symbol}Vetkin")
+    cant_be_renamed__test(one.image, image, f"Greg{bad_symbol}Vetkin")
