@@ -3,7 +3,7 @@ import time
 
 from api                import One
 from utils              import get_unic_name
-from one_cli.zone       import Zone, create_zone
+from one_cli.zone       import Zone, create_zone, zone_exist
 from config             import ADMIN_NAME
 
 from tests._common_tests.delete import delete__test
@@ -22,6 +22,8 @@ def zone():
     _id = create_zone(template)
     zone = Zone(_id)
     yield zone
+    if not zone_exist(_id):
+        return
     zone.delete()
 
 
