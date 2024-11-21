@@ -8,6 +8,8 @@ from api._host              import OneHost
 from api._hostpool          import OneHostpool
 from api._template          import OneTemplate
 from api._templatepool      import OneTemplatepool
+from api._zone              import OneZone
+from api._zonepool          import OneZonepool
 
 
 
@@ -28,4 +30,7 @@ class One():
 
         self.template       = OneTemplate(self._one_api)
         self.templatepool   = OneTemplatepool(self._one_api)
+
+        self.zone           = OneZone(self._one_api)
+        self.zonepool       = OneZonepool(self._one_api)
 
