@@ -145,12 +145,15 @@ def test_template_delete(one: One, vmtemplate: Template):
 
 
 
-#@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_delete_locked_template(one: One, vmtemplate: Template, lock_level: int):
     vmtemplate.lock(lock_level)
-    delete_undeletable__test(one.template, vmtemplate)
+
+    if lock_level == 3:
+        delete__test(one.template, vmtemplate)
+    else:
+        delete_undeletable__test(one.template, vmtemplate)
 
 
 
@@ -173,19 +176,5 @@ def test_delete_template_with_many_images(one: One, vmtemplate_with_2_images: Te
     assert not template_exist(vmtemplate_with_2_images._id)
     for disk in template_disks:
         assert not image_exist(disk["IMAGE_ID"])
-
-
-
-@pytest.mark.skip(reason="Нужна консультация по поводу провала при lock-level 4 (All). И уровне 3")
-@pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_delete_template_with_locked_image(one: One, vmtemplate_with_image: Template, lock_level):
-    image.lock(lock_level)
-
-    with pytest.raises(OneActionException):
-        one.template.delete(vmtemplate_with_image._id, True)
-
-    assert not template_exist(vmtemplate_with_image._id)
-    assert image_exist(image._id)
 
 

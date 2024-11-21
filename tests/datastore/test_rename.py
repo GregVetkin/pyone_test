@@ -6,9 +6,8 @@ from config             import ADMIN_NAME, BAD_SYMBOLS
 
 from tests._common_tests.rename import rename__test
 from tests._common_tests.rename import rename_if_not_exist__test
-from tests._common_tests.rename import rename_unavailable_symbol__test
-from tests._common_tests.rename import rename_empty_name__test
-from tests._common_tests.rename import rename_collision__test
+from tests._common_tests.rename import cant_be_renamed__test
+
 
 
 
@@ -60,17 +59,20 @@ def test_rename_datastore(one: One, datastore: Datastore):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_datastore_name_collision(one: One, datastore: Datastore, datastore_2: Datastore):
-    rename_collision__test(one.datastore, datastore, datastore_2)
+    cant_be_renamed__test(one.datastore, datastore, datastore_2.info().NAME)
+    
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_empty_datastore_name(one: One, datastore: Datastore):
-    rename_empty_name__test(one.datastore, datastore)
+    cant_be_renamed__test(one.datastore, datastore, "")
+
 
 
 @pytest.mark.parametrize("bad_symbol", BAD_SYMBOLS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_unavailable_symbols_in_datastore_name(one: One, datastore: Datastore, bad_symbol: str):
-    rename_unavailable_symbol__test(one.datastore, datastore, bad_symbol)
-
-
+    cant_be_renamed__test(one.datastore, datastore, f"{bad_symbol}")
+    cant_be_renamed__test(one.datastore, datastore, f"Greg{bad_symbol}")
+    cant_be_renamed__test(one.datastore, datastore, f"{bad_symbol}Vetkin")
+    cant_be_renamed__test(one.datastore, datastore, f"Greg{bad_symbol}Vetkin")

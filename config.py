@@ -5,5 +5,7 @@ COMMAND_EXECUTOR    = "ssh u@bufn1 sudo"
 ADMIN_NAME          = "brestadm"
 
 BAD_SYMBOLS         = ['$', '#', '&', '\"', '\'', '>', '<', '/', '\\', '|']
+
 LOCK_LEVELS         = [1, 2, 3, 4]
+
 

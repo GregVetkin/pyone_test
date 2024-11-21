@@ -8,7 +8,7 @@ from config         import ADMIN_NAME
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
-from tests._common_tests.delete import delete_undeletable__test
+from tests._common_tests.delete import cant_be_deleted__test
 
 
 
@@ -54,4 +54,4 @@ def test_delete_host_with_vm(one: One, vm: VirtualMachine):
             break
         i += 1
 
-    delete_undeletable__test(one.host, Host(i))
+    cant_be_deleted__test(one.host, Host(i))

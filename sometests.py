@@ -13,6 +13,4 @@ from one_cli.vm import VirtualMachine
 # one.template.instantiate(26, private_persistent_copy=True)
 
 
-temp = VirtualMachine(27).info().TEMPLATE
-
-print(temp["DISK"][0]["IMAGE_ID"])
+one.host.lock(30, 4)

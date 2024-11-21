@@ -9,7 +9,7 @@ from config             import ADMIN_NAME
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
-from tests._common_tests.delete import delete_undeletable__test
+from tests._common_tests.delete import cant_be_deleted__test
 
 
 
@@ -79,5 +79,5 @@ def test_delete_empty_datastore(one: One, empty_datastore: Datastore):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_delete_not_empty_datastore(one: One, not_empty_datastore: Datastore):
-    delete_undeletable__test(one.datastore, not_empty_datastore)
+    cant_be_deleted__test(one.datastore, not_empty_datastore)
 
