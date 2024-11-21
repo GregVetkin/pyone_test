@@ -1157,41 +1157,41 @@ TESTS["one"]["templatepool"]["info"]        = TestData(
 #                                                         xml_rpc_method  =   "one.vrouterpool.info",
 #                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vrouterpool/test_info.py"
 # )
-# # =======================================================================================================================
-# # one.zone
-# TESTS["one"]["zone"] = {}
-# TESTS["one"]["zone"]["allocate"]            = TestData(
-#                                                         xml_rpc_method  =   "one.zone.allocate",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_allocate.py"
-# )
-# TESTS["one"]["zone"]["delete"]              = TestData(
-#                                                         xml_rpc_method  =   "one.zone.delete",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_delete.py"
-# )
+# =======================================================================================================================
+# one.zone
+TESTS["one"]["zone"] = {}
+TESTS["one"]["zone"]["allocate"]            = TestData(
+                                                        xml_rpc_method  =   "one.zone.allocate",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_allocate.py"
+)
+TESTS["one"]["zone"]["delete"]              = TestData(
+                                                        xml_rpc_method  =   "one.zone.delete",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_delete.py"
+)
 # TESTS["one"]["zone"]["enable"]              = TestData(
 #                                                         xml_rpc_method  =   "one.zone.enable",
 #                                                         test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_enable.py"
 # )
-# TESTS["one"]["zone"]["info"]                = TestData(
-#                                                         xml_rpc_method  =   "one.zone.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_info.py"
-# )
-# TESTS["one"]["zone"]["raftstatus"]          = TestData(
-#                                                         xml_rpc_method  =   "one.zone.raftstatus",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_raftstatus.py"
-# )
-# TESTS["one"]["zone"]["rename"]              = TestData(
-#                                                         xml_rpc_method  =   "one.zone.rename",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_rename.py"
-# )
-# TESTS["one"]["zone"]["update"]              = TestData(
-#                                                         xml_rpc_method  =   "one.zone.update",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_update.py"
-# )
-# # =======================================================================================================================
-# # one.zonepool
-# TESTS["one"]["zonepool"] = {}
-# TESTS["one"]["zonepool"]["info"]            = TestData(
-#                                                         xml_rpc_method  =   "one.zonepool.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/zonepool/test_info.py"
-# )
+TESTS["one"]["zone"]["info"]                = TestData(
+                                                        xml_rpc_method  =   "one.zone.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_info.py"
+)
+TESTS["one"]["zone"]["raftstatus"]          = TestData(
+                                                        xml_rpc_method  =   "one.zone.raftstatus",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_raftstatus.py"
+)
+TESTS["one"]["zone"]["rename"]              = TestData(
+                                                        xml_rpc_method  =   "one.zone.rename",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_rename.py"
+)
+TESTS["one"]["zone"]["update"]              = TestData(
+                                                        xml_rpc_method  =   "one.zone.update",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/zone/test_update.py"
+)
+# =======================================================================================================================
+# one.zonepool
+TESTS["one"]["zonepool"] = {}
+TESTS["one"]["zonepool"]["info"]            = TestData(
+                                                        xml_rpc_method  =   "one.zonepool.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/zonepool/test_info.py"
+)

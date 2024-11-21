@@ -12,7 +12,7 @@ class OneZone:
     def allocate(self, template: str) -> int:
         return self._one_zone.allocate(template)
 
-    def detele(self, zone_id: int) -> int:
+    def delete(self, zone_id: int) -> int:
         return self._one_zone.delete(zone_id)
 
 
