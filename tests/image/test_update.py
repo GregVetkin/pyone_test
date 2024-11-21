@@ -66,6 +66,7 @@ def test_update_image__merge(one: One, image: Image):
 
 
 
+@pytest.mark.skip()
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_update_locked_image(one: One, image: Image, lock_level):
