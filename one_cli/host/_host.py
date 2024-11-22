@@ -1,4 +1,3 @@
-from config                 import COMMAND_EXECUTOR
 from utils                  import run_command
 from one_cli._base_commands import _delete, _info, _update, _exist, _rename, _enable, _disable, _offline
 from one_cli.host._common   import HostInfo, parse_host_info_from_xml
@@ -8,7 +7,7 @@ FUNCTION_NAME = "onehost"
 
 
 def create_host(name: str):
-    return int(run_command(COMMAND_EXECUTOR + " " + f"{FUNCTION_NAME} create {name}" + " | awk '{print $2}'"))
+    return int(run_command(f"sudo {FUNCTION_NAME} create {name}" + " | awk '{print $2}'"))
 
 
 def host_exist(host_id: int) -> bool:

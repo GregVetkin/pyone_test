@@ -1,12 +1,14 @@
-from config                 import COMMAND_EXECUTOR
 from utils                  import run_command
 from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist
 
 
 
+FUNCTION_NAME = "onegroup"
+
+
 
 def create_group(name: str):
-    return int(run_command(COMMAND_EXECUTOR + " " + f"onegroup create {name}" + " | awk '{print $2}'"))
+    return int(run_command(f"sudo {FUNCTION_NAME} create {name}" + " | awk '{print $2}'"))
 
 
 def group_exist(group_id: int) -> bool:

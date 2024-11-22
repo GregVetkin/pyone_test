@@ -3,13 +3,15 @@ from one_cli._base_commands     import _chmod, _chown, _delete, _info, _update, 
 from one_cli.image              import force_delete_image
 
 
+FUNCTION_NAME = "onedatastore"
+
 
 def datastore_exist(datastore_id: int) -> bool:
-    return _exist("onedatastore", datastore_id)
+    return _exist(FUNCTION_NAME, datastore_id)
 
 
 def create_datastore(datastore_template: str) -> int:
-    return _create("onedatastore", datastore_template)
+    return _create(FUNCTION_NAME, datastore_template)
 
 
 
@@ -31,7 +33,7 @@ def force_delete_datastore(datastore_id: int):
 class Datastore:
     def __init__(self, datastore_id: int) -> None:
         self._id        = datastore_id
-        self._function  = "onedatastore"
+        self._function  = FUNCTION_NAME
     
     def delete(self) -> None:
         _delete(self._function, self._id)

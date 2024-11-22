@@ -1,17 +1,16 @@
 import pyone
 
 from api            import One
-from config         import ADMIN_NAME, API_URI
-from utils          import get_user_auth
+from config         import API_URI, ADMIN_NAME
 
 
-one  = One(pyone.OneServer(API_URI, get_user_auth(ADMIN_NAME)))
+brestadm_auth = ADMIN_NAME+":"+"112cabb0345d2a47e1c9ab2f667c4e66f559d289180aa7974eab9f28a90cb06d"
+one  = One(pyone.OneServer(API_URI, brestadm_auth))
+
+
+
 
 zone_template = """
-
-    NAME = test
-    ENDPOINT = test
-
 
 """
 
@@ -19,17 +18,4 @@ zone_template = """
 
 
 
-from utils import federation_master, federation_standalone
-from utils.opennebula import _get_federation_mode
-
-
-# print(_get_federation_mode())
-# federation_standalone()
-# print(_get_federation_mode())
-
-# from utils import run_command
-# from config import COMMAND_EXECUTOR
-
-
-# print(one.zone.allocate(zone_template))
-print(_get_federation_mode())
+print(one.zone.allocate(zone_template))

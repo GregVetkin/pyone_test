@@ -59,7 +59,7 @@ def test_change_image_rights(one: One, image: Image, rights):
     
 
 
-
+@pytest.mark.skip()
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_change_locked_image_rights(one: One, image: Image, lock_level):

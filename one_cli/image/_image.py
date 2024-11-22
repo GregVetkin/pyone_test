@@ -1,31 +1,33 @@
+import os
 from time                   import sleep
-from config                 import COMMAND_EXECUTOR
 from utils                  import run_command
 from one_cli.image._common  import ImageInfo, parse_image_info_from_xml
 from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist, _lock, _unlock, _enable, _disable, _persistent, _nonpersistent
 from one_cli.vm             import VirtualMachine
 
 
+FUNCTION_NAME = "oneimage"
+
+
 def image_exist(image_id: int) -> bool:
-    return _exist("oneimage", image_id)
+    return _exist(FUNCTION_NAME, image_id)
 
 
 
 def create_image(datastore_id: int, image_template: str, await_image_rdy: bool = True) -> int:
     template_file_path  = "/tmp/test_template_file"
 
-    if "ssh" in COMMAND_EXECUTOR:
-        run_command(COMMAND_EXECUTOR + " " + f"\'cat <<EOF > {template_file_path}\n{image_template}\nEOF\'")
-    else:
-        run_command(COMMAND_EXECUTOR + " " + f"cat <<EOF > {template_file_path}\n{image_template}\nEOF")
+    #run_command(f"sudo cat <<EOF > {template_file_path}\n{image_template}\nEOF")
+    with open(template_file_path, "w") as file:
+        file.write(image_template)
 
-
-    image_id = int(run_command(COMMAND_EXECUTOR + " " + f"oneimage create -d {datastore_id} {template_file_path}" + " | awk '{print $2}'"))
+    image_id = int(run_command(f"sudo {FUNCTION_NAME} create -d {datastore_id} {template_file_path}" + " | awk '{print $2}'"))
 
     if await_image_rdy:
         wait_image_ready(image_id)
 
-    run_command(COMMAND_EXECUTOR + " " + f"rm -f {template_file_path}")
+    #run_command(f"sudo rm -f {template_file_path}")
+    os.remove(template_file_path)
     return image_id
 
 
@@ -62,7 +64,7 @@ def force_delete_image(image_id: int):
 class Image:
     def __init__(self, image_id: int) -> None:
         self._id       = image_id
-        self._function = "oneimage"
+        self._function = FUNCTION_NAME
 
 
     def info(self) -> ImageInfo:

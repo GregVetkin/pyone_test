@@ -1,12 +1,12 @@
-from config                 import COMMAND_EXECUTOR
 from utils                  import run_command
 from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist
 
 
 FUNCTION_NAME = "onecluster"
 
+
 def create_cluster(name: str):
-    return int(run_command(COMMAND_EXECUTOR + " " + f"{FUNCTION_NAME} create {name}" + " | awk '{print $2}'"))
+    return int(run_command(f"sudo {FUNCTION_NAME} create {name}" + " | awk '{print $2}'"))
 
 
 def cluster_exist(cluster_id: int) -> bool:

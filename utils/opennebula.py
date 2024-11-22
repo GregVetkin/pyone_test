@@ -1,19 +1,26 @@
 import re
 
 from utils      import run_command
-from config     import COMMAND_EXECUTOR, RAFT_CONFIG
+from config     import RAFT_CONFIG
 
 
 
 
 
 def restart_opennebula():
-    run_command(COMMAND_EXECUTOR + " " + "systemctl restart opennebula")
+    # Иногда перезагрузка сервиса возвращает ненулевой код :(
+    # Ребутим до победного, хоть вечность...
+    while True:
+        try:
+            run_command("sudo systemctl restart opennebula")
+            break
+        except Exception:
+            pass
 
 
 
 def _get_federation_mode() -> str:
-    content = run_command(COMMAND_EXECUTOR + " " + f"cat {RAFT_CONFIG}")
+    content = run_command(f"sudo cat {RAFT_CONFIG}")
     
     federation_match = re.search(
         r'FEDERATION\s*=\s*\[\s*(.*?)\s*\]',
@@ -36,7 +43,7 @@ def _change_federation_mode(mode: str) -> None:
     if _get_federation_mode() == mode:
         return
     
-    content = run_command(COMMAND_EXECUTOR + " " + f"cat {RAFT_CONFIG}")
+    content = run_command(f"sudo cat {RAFT_CONFIG}")
     
     federation_match = re.search(
         r'FEDERATION\s*=\s*\[\s*(.*?)\s*\]',
@@ -46,7 +53,7 @@ def _change_federation_mode(mode: str) -> None:
 
     if federation_match:
         federation_block = federation_match.group(1)
-        
+    
         new_federation_block = re.sub(
             r'MODE\s*=\s*["\'](.+?)["\']',
             f'MODE = "{mode}"',
@@ -58,10 +65,7 @@ def _change_federation_mode(mode: str) -> None:
             new_federation_block
         )
 
-        if "ssh" in COMMAND_EXECUTOR:
-            run_command(COMMAND_EXECUTOR + " " + f"\'tee {RAFT_CONFIG} << EOF\n{content}\nEOF\'")
-        else:
-            run_command(COMMAND_EXECUTOR + " " + f"tee {RAFT_CONFIG} << EOF\n{content}\nEOF")
+        run_command(f"sudo tee {RAFT_CONFIG} << EOF\n{content}\nEOF")
         
         restart_opennebula()
 
