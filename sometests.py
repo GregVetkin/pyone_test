@@ -19,13 +19,15 @@ one  = One(pyone.OneServer(API_URI, get_user_auth(ADMIN_NAME)))
 
 
 
-# from utils.other import get_federation_mode, change_federation_mode
+from utils.other import get_federation_mode, change_federation_mode
 
-# print(get_federation_mode())
-# change_federation_mode("MASTER")
-# print(get_federation_mode())
+print(get_federation_mode())
+change_federation_mode("STANDALONE")
+print(get_federation_mode())
 
 # from utils import run_command
 # from config import COMMAND_EXECUTOR
 
+
+print(one.zone.raftstatus())
 
