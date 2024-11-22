@@ -37,15 +37,18 @@ def zone():
 # =================================================================================================
 
 
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_zone_not_exist(one: One):
     delete_if_not_exist__test(one.zone)
 
 
 
+@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_delete_zone(one: One, zone: Zone):
+def test_delete_zone(one: One, federation_mode,  zone: Zone):
     delete__test(one.zone, zone)
+
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)

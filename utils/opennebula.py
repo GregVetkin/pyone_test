@@ -4,18 +4,25 @@ from utils      import run_command
 from config     import RAFT_CONFIG
 
 
-
-
-
-def restart_opennebula():
+def __restart_opennebula_dopobednogo():
     # Иногда перезагрузка сервиса возвращает ненулевой код :(
-    # Ребутим до победного, хоть вечность...
+    # Рестартим до победного, хоть вечность...
     while True:
         try:
             run_command("sudo systemctl restart opennebula")
             break
         except Exception:
             pass
+    
+
+
+def restart_opennebula(do_pobednogo: bool = True):
+    if do_pobednogo:
+        __restart_opennebula_dopobednogo()
+    else:
+        run_command("sudo systemctl restart opennebula")
+    
+    
 
 
 
