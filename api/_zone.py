@@ -1,5 +1,5 @@
 from api.one        import OneServer
-from pyone.bindings import ZONESub
+from pyone.bindings import ZONESub, RAFTSub
 
 
 
@@ -35,7 +35,7 @@ class OneZone:
     def info(self, zone_id: int, decrypt_secrets: bool = False) -> ZONESub:
         return self._one_zone.info(zone_id, decrypt_secrets)
 
-    def raftstatus(self) -> str:
+    def raftstatus(self) -> RAFTSub:
         return self._one_zone.raftstatus()
 
 

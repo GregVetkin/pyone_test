@@ -10,12 +10,8 @@ one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
-zone_template = """
 
-"""
-
+res = one.zone.raftstatus()
 
 
-
-
-print(one.zone.allocate(zone_template))
+print(res.has__content())
