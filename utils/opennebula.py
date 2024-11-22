@@ -1,10 +1,9 @@
 import re
 
 from utils      import run_command
-from config     import COMMAND_EXECUTOR
+from config     import COMMAND_EXECUTOR, RAFT_CONFIG
 
 
-RAFT_CONFIG = "/etc/one/one.d/raft.conf"
 
 
 

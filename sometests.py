@@ -7,27 +7,29 @@ from utils          import get_user_auth
 
 one  = One(pyone.OneServer(API_URI, get_user_auth(ADMIN_NAME)))
 
-# zone_template = """
+zone_template = """
 
-#     NAME = test
-#     ENDPOINT = test
+    NAME = test
+    ENDPOINT = test
 
 
-# """
-# result = one.zone.detele()
-
+"""
 
 
 
-from utils.other import get_federation_mode, change_federation_mode
 
-print(get_federation_mode())
-change_federation_mode("STANDALONE")
-print(get_federation_mode())
+
+from utils import federation_master, federation_standalone
+from utils.opennebula import _get_federation_mode
+
+
+# print(_get_federation_mode())
+# federation_standalone()
+# print(_get_federation_mode())
 
 # from utils import run_command
 # from config import COMMAND_EXECUTOR
 
 
-print(one.zone.raftstatus())
-
+# print(one.zone.allocate(zone_template))
+print(_get_federation_mode())
