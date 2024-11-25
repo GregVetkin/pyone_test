@@ -4,7 +4,7 @@ import time
 from api                import One
 from utils              import get_unic_name
 from one_cli.zone       import Zone, create_zone, zone_exist
-from config             import ADMIN_NAME
+from config             import ADMIN_NAME, API_URI
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
@@ -17,7 +17,7 @@ from tests._common_tests.delete import cant_be_deleted__test
 def zone():
     template = f"""
         NAME     = {get_unic_name()}
-        ENDPOINT = http://localhost:2633/RPC2
+        ENDPOINT = {API_URI}
     """
     _id = create_zone(template)
     zone = Zone(_id)

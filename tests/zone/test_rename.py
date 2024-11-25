@@ -1,8 +1,8 @@
 import pytest
 from api                import One
 from utils              import get_unic_name
-from one_cli.zone       import Zone, create_zone, zone_exist
-from config             import ADMIN_NAME, BAD_SYMBOLS
+from one_cli.zone       import Zone, create_zone
+from config             import ADMIN_NAME, BAD_SYMBOLS, API_URI
 
 from tests._common_tests.rename import rename__test
 from tests._common_tests.rename import rename_if_not_exist__test
@@ -17,7 +17,7 @@ from tests._common_tests.rename import cant_be_renamed__test
 def zone():
     template = f"""
         NAME     = {get_unic_name()}
-        ENDPOINT = http://localhost:2633/RPC2
+        ENDPOINT = {API_URI}
     """
     _id = create_zone(template)
     zone = Zone(_id)

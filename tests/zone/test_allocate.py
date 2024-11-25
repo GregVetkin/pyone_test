@@ -4,7 +4,7 @@ from api                import One
 from pyone              import OneException
 from utils              import get_unic_name
 from one_cli.zone       import Zone, zone_exist
-from config             import ADMIN_NAME
+from config             import ADMIN_NAME, API_URI
 
 
 
@@ -19,7 +19,7 @@ from config             import ADMIN_NAME
 def test_not_a_master_mode(one: One, federation_mode):
     template = f"""
         NAME     = {get_unic_name()}
-        ENDPOINT = {Zone(0).info().TEMPLATE["ENDPOINT"]}
+        ENDPOINT = {API_URI}
      """
     with pytest.raises(OneException):
         one.zone.allocate(template)
@@ -31,7 +31,7 @@ def test_not_a_master_mode(one: One, federation_mode):
 def test_allocate_zone(one: One, federation_mode):
     template = f"""
         NAME = {get_unic_name()}
-        ENDPOINT = {Zone(0).info().TEMPLATE["ENDPOINT"]}
+        ENDPOINT = {API_URI}
      """
     zone_id = one.zone.allocate(template)
     assert zone_exist(zone_id)
@@ -42,10 +42,8 @@ def test_allocate_zone(one: One, federation_mode):
 @pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_allocate_zone_by_xml(one: One, federation_mode):
-    name = get_unic_name()
-    endpoint = Zone(0).info().TEMPLATE["ENDPOINT"]
-    template = f"<ZONE><NAME>{name}</NAME><ENDPOINT>{endpoint}</ENDPOINT></ZONE>"
-    zone_id = one.zone.allocate(template)
+    template = f"<ZONE><NAME>{get_unic_name()}</NAME><ENDPOINT>{API_URI}</ENDPOINT></ZONE>"
+    zone_id  = one.zone.allocate(template)
     assert zone_exist(zone_id)
     Zone(zone_id).delete()
 
@@ -54,14 +52,12 @@ def test_allocate_zone_by_xml(one: One, federation_mode):
 @pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_required_attributes(one: One, federation_mode):
-    name = get_unic_name()
-    endp = Zone(0).info().TEMPLATE["ENDPOINT"]
 
-    template_without_name = f"ENDPOINT={endp}"
+    template_without_name = f"ENDPOINT={API_URI}"
     with pytest.raises(OneException):
         one.zone.allocate(template_without_name)
     
-    template_without_endpoint = f"NAME={name}"
+    template_without_endpoint = f"NAME={get_unic_name()}"
     with pytest.raises(OneException):
         one.zone.allocate(template_without_endpoint)
 

@@ -3,7 +3,7 @@ import pytest
 from api                import One
 from utils              import get_unic_name
 from one_cli.zone       import Zone, create_zone, zone_exist
-from config             import ADMIN_NAME
+from config             import ADMIN_NAME, API_URI
 
 from tests._common_tests.update import update_and_merge__test
 from tests._common_tests.update import update_and_replace__test
@@ -17,7 +17,7 @@ from tests._common_tests.update import update_if_not_exist__test
 def zone():
     template = f"""
         NAME     = {get_unic_name()}
-        ENDPOINT = http://localhost:2633/RPC2
+        ENDPOINT = {API_URI}
     """
     _id = create_zone(template)
     zone = Zone(_id)
