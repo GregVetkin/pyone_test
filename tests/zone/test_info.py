@@ -20,8 +20,6 @@ def zone():
     _id = create_zone(template)
     zone = Zone(_id)
     yield zone
-    if not zone_exist(_id):
-        return
     zone.delete()
 
 
