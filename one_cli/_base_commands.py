@@ -18,14 +18,15 @@ def _exist_in_show(function_name: str, object_id: int) -> bool:
     return not bool(int(run_command(f"sudo {function_name} show {object_id} &>/dev/null; echo $?")))
 
 def _exist_in_list(function_name: str, object_id: int) -> bool:
-    string_object_id = str(object_id)
-    list_result = run_command(f"sudo {function_name} list")
-    lines = list_result.splitlines()
-    IDs_id = next(col_number for col_number, col_name in enumerate(lines[0].split()) if col_name == "ID")
-    for line in lines:
-        if line.split()[IDs_id] == string_object_id:
-            return True
-    return False
+    return not bool(int(run_command(f"sudo {function_name}list | grep ' {object_id} ' &>/dev/null; echo $?")))
+    # string_object_id = str(object_id)
+    # list_result = run_command(f"sudo {function_name} list")
+    # lines = list_result.splitlines()
+    # IDs_id = next(col_number for col_number, col_name in enumerate(lines[0].split()) if col_name == "ID")
+    # for line in lines:
+    #     if line.split()[IDs_id] == string_object_id:
+    #         return True
+    # return False
 
 
 def _exist(function_name: str, object_id: int) -> bool:
