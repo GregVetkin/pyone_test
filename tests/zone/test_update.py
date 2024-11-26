@@ -13,8 +13,9 @@ from tests._common_tests.update import update_if_not_exist__test
 
 
 
+@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
 @pytest.fixture
-def zone():
+def zone(federation_mode):
     template = f"""
         NAME     = {get_unic_name()}
         ENDPOINT = {API_URI}

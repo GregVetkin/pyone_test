@@ -12,9 +12,9 @@ from tests._common_tests.delete import cant_be_deleted__test
 
 
 
-
+@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
 @pytest.fixture
-def zone():
+def zone(federation_mode):
     template = f"""
         NAME     = {get_unic_name()}
         ENDPOINT = {API_URI}
@@ -44,9 +44,9 @@ def test_zone_not_exist(one: One):
 
 
 
-@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_delete_zone(one: One, federation_mode,  zone: Zone):
+def test_delete_zone(one: One,  zone: Zone):
     delete__test(one.zone, zone)
 
 

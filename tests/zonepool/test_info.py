@@ -10,9 +10,9 @@ from typing             import List
 
 
 
-
+@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
 @pytest.fixture
-def zones():
+def zones(federation_mode):
     zone_list = []
     for _ in range(5):
         template = f"""
