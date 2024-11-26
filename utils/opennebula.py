@@ -21,7 +21,7 @@ def restart_opennebula(do_pobednogo: bool = True):
         __restart_opennebula_dopobednogo()
     else:
         run_command("sudo systemctl restart opennebula")
-    sleep(5)
+    #sleep(5)
     
 
 

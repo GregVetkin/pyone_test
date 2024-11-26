@@ -1,18 +1,27 @@
 import pytest
 
 from api                import One
-from utils              import get_unic_name
+from utils              import get_unic_name, restart_opennebula, federation_master, run_command
 from one_cli.zone       import Zone, create_zone
-from config             import ADMIN_NAME, API_URI
+from config             import ADMIN_NAME, API_URI, RAFT_CONFIG
 from typing             import List
 
 
 
+@pytest.fixture(scope="module")
+def federation_master_mode():
+    copy_path  = "/tmp/raft_orig.conf"
+    run_command(f"sudo cp -p {RAFT_CONFIG} {copy_path}")
+    federation_master()
+    yield
+    run_command(f"sudo cat {copy_path} | sudo tee {RAFT_CONFIG}")
+    run_command(f"sudo rm -f {copy_path}")
+    restart_opennebula()
 
 
-@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
+
 @pytest.fixture
-def zones(federation_mode):
+def zones(federation_master_mode):
     zone_list = []
     for _ in range(5):
         template = f"""
