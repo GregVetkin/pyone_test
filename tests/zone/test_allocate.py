@@ -2,10 +2,22 @@ import pytest
 
 from api                import One
 from pyone              import OneException
-from utils              import get_unic_name
+from utils              import get_unic_name, federation_master, restart_opennebula, run_command
 from one_cli.zone       import Zone, zone_exist
-from config             import ADMIN_NAME, API_URI
+from config             import ADMIN_NAME, API_URI, RAFT_CONFIG
 
+
+
+
+@pytest.fixture(scope="module")
+def federation_master_mode():
+    copy_path  = "/tmp/raft_orig.conf"
+    run_command(f"sudo cp -p {RAFT_CONFIG} {copy_path}")
+    federation_master()
+    yield
+    run_command(f"sudo cat {copy_path} | sudo tee {RAFT_CONFIG}")
+    run_command(f"sudo rm -f {copy_path}")
+    restart_opennebula()
 
 
 
@@ -26,9 +38,9 @@ def test_not_a_master_mode(one: One, federation_mode):
 
 
 
-@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_allocate_zone(one: One, federation_mode):
+def test_allocate_zone(one: One, federation_master_mode):
     template = f"""
         NAME = {get_unic_name()}
         ENDPOINT = {API_URI}
@@ -39,9 +51,9 @@ def test_allocate_zone(one: One, federation_mode):
 
 
 
-@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_allocate_zone_by_xml(one: One, federation_mode):
+def test_allocate_zone_by_xml(one: One, federation_master_mode):
     template = f"<ZONE><NAME>{get_unic_name()}</NAME><ENDPOINT>{API_URI}</ENDPOINT></ZONE>"
     zone_id  = one.zone.allocate(template)
     assert zone_exist(zone_id)
@@ -49,9 +61,9 @@ def test_allocate_zone_by_xml(one: One, federation_mode):
 
 
 
-@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_required_attributes(one: One, federation_mode):
+def test_required_attributes(one: One, federation_master_mode):
 
     template_without_name = f"ENDPOINT={API_URI}"
     with pytest.raises(OneException):

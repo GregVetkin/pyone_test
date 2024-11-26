@@ -2,9 +2,9 @@ import pytest
 import time
 
 from api                import One
-from utils              import get_unic_name
+from utils              import get_unic_name, restart_opennebula, run_command ,federation_master
 from one_cli.zone       import Zone, create_zone, zone_exist
-from config             import ADMIN_NAME, API_URI
+from config             import ADMIN_NAME, API_URI, RAFT_CONFIG
 
 from tests._common_tests.delete import delete__test
 from tests._common_tests.delete import delete_if_not_exist__test
@@ -12,9 +12,21 @@ from tests._common_tests.delete import cant_be_deleted__test
 
 
 
-@pytest.mark.parametrize("federation_mode", ["MASTER"], indirect=True)
+@pytest.fixture(scope="module")
+def federation_master_mode():
+    copy_path  = "/tmp/raft_orig.conf"
+    run_command(f"sudo cp -p {RAFT_CONFIG} {copy_path}")
+    federation_master()
+    yield
+    run_command(f"sudo cat {copy_path} | sudo tee {RAFT_CONFIG}")
+    run_command(f"sudo rm -f {copy_path}")
+    restart_opennebula()
+
+
+
+
 @pytest.fixture
-def zone(federation_mode):
+def zone(federation_master_mode):
     template = f"""
         NAME     = {get_unic_name()}
         ENDPOINT = {API_URI}
