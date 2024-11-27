@@ -1,6 +1,6 @@
-from utils                  import run_command
-from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist
-
+from utils                      import run_command
+from one_cli._base_commands     import _chmod, _chown, _delete, _info, _update, _exist
+from one_cli.cluster._common    import ClusterInfo, parse_cluster_info_from_xml
 
 FUNCTION_NAME = "onecluster"
 
@@ -23,4 +23,10 @@ class Cluster:
     def delete(self) -> None:
         _delete(self._function, self._id)
 
+    def update(self, template: str, append: bool = False) -> None:
+        _update(self._function, self._id, template, append)
 
+    def info(self) -> ClusterInfo:
+        return parse_cluster_info_from_xml(_info(self._function, self._id, xml=True))
+    
+    
