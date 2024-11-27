@@ -4,14 +4,11 @@ from api            import One
 from config         import API_URI, ADMIN_NAME
 
 
-brestadm_auth = ADMIN_NAME+":"+"112cabb0345d2a47e1c9ab2f667c4e66f559d289180aa7974eab9f28a90cb06d"
-one  = One(pyone.OneServer(API_URI, brestadm_auth))
+brestadm_auth = ADMIN_NAME+":"+"145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b913faf6e4ff085d2"
+# one  = One(pyone.OneServer(API_URI, brestadm_auth))
+# res = one.zone.info(0)
+# print(dir(res))
 
 
-
-
-
-res = one.zone.raftstatus()
-
-
-print(res.has__content())
+res = pyone.OneServer(API_URI, brestadm_auth).acl.info()
+print(res)

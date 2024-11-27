@@ -10,6 +10,8 @@ from api._template          import OneTemplate
 from api._templatepool      import OneTemplatepool
 from api._zone              import OneZone
 from api._zonepool          import OneZonepool
+from api._cluster           import OneCluster
+from api._clusterpool       import OneClusterpool
 
 
 
@@ -34,3 +36,7 @@ class One():
         self.zone           = OneZone(self._one_api)
         self.zonepool       = OneZonepool(self._one_api)
 
+        self.cluster        = OneCluster(self._one_api)
+        self.clusterpool    = OneClusterpool(self._one_api)
+
+        
