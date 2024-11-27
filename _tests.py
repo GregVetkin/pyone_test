@@ -198,60 +198,60 @@ TESTS["one"]["host"]["status"]              = TestData(
 #                                                         xml_rpc_method  =   "one.acl.info",
 #                                                         test_file_path  =   f"{PROJECT_DIR}/tests/acl/test_info.py"
 # )
-# # =======================================================================================================================
-# # one.cluster
-# TESTS["one"]["cluster"] = {}
-# TESTS["one"]["cluster"]["adddatastore"]     = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.adddatastore",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_adddatastore.py"
-# )
-# TESTS["one"]["cluster"]["addhost"]          = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.addhost",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_addhost.py"
-# )
-# TESTS["one"]["cluster"]["addvnet"]          = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.addvnet",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_addvnet.py"
-# )
-# TESTS["one"]["cluster"]["allocate"]         = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.allocate",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_allocate.py"
-# )
-# TESTS["one"]["cluster"]["deldatastore"]     = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.deldatastore",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_deldatastore.py"
-# )
-# TESTS["one"]["cluster"]["delete"]           = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.delete",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_delete.py"
-# )
-# TESTS["one"]["cluster"]["delhost"]          = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.delhost",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_delhost.py"
-# )
-# TESTS["one"]["cluster"]["delvnet"]          = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.delvnet",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_delvnet.py"
-# )
-# TESTS["one"]["cluster"]["info"]             = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_info.py"
-# )
-# TESTS["one"]["cluster"]["rename"]           = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.rename",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_rename.py"
-# )
-# TESTS["one"]["cluster"]["update"]           = TestData(
-#                                                         xml_rpc_method  =   "one.cluster.update",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_update.py"
-# )
-# # =======================================================================================================================
-# # one.clusterpool
-# TESTS["one"]["clusterpool"] = {}
-# TESTS["one"]["clusterpool"]["info"]         = TestData(
-#                                                         xml_rpc_method  =   "one.clusterpool.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/clusterpool/test_info.py"
-# )
+# =======================================================================================================================
+# one.cluster
+TESTS["one"]["cluster"] = {}
+TESTS["one"]["cluster"]["adddatastore"]     = TestData(
+                                                        xml_rpc_method  =   "one.cluster.adddatastore",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_adddatastore.py"
+)
+TESTS["one"]["cluster"]["addhost"]          = TestData(
+                                                        xml_rpc_method  =   "one.cluster.addhost",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_addhost.py"
+)
+TESTS["one"]["cluster"]["addvnet"]          = TestData(
+                                                        xml_rpc_method  =   "one.cluster.addvnet",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_addvnet.py"
+)
+TESTS["one"]["cluster"]["allocate"]         = TestData(
+                                                        xml_rpc_method  =   "one.cluster.allocate",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_allocate.py"
+)
+TESTS["one"]["cluster"]["deldatastore"]     = TestData(
+                                                        xml_rpc_method  =   "one.cluster.deldatastore",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_deldatastore.py"
+)
+TESTS["one"]["cluster"]["delete"]           = TestData(
+                                                        xml_rpc_method  =   "one.cluster.delete",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_delete.py"
+)
+TESTS["one"]["cluster"]["delhost"]          = TestData(
+                                                        xml_rpc_method  =   "one.cluster.delhost",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_delhost.py"
+)
+TESTS["one"]["cluster"]["delvnet"]          = TestData(
+                                                        xml_rpc_method  =   "one.cluster.delvnet",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_delvnet.py"
+)
+TESTS["one"]["cluster"]["info"]             = TestData(
+                                                        xml_rpc_method  =   "one.cluster.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_info.py"
+)
+TESTS["one"]["cluster"]["rename"]           = TestData(
+                                                        xml_rpc_method  =   "one.cluster.rename",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_rename.py"
+)
+TESTS["one"]["cluster"]["update"]           = TestData(
+                                                        xml_rpc_method  =   "one.cluster.update",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/cluster/test_update.py"
+)
+# =======================================================================================================================
+# one.clusterpool
+TESTS["one"]["clusterpool"] = {}
+TESTS["one"]["clusterpool"]["info"]         = TestData(
+                                                        xml_rpc_method  =   "one.clusterpool.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/clusterpool/test_info.py"
+)
 # # =======================================================================================================================
 # # one.document
 # TESTS["one"]["document"] = {}
