@@ -39,10 +39,8 @@ def cluster_with_datastore(datastore):
     cluster    = Cluster(cluster_id)
     cluster.adddatastore(datastore._id)
     yield cluster
-
-    if cluster_exist(cluster_id):
-        cluster.deldatastore(datastore._id)
-        cluster.delete()
+    cluster.deldatastore(datastore._id)
+    cluster.delete()
 
 
 
