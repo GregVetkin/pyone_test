@@ -60,7 +60,7 @@ def test_host_not_exist(one: One, cluster: Cluster):
    
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_remove_datastore_from_cluster(one: One, cluster_with_host: Cluster):
+def test_remove_host_from_cluster(one: One, cluster_with_host: Cluster):
     old_cluster_hosts = cluster_with_host.info().HOSTS
     assert old_cluster_hosts
     host_id = old_cluster_hosts[0]
