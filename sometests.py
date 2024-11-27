@@ -12,3 +12,4 @@ one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 res = one.cluster.delhost(99999, 0)
 print(res)
+
