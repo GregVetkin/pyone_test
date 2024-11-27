@@ -39,10 +39,8 @@ def cluster_with_datastore(datastore):
     cluster    = Cluster(cluster_id)
     cluster.adddatastore(datastore._id)
     yield cluster
-
-    if cluster_exist(cluster_id):
-        cluster.deldatastore(datastore._id)
-        cluster.delete()
+    cluster.deldatastore(datastore._id)
+    cluster.delete()
 
 
 
@@ -54,13 +52,13 @@ def cluster_with_datastore(datastore):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_cluster_not_exist(one: One, datastore: Datastore):
     with pytest.raises(OneException):
-        one.cluster.adddatastore(999999, datastore._id)
+        one.cluster.deldatastore(999999, datastore._id)
    
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_datastore_not_exist(one: One, cluster: Cluster):
     with pytest.raises(OneException):
-        one.cluster.adddatastore(cluster._id, 999999)
+        one.cluster.deldatastore(cluster._id, 999999)
    
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
@@ -69,7 +67,8 @@ def test_remove_datastore_from_cluster(one: One, cluster_with_datastore: Cluster
     assert old_cluster_datastores
 
     datastore_id = old_cluster_datastores[0]
-    one.cluster.deldatastore(cluster_with_datastore._id, datastore_id)
+    _id = one.cluster.deldatastore(cluster_with_datastore._id, datastore_id)
+    assert _id == cluster_with_datastore._id
 
     new_cluster_datastores = cluster_with_datastore.info().DATASTORES
     assert datastore_id not in new_cluster_datastores

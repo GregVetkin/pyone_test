@@ -64,7 +64,8 @@ def test_host_not_exist(one: One, cluster: Cluster):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_add_host_to_cluster(one: One, cluster: Cluster, host: Host):
     assert host._id not in cluster.info().HOSTS
-    one.cluster.addhost(cluster._id, host._id)
+    _id = one.cluster.addhost(cluster._id, host._id)
+    assert _id == cluster._id
     assert host._id in cluster.info().HOSTS
 
 
@@ -73,7 +74,10 @@ def test_add_added_host_to_cluster(one: One, cluster_with_host: Cluster):
     old_cluster_hosts = cluster_with_host.info().HOSTS
     assert old_cluster_hosts
     added_host_id = old_cluster_hosts[0]
-    one.cluster.addhost(cluster_with_host._id, added_host_id)
+
+    _id = one.cluster.addhost(cluster_with_host._id, added_host_id)
+    assert _id == cluster_with_host._id
+
     new_cluster_hosts = cluster_with_host.info().HOSTS
     assert added_host_id in new_cluster_hosts
     assert len(old_cluster_hosts) == len(new_cluster_hosts)

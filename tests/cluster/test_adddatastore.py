@@ -64,7 +64,8 @@ def test_datastore_not_exist(one: One, cluster: Cluster):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_add_datastore_to_cluster(one: One, cluster: Cluster, datastore: Datastore):
     assert datastore._id not in cluster.info().DATASTORES
-    one.cluster.adddatastore(cluster._id, datastore._id)
+    _id = one.cluster.adddatastore(cluster._id, datastore._id)
+    assert _id == cluster._id
     assert datastore._id in cluster.info().DATASTORES
 
 
@@ -74,7 +75,8 @@ def test_add_added_datastore_to_cluster(one: One, cluster_with_datastore: Cluste
     assert old_cluster_datastores
     added_datastore_id = old_cluster_datastores[0]
 
-    one.cluster.adddatastore(cluster_with_datastore._id, added_datastore_id)
+    _id = one.cluster.adddatastore(cluster_with_datastore._id, added_datastore_id)
+    assert _id == cluster_with_datastore._id
 
     new_cluster_datastores = cluster_with_datastore.info().DATASTORES
     assert added_datastore_id in new_cluster_datastores
