@@ -8,8 +8,6 @@ brestadm_auth = ADMIN_NAME+":"+"145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b
 one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
-
-
-res = one.cluster.delhost(99999, 0)
+res = one.cluster.delhost(287, 87)
 print(res)
 

@@ -12,6 +12,9 @@ from api._zone              import OneZone
 from api._zonepool          import OneZonepool
 from api._cluster           import OneCluster
 from api._clusterpool       import OneClusterpool
+from api._group             import OneGroup
+from api._grouppool         import OneGrouppool
+from api._groupquota        import OneGroupquota
 
 
 
@@ -38,5 +41,9 @@ class One():
 
         self.cluster        = OneCluster(self._one_api)
         self.clusterpool    = OneClusterpool(self._one_api)
+
+        self.group          = OneGroup(self._one_api)
+        self.grouppool      = OneGrouppool(self._one_api)
+        self.groupquota     = OneGroupquota(self._one_api)
 
         
