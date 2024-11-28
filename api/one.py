@@ -15,6 +15,9 @@ from api._clusterpool       import OneClusterpool
 from api._group             import OneGroup
 from api._grouppool         import OneGrouppool
 from api._groupquota        import OneGroupquota
+from api._user              import OneUser
+from api._userpool          import OneUserpool
+from api._userquota         import OneUserquota
 
 
 
@@ -46,4 +49,6 @@ class One():
         self.grouppool      = OneGrouppool(self._one_api)
         self.groupquota     = OneGroupquota(self._one_api)
 
-        
+        self.user           = OneUser(self._one_api)
+        self.userpool       = OneUserpool(self._one_api)
+        self.userquota      = OneUserquota(self._one_api)
