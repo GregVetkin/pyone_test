@@ -46,7 +46,7 @@ def test_wrong_status_code(one: One, host: Host):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_host_disable(one: One, host: Host):
     #one.host.status(host._id, 1)
-    one.host.disable(host._id)
+    one.host._disable(host._id)
     assert host.info().STATE == 4   # 4 - DISABLED
 
 
@@ -54,7 +54,7 @@ def test_host_disable(one: One, host: Host):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_host_offline(one: One, host: Host):
     #one.host.status(host._id, 2)
-    one.host.offline(host._id)
+    one.host._offline(host._id)
     assert host.info().STATE == 8   # 8 - OFFLINE
     
 
@@ -63,5 +63,5 @@ def test_host_offline(one: One, host: Host):
 def test_host_enable(one: One, host: Host):
     host.disable()
     #one.host.status(host._id, 0)
-    one.host.enable(host._id)
+    one.host._enable(host._id)
     assert host.info().STATE not in (4, 8)

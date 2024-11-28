@@ -86,9 +86,9 @@ def used_image(image_datastore: Datastore):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
-        one.image.enable(999999)
+        one.image._enable(999999)
     with pytest.raises(OneNoExistsException):
-        one.image.disable(999999)
+        one.image._disable(999999)
 
 
 
@@ -97,11 +97,11 @@ def test_enable_and_disable_used_image(one: One, used_image: Image):
     assert used_image.info().STATE == 2
 
     with pytest.raises(OneInternalException):
-        one.image.disable(used_image._id)
+        one.image._disable(used_image._id)
     assert used_image.info().STATE == 2
     
     with pytest.raises(OneInternalException):
-        one.image.enable(used_image._id)
+        one.image._enable(used_image._id)
     assert used_image.info().STATE == 2
 
 
@@ -109,7 +109,7 @@ def test_enable_and_disable_used_image(one: One, used_image: Image):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_enable_enabled_image(one: One, image: Image):
     assert image.info().STATE == 1
-    one.image.enable(image._id)
+    one.image._enable(image._id)
     assert image.info().STATE == 1
 
 
@@ -118,7 +118,7 @@ def test_enable_enabled_image(one: One, image: Image):
 def test_enable_disabled_image(one: One, image: Image):
     image.disable()
     assert image.info().STATE == 3
-    one.image.enable(image._id)
+    one.image._enable(image._id)
     assert image.info().STATE == 1
 
 
@@ -127,7 +127,7 @@ def test_enable_disabled_image(one: One, image: Image):
 def test_disable_disabled_image(one: One, image: Image):
     image.disable()
     assert image.info().STATE == 3
-    one.image.disable(image._id)
+    one.image._disable(image._id)
     assert image.info().STATE == 3
 
 
@@ -135,5 +135,5 @@ def test_disable_disabled_image(one: One, image: Image):
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_disable_enabled_image(one: One, image: Image):
     assert image.info().STATE == 1
-    one.image.disable(image._id)
+    one.image._disable(image._id)
     assert image.info().STATE == 3

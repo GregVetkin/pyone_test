@@ -8,4 +8,5 @@ class OneDatastorepool:
         self._one_dspool = one_api.datastorepool
     
     def info(self) -> DATASTORE_POOLSub:
+        """Retrieves information for all or part of the datastores in the pool"""
         return self._one_dspool.info()

@@ -8,21 +8,9 @@ class OneSystem:
         self._one_system = one_api.system
     
     def version(self) -> str:
-        """
-        Command: -\n
-        XML-RPC Method: one.system.version\n
-        Auth. Request: -
-        """
-        
+        """Returns the OpenNebula core version"""
         return self._one_system.version()
     
-
     def config(self) -> OPENNEBULA_CONFIGURATIONSub:
-        """
-        Command: -\n
-        XML-RPC Method: one.system.config\n
-        Auth. Request: Ony for users in the oneadmin group
-        """
-
+        """Returns the OpenNebula configuration"""
         return self._one_system.config()
-    

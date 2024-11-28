@@ -3,7 +3,6 @@ from pyone.bindings import GROUPSub
 
 
 
-
 class OneGroup:
     def __init__(self, one_api: OneServer) -> None:
         self._one_group = one_api.group
@@ -35,4 +34,3 @@ class OneGroup:
     def quota(self, group_id: int, template: str) -> int:
         """Sets the group quota limits"""
         return self._one_group.quota(group_id, template)
-    

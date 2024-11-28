@@ -117,9 +117,9 @@ def image_with_snapshot(image_datastore: Datastore, system_datastore: Datastore)
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_image_not_exist(one: One):
     with pytest.raises(OneNoExistsException):
-        one.image.persistent(999999)
+        one.image._persistent(999999)
     with pytest.raises(OneNoExistsException):
-        one.image.nonpersistent(999999)
+        one.image._nonpersistent(999999)
 
 
 
@@ -130,11 +130,11 @@ def test_used_image_persistencte(one: One, used_image: Image):
     start_image_persistence = image_info.PERSISTENT
     
     with pytest.raises(OneInternalException):
-        one.image.persistent(used_image._id)
+        one.image._persistent(used_image._id)
     assert used_image.info().PERSISTENT == start_image_persistence
 
     with pytest.raises(OneInternalException):
-        one.image.nonpersistent(used_image._id)
+        one.image._nonpersistent(used_image._id)
     assert used_image.info().PERSISTENT == start_image_persistence
 
 
@@ -150,9 +150,9 @@ def test_persistent_image(one: One, image: Image, start_persistent: bool, target
     assert image.info().PERSISTENT == start_persistent
 
     if target_persistence:
-        one.image.persistent(image._id)
+        one.image._persistent(image._id)
     else:
-        one.image.nonpersistent(image._id)
+        one.image._nonpersistent(image._id)
     assert image.info().PERSISTENT == target_persistence
 
 
@@ -161,5 +161,5 @@ def test_persistent_image(one: One, image: Image, start_persistent: bool, target
 def test_make_nonpers_image_with_snapshots(one: One, image_with_snapshot: Image):
     assert image_with_snapshot.info().SNAPSHOTS
     with pytest.raises(OneInternalException):
-        one.image.nonpersistent(image_with_snapshot._id)
+        one.image._nonpersistent(image_with_snapshot._id)
     assert image_with_snapshot.info().PERSISTENT
