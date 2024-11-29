@@ -29,3 +29,9 @@ class Group:
     def info(self) -> GroupInfo:
         return parse_group_info_from_xml(_info(self._function, self._id, xml=True))
 
+    def addadmin(self, user_id: int) -> None:
+        run_command(f"sudo {self._function} addadmin {self._id} {user_id}")
+
+    def deladmin(self, user_id: int) -> None:
+        run_command(f"sudo {self._function} deladmin {self._id} {user_id}")
+    

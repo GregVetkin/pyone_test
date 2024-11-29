@@ -13,7 +13,7 @@ one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
-res = one.grouppool.info()
+res = one.group.addadmin(100, 2)
 print(res)
 
 

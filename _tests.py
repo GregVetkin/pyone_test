@@ -302,55 +302,55 @@ TESTS["one"]["clusterpool"]["info"]         = TestData(
 #                                                         xml_rpc_method  =   "one.documentpool.info",
 #                                                         test_file_path  =   f"{PROJECT_DIR}/tests/documentpool/test_info.py"
 # )
-# # =======================================================================================================================
-# # one.group
-# TESTS["one"]["group"] = {}
-# TESTS["one"]["group"]["addadmin"]           = TestData(
-#                                                         xml_rpc_method  =   "one.group.addadmin",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/group/test_addadmin.py"
-# )
-# TESTS["one"]["group"]["allocate"]           = TestData(
-#                                                         xml_rpc_method  =   "one.group.allocate",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/group/test_allocate.py"
-# )
-# TESTS["one"]["group"]["deladmin"]           = TestData(
-#                                                         xml_rpc_method  =   "one.group.deladmin",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/group/test_deladmin.py"
-# )
-# TESTS["one"]["group"]["delete"]             = TestData(
-#                                                         xml_rpc_method  =   "one.group.delete",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/group/test_delete.py"
-# )
-# TESTS["one"]["group"]["info"]               = TestData(
-#                                                         xml_rpc_method  =   "one.group.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/group/test_info.py"
-# )
-# TESTS["one"]["group"]["quota"]              = TestData(
-#                                                         xml_rpc_method  =   "one.group.quota",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/group/test_quota.py"
-# )
-# TESTS["one"]["group"]["update"]             = TestData(
-#                                                         xml_rpc_method  =   "one.group.update",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/group/test_update.py"
-# )
-# # =======================================================================================================================
-# # one.grouppool
-# TESTS["one"]["grouppool"] = {}
-# TESTS["one"]["grouppool"]["info"]           = TestData(
-#                                                         xml_rpc_method  =   "one.grouppool.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/grouppool/test_info.py"
-# )
-# # =======================================================================================================================
-# # one.groupquota
-# TESTS["one"]["groupquota"] = {}
-# TESTS["one"]["groupquota"]["info"]          = TestData(
-#                                                         xml_rpc_method  =   "one.groupquota.info",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/groupquota/test_info.py"
-# )
-# TESTS["one"]["groupquota"]["update"]        = TestData(
-#                                                         xml_rpc_method  =   "one.groupquota.update",
-#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/groupquota/test_update.py"
-# )
+# =======================================================================================================================
+# one.group
+TESTS["one"]["group"] = {}
+TESTS["one"]["group"]["addadmin"]           = TestData(
+                                                        xml_rpc_method  =   "one.group.addadmin",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/group/test_addadmin.py"
+)
+TESTS["one"]["group"]["allocate"]           = TestData(
+                                                        xml_rpc_method  =   "one.group.allocate",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/group/test_allocate.py"
+)
+TESTS["one"]["group"]["deladmin"]           = TestData(
+                                                        xml_rpc_method  =   "one.group.deladmin",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/group/test_deladmin.py"
+)
+TESTS["one"]["group"]["delete"]             = TestData(
+                                                        xml_rpc_method  =   "one.group.delete",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/group/test_delete.py"
+)
+TESTS["one"]["group"]["info"]               = TestData(
+                                                        xml_rpc_method  =   "one.group.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/group/test_info.py"
+)
+TESTS["one"]["group"]["quota"]              = TestData(
+                                                        xml_rpc_method  =   "one.group.quota",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/group/test_quota.py"
+)
+TESTS["one"]["group"]["update"]             = TestData(
+                                                        xml_rpc_method  =   "one.group.update",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/group/test_update.py"
+)
+# =======================================================================================================================
+# one.grouppool
+TESTS["one"]["grouppool"] = {}
+TESTS["one"]["grouppool"]["info"]           = TestData(
+                                                        xml_rpc_method  =   "one.grouppool.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/grouppool/test_info.py"
+)
+# =======================================================================================================================
+# one.groupquota
+TESTS["one"]["groupquota"] = {}
+TESTS["one"]["groupquota"]["info"]          = TestData(
+                                                        xml_rpc_method  =   "one.groupquota.info",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/groupquota/test_info.py"
+)
+TESTS["one"]["groupquota"]["update"]        = TestData(
+                                                        xml_rpc_method  =   "one.groupquota.update",
+                                                        test_file_path  =   f"{PROJECT_DIR}/tests/groupquota/test_update.py"
+)
 # # =======================================================================================================================
 # # one.hook
 # TESTS["one"]["hook"] = {}

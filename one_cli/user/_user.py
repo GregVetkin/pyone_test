@@ -26,3 +26,10 @@ class User:
     def delete(self) -> None:
         _delete(self._function, self._id)
 
+    def addgroup(self, group_id: int) -> None:
+        run_command(f"sudo {self._function} addgroup {self._id} {group_id}")
+
+    def delgroup(self, group_id: int) -> None:
+        run_command(f"sudo {self._function} delgroup {self._id} {group_id}")
+
+    
