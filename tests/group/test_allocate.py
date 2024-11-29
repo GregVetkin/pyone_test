@@ -4,15 +4,9 @@ from api                import One
 from pyone              import OneException
 from utils              import get_unic_name
 from config             import ADMIN_NAME
-from one_cli.group      import Group, group_exist, create_group
+from one_cli.group      import Group, group_exist
 
 
-@pytest.fixture
-def group():
-    _id     = create_group(get_unic_name())
-    group   = Group(_id)
-    yield group
-    group.delete()
 
 
 # =================================================================================================
@@ -26,9 +20,9 @@ def test_empty_group_name(one: One):
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_group_name_is_taken(one: One, group: Group):
+def test_group_name_is_taken(one: One):
     with pytest.raises(OneException):
-        one.group.allocate(group.info().NAME)
+        one.group.allocate(Group(0).info().NAME)
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
