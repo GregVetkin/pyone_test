@@ -13,17 +13,15 @@ one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
-# res = one.groupquota.info()
-# print(res)
+res = one.grouppool.info()
+print(res)
 
 
 
-from one_cli.group import Group
-
-
-print(Group(115).info().IMAGE_QUOTA)
-print(Group(115).info().TEMPLATE)
-print(Group(0).info().IMAGE_QUOTA)
+# from one_cli.group import Group
+# print(Group(115).info().IMAGE_QUOTA)
+# print(Group(115).info().TEMPLATE)
+# print(Group(0).info().IMAGE_QUOTA)
 
 
 
