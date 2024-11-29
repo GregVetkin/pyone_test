@@ -107,5 +107,3 @@ def test_add_admin_to_group(one: One, group_with_nonadmin_user: Group):
     assert _id == group_with_nonadmin_user._id
     assert group_users[0] in group_with_nonadmin_user.info().ADMINS
 
-
-
