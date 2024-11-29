@@ -116,13 +116,13 @@ def test_vm_quota(one: One, group: Group):
     
     vm_quota_template   = f"""
         VM=[
-            VMS="{vms}",
-            CPU="{cpu}",
-            MEMORY="{memory}",
-            SYSTEM_DISK_SIZE="{system_disk_size}",
-            RUNNING_CPU="{running_cpu}",
-            RUNNING_MEMORY="{running_memory}",
-            RUNNING_VMS="{running_vms}"
+            VMS=                "{vms}",
+            CPU=                "{cpu}",
+            MEMORY=             "{memory}",
+            SYSTEM_DISK_SIZE=   "{system_disk_size}",
+            RUNNING_CPU=        "{running_cpu}",
+            RUNNING_MEMORY=     "{running_memory}",
+            RUNNING_VMS=        "{running_vms}"
         ]
     """
     _id = one.group.quota(group._id, vm_quota_template)
@@ -151,21 +151,21 @@ def test_storage_quota(one: One, group: Group, datastores: List[Datastore]):
     ds_quotas = {}
     ds_quota_template = ""
     for _ in range(len(datastores)):
-        ds_id       = datastores[_]._id
-        ds_images   = randint(1, 1024)
-        ds_size     = randint(1, 1024)
-        ds_quotas[ds_id] = DatastoreQuotaInfo(
-                                        ID=          ds_id,
-                                        IMAGES=      ds_images,
-                                        SIZE=        ds_size,
+        _id       = datastores[_]._id
+        _images   = randint(1, 1024)
+        _size     = randint(1, 1024)
+        ds_quotas[_id] = DatastoreQuotaInfo(
+                                        ID=          _id,
+                                        IMAGES=      _images,
+                                        SIZE=        _size,
                                         IMAGES_USED= 0,
                                         SIZE_USED=   0,
                                     )
         ds_quota_template += f"""
             DATASTORE=[
-                ID="{ds_id}",
-                IMAGES="{ds_images}",
-                SIZE="{ds_size}"
+                ID=     "{_id}",
+                IMAGES= "{_images}",
+                SIZE=   "{_size}"
         ]
         """
     
@@ -189,17 +189,17 @@ def test_image_quota(one: One, group: Group, images: List[Image]):
     img_quotas = {}
     img_quota_template = ""
     for _ in range(len(images)):
-        img_id    = images[_]._id
-        img_rvms  = randint(1, 1024)
-        img_quotas[img_id] = ImageQuotaInfo(
-                                        ID=         img_id,
-                                        RVMS=       img_rvms,
+        _id   = images[_]._id
+        _rvms = randint(1, 1024)
+        img_quotas[_id] = ImageQuotaInfo(
+                                        ID=         _id,
+                                        RVMS=       _rvms,
                                         RVMS_USED=  0,
                                     )
         img_quota_template += f"""
             IMAGE=[
-                ID="{img_id}",
-                RVMS="{img_rvms}"
+                ID=     "{_id}",
+                RVMS=   "{_rvms}"
             ]
         """
     
