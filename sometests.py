@@ -7,21 +7,20 @@ from config         import API_URI, ADMIN_NAME
 brestadm_auth = ADMIN_NAME+":"+"145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b913faf6e4ff085d2"
 
 
-one  = One(pyone.OneServer(API_URI, brestadm_auth))
+# one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
 
 
-res = one.group.deladmin(100, 2)
-print(res)
+# res = one.group.deladmin(100, 2)
+# print(res)
 
 
 
-# from one_cli.group import Group
-# print(Group(115).info().IMAGE_QUOTA)
-# print(Group(115).info().TEMPLATE)
-# print(Group(0).info().IMAGE_QUOTA)
+from one_cli.group import Group
+print(Group(100).info().DATASTORE_QUOTA)
+print(Group(0).info().DATASTORE_QUOTA)
 
 
 

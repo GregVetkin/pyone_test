@@ -48,9 +48,9 @@ def parse_vmquota(raw_xml) -> Optional[VmQuotaInfo]:
 
 @dataclass
 class NetworkQuotaInfo:
-    ID: int
-    LEASES: int
-    LEASES_USED: int
+    ID:             int
+    LEASES:         int
+    LEASES_USED:    int
 
 def parse_networkquota(raw_xml) -> Optional[List[NetworkQuotaInfo]]:
     def _network_quota(xml_elem):
@@ -62,6 +62,30 @@ def parse_networkquota(raw_xml) -> Optional[List[NetworkQuotaInfo]]:
     netquota        = xmlTree.fromstring(raw_xml).find("NETWORK_QUOTA")
     net_quota_list  = [_network_quota(net) for net in netquota.findall("NETWORK")]
     return net_quota_list if net_quota_list else None
+
+
+
+@dataclass
+class DatastoreQuotaInfo:
+    ID:             int
+    IMAGES:         int
+    IMAGES_USED:    int
+    SIZE:           int
+    SIZE_USED:      int
+
+def parse_datastorequota(raw_xml) -> Optional[List[DatastoreQuotaInfo]]:
+    def _datastore_quota(xml_elem):
+        return DatastoreQuotaInfo(
+            ID=             int(xml_elem.find("ID").text),
+            IMAGES=         int(xml_elem.find("IMAGES").text),
+            IMAGES_USED=    int(xml_elem.find("IMAGES_USED").text),
+            SIZE=           int(xml_elem.find("SIZE").text),
+            SIZE_USED=      int(xml_elem.find("SIZE_USED").text),
+        )
+    dsquota        = xmlTree.fromstring(raw_xml).find("DATASTORE_QUOTA")
+    ds_quota_list  = [_datastore_quota(ds) for ds in dsquota.findall("DATASTORE")]
+    return ds_quota_list if ds_quota_list else None
+
 
 
 
@@ -90,10 +114,10 @@ def parse_imagequota(raw_xml) -> Optional[List[ImageQuotaInfo]]:
 class GroupInfo:
     ID:                 int
     NAME:               str
-    TEMPLATE:           Dict[str, List[Dict[str, str]]] = field(default_factory=dict)
-    USERS:              List[int] = field(default_factory=list)
-    ADMINS:             List[int] = field(default_factory=list)
-    #DATASTORE_QUOTA:    Optional[List[DatastoreQuotaInfo]]
+    TEMPLATE:           Dict[str, List[Dict[str, str]]]     = field(default_factory=dict)
+    USERS:              List[int]                           = field(default_factory=list)
+    ADMINS:             List[int]                           = field(default_factory=list)
+    DATASTORE_QUOTA:    Optional[List[DatastoreQuotaInfo]]  = field(default_factory=None)
     NETWORK_QUOTA:      Optional[List[NetworkQuotaInfo]]    = field(default_factory=None)
     VM_QUOTA:           Optional[VmQuotaInfo]               = field(default_factory=None)
     IMAGE_QUOTA:        Optional[List[ImageQuotaInfo]]      = field(default_factory=None)
@@ -124,7 +148,7 @@ def parse_group_info_from_xml(raw_xml: str) -> GroupInfo:
     xml      = xmlTree.fromstring(raw_xml)
     
     template        = __parse_template(raw_xml)
-    #datastore_quota = __parse_category(raw_xml, "DATASTORE_QUOTA")
+    datastore_quota = parse_datastorequota(raw_xml)
     network_quota   = parse_networkquota(raw_xml)
     vm_quota        = parse_vmquota(raw_xml)
     image_quota     = parse_imagequota(raw_xml)
@@ -135,8 +159,8 @@ def parse_group_info_from_xml(raw_xml: str) -> GroupInfo:
             TEMPLATE=           template,
             USERS=              [int(vm_id.text) for vm_id in xml.find('USERS').findall('ID')],
             ADMINS=             [int(vm_id.text) for vm_id in xml.find('ADMINS').findall('ID')],
-            #DATASTORE_QUOTA=    datastore_quota,
+            DATASTORE_QUOTA=    datastore_quota,
             NETWORK_QUOTA=      network_quota,
             VM_QUOTA=           vm_quota,
             IMAGE_QUOTA=        image_quota,
-            )
+        )
