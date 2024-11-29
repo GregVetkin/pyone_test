@@ -39,30 +39,6 @@ def group_with_admin(group_with_nonadmin_user):
         group_with_nonadmin_user.deladmin(admins[0])
 
 
-
-
-# @pytest.fixture
-# def group_with_admin(user):
-#     _id     = create_group(get_unic_name())
-#     group   = Group(_id)
-#     user.addgroup(group._id)
-#     group.addadmin(user._id)
-#     yield group
-#     group.deladmin(user._id)
-#     user.delgroup(group._id)
-#     group.delete()
-
-# @pytest.fixture
-# def group_with_nonadmin_user(user):
-#     _id     = create_group(get_unic_name())
-#     group   = Group(_id)
-#     user.addgroup(group._id)
-#     yield group
-#     user.delgroup(group._id)
-#     group.delete()
-
-
-
 # =================================================================================================
 # TESTS
 # =================================================================================================

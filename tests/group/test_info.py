@@ -1,13 +1,12 @@
 import pytest
 
 from api                import One
-from pyone              import OneException
 from utils              import get_unic_name
-from one_cli.user       import User, create_user
-from one_cli.group      import Group, create_group, group_exist
+from one_cli.group      import Group, create_group
 from config             import ADMIN_NAME
 
-from tests._common_tests.info   import info__test, info_if_not_exist__test
+from tests._common_tests.info   import info__test
+from tests._common_tests.info   import info_if_not_exist__test
 
 
 @pytest.fixture
@@ -21,6 +20,7 @@ def group():
 # =================================================================================================
 # TESTS
 # =================================================================================================
+
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_group_not_exist(one: One):
