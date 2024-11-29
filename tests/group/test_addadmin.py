@@ -26,14 +26,18 @@ def user():
 def group_with_nonadmin_user(empty_group, user):
     user.addgroup(empty_group._id)
     yield empty_group
-    user.delgroup(empty_group._id)
+    if user._id in empty_group.info().USERS:
+        user.delgroup(empty_group._id)
 
 
 @pytest.fixture
 def group_with_admin(group_with_nonadmin_user):
     group_with_nonadmin_user.addadmin(group_with_nonadmin_user.info().USERS[0])
     yield group_with_nonadmin_user
-    group_with_nonadmin_user.deladmin(group_with_nonadmin_user.info().ADMINS[0])
+    admins = group_with_nonadmin_user.info().ADMINS
+    if admins:
+        group_with_nonadmin_user.deladmin(admins[0])
+
 
 
 
@@ -71,9 +75,9 @@ def test_group_not_exist(one: One):
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_user_not_exist(one: One, empty_group: Group):
+def test_user_not_exist(one: One):
     with pytest.raises(OneException):
-        one.group.addadmin(empty_group._id, 999999)
+        one.group.addadmin(0, 999999)
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
