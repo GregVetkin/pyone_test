@@ -13,7 +13,7 @@ brestadm_auth = ADMIN_NAME+":"+"145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b
 
 
 
-# res = one.groupquota.info()
+# res = one.groupquota.update("")
 # print(res)
 
 
@@ -41,11 +41,12 @@ server = xmlrpc.client.ServerProxy(API_URI)
 session_string = brestadm_auth
 
 
-response = server.one.groupquota.info(session_string)
-xml_string = response[1]
-# xml_string = "<TEST>" + xml_string + "</TEST>"
-default_quota_element   = xmlTree.fromstring(xml_string)
-default_quota_info      = parse_default_group_quotas(default_quota_element)
-assert image_quota in default_quota_info.IMAGE_QUOTA
+response = server.one.groupquota.update(session_string, "")
+print(response[1])
+# xml_string = response[1]
+# # xml_string = "<TEST>" + xml_string + "</TEST>"
+# default_quota_element   = xmlTree.fromstring(xml_string)
+# default_quota_info      = parse_default_group_quotas(default_quota_element)
+# assert image_quota in default_quota_info.IMAGE_QUOTA
 
 

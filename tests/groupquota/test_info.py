@@ -35,7 +35,7 @@ def test_get_default_quotas(one: One):
     response    = server.one.groupquota.info(session)
 
 
-    assert response[0], "Вызов метода one.groupquota.info() завершился ошибкой"
+    assert response[0], "Вызов метода one.groupquota.info завершился ошибкой"
     default_quota_element   = xmlTree.fromstring(response[1])
     default_quota_info      = parse_default_group_quotas(default_quota_element)
     assert image_quota in default_quota_info.IMAGE_QUOTA
