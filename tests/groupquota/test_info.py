@@ -11,25 +11,13 @@ from one_cli.group._common  import ImageQuotaInfo, NetworkQuotaInfo, DatastoreQu
 
 
 
-
-
-
-@pytest.fixture
-def group():
-    _id     = create_group(get_unic_name())
-    group   = Group(_id)
-    yield group
-    group.delete()
-
-
-
 # =================================================================================================
 # TESTS
 # =================================================================================================
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_get_default_quotas(one: One, group: Group):
+def test_get_default_quotas(one: One):
     default_quota_template = ""
 
     image_quota = ImageQuotaInfo(
@@ -41,7 +29,7 @@ def test_get_default_quotas(one: One, group: Group):
     one.groupquota.update(default_quota_template)
     
 
-    # pyone плохо работает с one.groupquota (возвращает обрубок xml)
+    # pyone плохо работает с one.groupquota (возвращает обрубок xml), поэтому проверка через прямой xmlrpc запрос
     server      = xmlrpc.client.ServerProxy(API_URI)
     session     = get_user_auth(ADMIN_NAME)
     response    = server.one.groupquota.info(session)
