@@ -18,6 +18,8 @@ from api._groupquota        import OneGroupquota
 from api._user              import OneUser
 from api._userpool          import OneUserpool
 from api._userquota         import OneUserquota
+from api._vm                import OneVm
+from api._vmpool            import OneVmpool
 
 
 
@@ -52,3 +54,7 @@ class One():
         self.user           = OneUser(self._one_api)
         self.userpool       = OneUserpool(self._one_api)
         self.userquota      = OneUserquota(self._one_api)
+
+        self.vm             = OneVm(self._one_api)
+        self.vmpool         = OneVmpool(self._one_api)
+        
