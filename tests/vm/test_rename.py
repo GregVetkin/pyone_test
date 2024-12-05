@@ -1,8 +1,7 @@
 import pytest
 
 from api                        import One
-from utils                      import get_unic_name
-from one_cli.vm                 import VirtualMachine, create_vm, vm_exist
+from one_cli.vm                 import VirtualMachine, create_vm
 from config                     import ADMIN_NAME, BAD_SYMBOLS
 
 from tests._common_tests.rename import rename__test

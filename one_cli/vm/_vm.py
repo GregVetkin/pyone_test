@@ -1,6 +1,6 @@
 from utils                  import run_command
 from time                   import sleep   
-from one_cli._base_commands import _info, _exist, _create, _info
+from one_cli._base_commands import _info, _exist, _create, _info, _lock, _unlock
 from one_cli.vm._common     import VirtualMachineInfo, parse_vm_info_from_xml
 
 
@@ -57,8 +57,14 @@ class VirtualMachine:
         datastore_id    = f"-d {datastore_id}" if datastore_id != -1 else ""
         run_command(f"sudo {self._function} backup {self._id} {datastore_id} {backup_name}")
 
-    
+
     def info(self) -> VirtualMachineInfo:
         return parse_vm_info_from_xml(_info(self._function, self._id, xml=True))
 
-    
+
+    def lock(self, lock_level: int = 1) -> None:
+        _lock(self._function, self._id, lock_level)
+
+
+    def unlock(self) -> None:
+        _unlock(self._function, self._id)

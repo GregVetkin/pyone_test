@@ -34,7 +34,7 @@ class Template:
         return parse_template_info_from_xml(_info(self._function, self._id, xml=True))
     
 
-    def lock(self, lock_level: int = 4) -> None:
+    def lock(self, lock_level: int = 1) -> None:
         _lock(self._function, self._id, lock_level)
 
 
