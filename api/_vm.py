@@ -126,4 +126,12 @@ class OneVm:
         """Unlocks a Virtual Machine"""
         return self._one_vm.unlock(vm_id)
     
+    # def attachsg(self, vm_id: int, nic_id: int, sg_id: int) -> int:
+    #     """Attaches a security group to a network interface of a VM, if the VM is running it updates the associated rules"""
+    #     return self._one_vm.attachsg(vm_id, nic_id, sg_id)
+    
+    # def detachsg(self, sg_id: int, nic_id: int) -> int:
+    #     """Detaches a security group from a network interface of a VM, if the VM is running it removes the associated rules"""
+    #     return self._one_vm.detachsg(sg_id, nic_id)
+
     

@@ -13,7 +13,7 @@ one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
-res = one.vm.action("resume", 4)
+res = one.vm.attachsg(4, 19, 100)
 print(res)
 
 
