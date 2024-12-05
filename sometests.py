@@ -10,16 +10,8 @@ brestadm_auth = ADMIN_NAME+":"+"145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b
 one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
-templ = f"""
-<VM>
-<NAME>sssse</NAME>
-<CPU>1</CPU>
-<VCPU>1</VCPU>
-<MEMORY>1</MEMORY>
-</VM>
-"""
 
-res = one.vm.allocate(templ)
+res = one.vm.rename(26, "")
 print(res)
 
 
