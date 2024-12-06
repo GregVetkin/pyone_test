@@ -11,8 +11,9 @@ one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
-res = one.vm.rename(26, "")
-print(res)
+
+res2 = one.vm.attach(181, "DISK=[IMAGE_ID=52]")
+
 
 
 

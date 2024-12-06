@@ -1,5 +1,5 @@
 import xml.etree.ElementTree as xmlTree
-from dataclasses    import dataclass
+from dataclasses    import dataclass,  make_dataclass
 from typing         import Optional
 
 
@@ -57,3 +57,27 @@ def parse_lock_from_xml(raw_xml: str) -> Optional[LockStatus]:
             REQ_ID=     int(xml.find('LOCK/REQ_ID').text)
         )
     return lock
+
+
+def create_dataclass_from_xml(element: xmlTree.Element):
+    fields = []
+    values = {}
+
+    for child in element:
+        tag_name = child.tag.upper()
+        fields.append(tag_name)
+
+        if len(child) == 0:
+            values[tag_name] = child.text
+
+        elif tag_name in values:
+            if not isinstance(values[tag_name], list):
+                values[tag_name] = [values[tag_name]]
+            values[tag_name].append(create_dataclass_from_xml(child))
+
+        else:
+            values[tag_name] = create_dataclass_from_xml(child)
+
+    fields = set(fields)
+    DynamicClass = make_dataclass("DynamicDataClass", fields)
+    return DynamicClass(**values)
