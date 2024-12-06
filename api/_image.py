@@ -42,25 +42,25 @@ class OneImage:
         """Enables or disables an image"""
         return self._one_image.enable(image_id, enable)
 
-    def _enable(self, image_id: int) -> int:
-        """Enables an image"""
-        return self.enable(image_id, True)
+    # def _enable(self, image_id: int) -> int:
+    #     """Enables an image"""
+    #     return self.enable(image_id, True)
     
-    def _disable(self, image_id: int) -> int:
-        """Disables an image"""
-        return self.enable(image_id, False)
+    # def _disable(self, image_id: int) -> int:
+    #     """Disables an image"""
+    #     return self.enable(image_id, False)
     
     def persistent(self, image_id: int, persistent: bool) -> int:
         """Sets the Image as persistent or not persistent"""
         return self._one_image.persistent(image_id, persistent)
 
-    def _persistent(self, image_id: int) -> int:
-        """Sets the Image as persistent"""
-        return self.persistent(image_id, True)
+    # def _persistent(self, image_id: int) -> int:
+    #     """Sets the Image as persistent"""
+    #     return self.persistent(image_id, True)
     
-    def _nonpersistent(self, image_id: int) -> int:
-        """Sets the Image as not persistent"""
-        return self.persistent(image_id, False)
+    # def _nonpersistent(self, image_id: int) -> int:
+    #     """Sets the Image as not persistent"""
+    #     return self.persistent(image_id, False)
     
     def info(self, image_id: int, decrypt_secrets: bool = False) -> IMAGESub:
         """Retrieves information for the image"""

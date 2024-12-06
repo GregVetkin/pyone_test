@@ -52,13 +52,13 @@ class OneUser:
         """Enables or disables a user"""
         return self._one_user.enable(user_id, enable)
     
-    def _enable(self, user_id: int) -> int:
-        """Enables a user"""
-        return self.enable(user_id, True)
+    # def _enable(self, user_id: int) -> int:
+    #     """Enables a user"""
+    #     return self.enable(user_id, True)
     
-    def _disable(self, user_id: int) -> int:
-        """Disables a user"""
-        return self.enable(user_id, False)
+    # def _disable(self, user_id: int) -> int:
+    #     """Disables a user"""
+    #     return self.enable(user_id, False)
     
     def info(self, user_id: int = -1, decrypt_secrets: bool = False) -> USERSub:
         """Retrieves information for the user"""

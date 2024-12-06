@@ -1,14 +1,19 @@
 import os
-from utils          import run_command
+import xml.etree.ElementTree as xmltree
+
+from utils              import run_command
+from dataclasses        import dataclass
+from one_cli._common    import create_dataclass_from_xml
+
 
 
 
 def _create(function_name: str, template: str) -> int:
     template_file = "/tmp/test_template_file"
+
     with open(template_file, "w") as file:
         file.write(template)
 
-    #run_command(f"sudo cat <<EOF > {file}\n{template}\nEOF")
     _id = int(run_command(f"sudo {function_name} create {template_file}" + " | awk '{print $2}'"))
     os.remove(template_file)
     return _id
@@ -19,20 +24,10 @@ def _exist_in_show(function_name: str, object_id: int) -> bool:
 
 def _exist_in_list(function_name: str, object_id: int) -> bool:
     return not bool(int(run_command(f"sudo {function_name} list | grep ' {object_id} ' &>/dev/null; echo $?")))
-    # string_object_id = str(object_id)
-    # list_result = run_command(f"sudo {function_name} list")
-    # lines = list_result.splitlines()
-    # IDs_id = next(col_number for col_number, col_name in enumerate(lines[0].split()) if col_name == "ID")
-    # for line in lines:
-    #     if line.split()[IDs_id] == string_object_id:
-    #         return True
-    # return False
+
 
 
 def _exist(function_name: str, object_id: int) -> bool:
-    # exec_code_show = int(run_command(f"sudo {function_name} show {object_id} &>/dev/null; echo $?"))
-    # exec_code_list = int(run_command(f"sudo {function_name} list" + " | " + "awk '{print $1}' | " + f" grep {object_id} &>/dev/null; echo $?"))
-    # return True if exec_code_show == 0 and exec_code_list == 0 else False
     return _exist_in_show(function_name, object_id) and _exist_in_list(function_name, object_id)
     
 
@@ -47,9 +42,12 @@ def _chmod(function_name: str, object_id: int, octet: str) -> None:
     run_command(f"sudo {function_name} chmod {object_id} {octet}")
 
 
-def _info(function_name: str, object_id: int, xml: bool = False) -> str:
-    xml_flag = "-x" if xml else ""
-    return run_command(f"sudo {function_name} show {object_id} {xml_flag}")
+def _info_xml(function_name: str, object_id: int) -> str:
+    return run_command(f"sudo {function_name} show {object_id} -x")
+
+
+def _info_dataclass(function_name: str, object_id: int) -> dataclass:
+    return create_dataclass_from_xml(xmltree.fromstring(_info_xml(function_name, object_id)))
 
 
 def _delete(function_name: str, object_id: int) -> None:
@@ -60,7 +58,6 @@ def _update(function_name: str, object_id: int, template: str, append: bool = Fa
     template_file = "/tmp/test_file"
     with open(template_file, "w") as file:
         file.write(template)
-    #run_command(f"sudo cat <<EOF > {file}\n{template}\nEOF")
     append_flag = "-a" if append else ""
     run_command(f"sudo {function_name} update {object_id} {template_file} {append_flag}")
     os.remove(template_file)

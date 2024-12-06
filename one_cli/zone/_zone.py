@@ -1,6 +1,6 @@
-from one_cli.zone._common       import ZoneInfo, parse_zone_info_from_xml
-from one_cli._base_commands     import _chmod, _chown, _delete, _info, _update, _exist, _create
-from one_cli.image              import force_delete_image
+from dataclasses                import dataclass
+from one_cli._base_commands     import _delete, _info_dataclass, _update, _exist, _create
+
 
 
 FUNCTION_NAME = "onezone"
@@ -28,8 +28,8 @@ class Zone:
         _delete(self._function, self._id)
 
 
-    def info(self) -> ZoneInfo:
-        return parse_zone_info_from_xml(_info(self._function, self._id, xml=True))
+    def info(self) -> dataclass:
+        return _info_dataclass(self._function, self._id)
 
 
     def update(self, template: str, append: bool = False) -> None:

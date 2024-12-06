@@ -1,9 +1,8 @@
 import os
 from time                   import sleep
 from utils                  import run_command
-from one_cli.image._common  import ImageInfo, parse_image_info_from_xml
-from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist, _lock, _unlock, _enable, _disable, _persistent, _nonpersistent
-from one_cli.vm             import VirtualMachine
+from one_cli._base_commands import _chmod, _chown, _delete, _info_dataclass, _update, _exist, _lock, _unlock, _enable, _disable, _persistent, _nonpersistent
+from dataclasses            import dataclass
 
 
 FUNCTION_NAME = "oneimage"
@@ -17,7 +16,6 @@ def image_exist(image_id: int) -> bool:
 def create_image(datastore_id: int, image_template: str, await_image_rdy: bool = True) -> int:
     template_file_path  = "/tmp/test_template_file"
 
-    #run_command(f"sudo cat <<EOF > {template_file_path}\n{image_template}\nEOF")
     with open(template_file_path, "w") as file:
         file.write(image_template)
 
@@ -26,7 +24,6 @@ def create_image(datastore_id: int, image_template: str, await_image_rdy: bool =
     if await_image_rdy:
         wait_image_ready(image_id)
 
-    #run_command(f"sudo rm -f {template_file_path}")
     os.remove(template_file_path)
     return image_id
 
@@ -42,22 +39,6 @@ def _wait_image_state(image_id: int, state_code: int, interval: float = 1.) -> N
 def wait_image_ready(image_id: int, interval: float = 1.) -> None:
     _wait_image_state(image_id, 1, interval)
 
-def force_delete_image(image_id: int):
-    if not image_exist(image_id):
-        return
-
-    image = Image(image_id)
-    image_info = image.info()
-    
-    if image_info.STATE == 2:
-        for vm_id in image_info.VMS:
-            VirtualMachine(vm_id).terminate()
-        wait_image_ready(image_id)
-
-    if image_info.LOCK is not None:
-        image.unlock()
-
-    image.delete()
 
 
 
@@ -67,8 +48,8 @@ class Image:
         self._function = FUNCTION_NAME
 
 
-    def info(self) -> ImageInfo:
-        return parse_image_info_from_xml(_info(self._function, self._id, xml=True))
+    def info(self) -> dataclass:
+        return _info_dataclass(self._function, self._id)
 
  
     def delete(self) -> None:

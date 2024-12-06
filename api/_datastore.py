@@ -38,17 +38,17 @@ class OneDatastore:
         """Renames a datastore"""
         return self._one_ds.rename(datastore_id, new_name)
     
-    def _enable(self, datastore_id: int, enable: bool) -> int:
+    def enable(self, datastore_id: int, enable: bool) -> int:
         """Enables or disables a datastore"""
         return self._one_ds.enable(datastore_id, enable)
 
-    def enable(self, datastore_id: int) -> int:
-        """Enables a datastore"""
-        return self._one_ds.enable(datastore_id, True)
+    # def enable(self, datastore_id: int) -> int:
+    #     """Enables a datastore"""
+    #     return self._one_ds.enable(datastore_id, True)
     
-    def disable(self, datastore_id: int) -> int:
-        """Disables a datastore"""
-        return self._one_ds.enable(datastore_id, False)
+    # def disable(self, datastore_id: int) -> int:
+    #     """Disables a datastore"""
+    #     return self._one_ds.enable(datastore_id, False)
     
     def info(self, datastore_id: int, decrypt_secrets: bool = False) -> DATASTORESub:
         """Retrieves information for the datastore"""

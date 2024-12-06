@@ -1,6 +1,6 @@
 from utils                  import run_command
-from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist
-from one_cli.group._common  import GroupInfo, parse_group_info_from_xml
+from one_cli._base_commands import _delete, _info_dataclass, _update, _exist
+from dataclasses            import dataclass
 
 
 
@@ -26,8 +26,8 @@ class Group:
     def delete(self) -> None:
         _delete(self._function, self._id)
 
-    def info(self) -> GroupInfo:
-        return parse_group_info_from_xml(_info(self._function, self._id, xml=True))
+    def info(self) -> dataclass:
+        return _info_dataclass(self._function, self._id)
 
     def addadmin(self, user_id: int) -> None:
         run_command(f"sudo {self._function} addadmin {self._id} {user_id}")

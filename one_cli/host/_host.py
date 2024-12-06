@@ -1,6 +1,6 @@
 from utils                  import run_command
-from one_cli._base_commands import _delete, _info, _update, _exist, _rename, _enable, _disable, _offline
-from one_cli.host._common   import HostInfo, parse_host_info_from_xml
+from one_cli._base_commands import _delete, _info_dataclass, _update, _exist, _rename, _enable, _disable, _offline
+from dataclasses            import dataclass
 
 
 FUNCTION_NAME = "onehost"
@@ -46,5 +46,7 @@ class Host:
         _update(self._function, self._id, template, append)
 
 
-    def info(self) -> HostInfo:
-        return parse_host_info_from_xml(_info(self._function, self._id, xml=True))
+    def info(self) -> dataclass:
+        return _info_dataclass(self._function, self._id)
+    
+    

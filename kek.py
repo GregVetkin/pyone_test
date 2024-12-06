@@ -47,5 +47,9 @@ def create_dataclass_from_xml(element: xmlTree.Element):
 vm_data_xml = run_command("ssh u@bufn1 'sudo oneimage show 52 -x'")
 vm_data     = create_dataclass_from_xml(xmlTree.fromstring(vm_data_xml))
 
-print(vm_data.TEMPLATE.FL)
-print(type(vm_data.TEMPLATE.FL))
+
+
+print(hasattr(vm_data, "LOCK"))
+data = vm_data.LOCK.LOCKED
+print(data)
+print(type(data))
