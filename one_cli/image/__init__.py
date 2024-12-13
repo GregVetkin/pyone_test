@@ -1,4 +1,4 @@
-from one_cli.image._image  import Image, create_image, image_exist, wait_image_ready, force_delete_image
+from one_cli.image._image  import Image, create_image, image_exist, wait_image_ready
 
 
 
@@ -8,5 +8,4 @@ __all__ = [
     "create_image",
     "image_exist",
     "wait_image_ready",
-    "force_delete_image",
 ]

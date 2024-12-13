@@ -1,5 +1,5 @@
 from utils                  import run_command
-from one_cli._base_commands import _chmod, _chown, _delete, _info, _update, _exist
+from one_cli._base_commands import _delete, _exist
 
 
 FUNCTION_NAME = "oneuser"

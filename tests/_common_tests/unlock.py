@@ -12,15 +12,15 @@ def unlock_if_not_exist__test(api_method):
 
 
 def unlock_locked__test(api_method, one_object):
-    assert one_object.info().LOCK is not None
+    assert hasattr(one_object.info(), "LOCK")
     api_method.unlock(one_object._id)
-    assert one_object.info().LOCK == None
+    assert not hasattr(one_object.info(), "LOCK")
 
 
 def unlock_unlocked__test(api_method, one_object):
-    assert one_object.info().LOCK == None
+    assert not hasattr(one_object.info(), "LOCK")
     api_method.unlock(one_object._id)
-    assert one_object.info().LOCK == None
+    assert not hasattr(one_object.info(), "LOCK")
 
 
     

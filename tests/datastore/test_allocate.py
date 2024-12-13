@@ -81,6 +81,6 @@ def test_datastore_create_with_certain_cluster(one: One, cluster: Cluster):
     _id  = one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs", cluster_id=cluster._id)
     datastore = Datastore(_id)
     assert datastore_exist(_id)
-    assert cluster._id in datastore.info().CLUSTERS
+    assert cluster._id == datastore.info().CLUSTERS.ID
     datastore.delete()
 

@@ -41,7 +41,8 @@ def chown_user_and_group_change__test(api_method, one_object, user: User, group:
 
 def chown_user_and_group_not_changed__test(api_method, one_object):
     old_one_object_info = one_object.info()
-    api_method.chown(one_object._id)
+    _id = api_method.chown(one_object._id)
+    assert _id == one_object._id
     new_one_object_info = one_object.info()
     assert old_one_object_info.UNAME == new_one_object_info.UNAME
     assert old_one_object_info.GNAME == new_one_object_info.GNAME

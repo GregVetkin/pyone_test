@@ -12,7 +12,10 @@ def rename_if_not_exist__test(api_method) -> None:
 
 def rename__test(api_method, one_object) -> None:
     new_name = get_unic_name()
-    api_method.rename(one_object._id, new_name)
+    _id = api_method.rename(one_object._id, new_name)
+    assert _id == one_object._id
+    print(new_name)
+    print(one_object.info().NAME)
     assert new_name == one_object.info().NAME
 
 

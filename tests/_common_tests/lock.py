@@ -14,7 +14,8 @@ def lock_if_not_exist__test(api_method, lock_level):
 
 
 def lock_unlocked__test(api_method, one_object, lock_level):
-    assert one_object.info().LOCK == None
+    assert not hasattr(one_object.info(), "LOCK")
+    #assert one_object.info().LOCK == None
     api_method.lock(one_object._id, lock_level)
     assert one_object.info().LOCK.LOCKED == lock_level
 
@@ -23,7 +24,8 @@ def lock_unlocked__test(api_method, one_object, lock_level):
 
 def lock_locked__test(api_method, one_object, lock_level, lock_check):
     start_info = one_object.info()
-    assert start_info.LOCK is not None
+    assert hasattr(start_info, "LOCK")
+    #assert start_info.LOCK is not None
 
     if lock_check:
         with pytest.raises(OneActionException):
