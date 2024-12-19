@@ -5,18 +5,7 @@ from typing             import List, Dict, Optional, Union
 from one_cli._common    import Permissions, parse_lock_from_xml, parse_permissions_from_xml, LockStatus
 
 
-def __convert(text: str) -> Union[str, int, float]:
-    try:
-        return int(text)
-    except Exception:
-        pass
-    
-    try:
-        return float(text)
-    except Exception:
-        pass
 
-    return text
 
 
 
@@ -27,12 +16,11 @@ def __parse_template(raw_template_xml):
     
     for element in template_element:
         if len(element) == 0:
-            template[element.tag] = __convert(element.text)
+            template[element.tag] = element.text
+        elif element.tag in template:
+            template[element.tag].append({_.tag: _.text or "" for _ in element.iter() if _ is not element})
         else:
-            if element.tag in template:
-                template[element.tag].append({_.tag: __convert(_.text) or "" for _ in element.iter() if _ is not element})
-            else:
-                template[element.tag] = [{_.tag: __convert(_.text) or "" for _ in element.iter() if _ is not element}]
+            template[element.tag] = [{_.tag: _.text or "" for _ in element.iter() if _ is not element}]
                 
     return template
 

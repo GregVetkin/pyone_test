@@ -5,7 +5,7 @@ from api                import One
 from utils              import get_unic_name
 from one_cli.image      import Image, create_image
 from one_cli.datastore  import Datastore, create_datastore
-from one_cli.vm         import VirtualMachine, create_vm
+from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
 from config             import ADMIN_NAME
 
 
@@ -71,11 +71,9 @@ def test_image_not_exist(one: One, vm: VirtualMachine):
 def test_attach_disk_to_vm(one: One, vm: VirtualMachine, image: Image):
     _id = one.vm.attach(vm._id, f"DISK=[IMAGE_ID={image._id}]")
     assert _id == vm._id
-    
-    from utils import run_command
-    from one_cli._common import create_dataclass_from_xml
-    from one_cli.vm         import wait_vm_offline
-    import xml.etree.ElementTree as et
     wait_vm_offline(vm._id)
-    vm_info = create_dataclass_from_xml(et.fromstring(run_command(f"sudo onevm show {vm._id} -x")))
-    assert int(vm_info.TEMPLATE.DISK.IMAGE_ID) == image._id
+    
+    assert int(one.vm.info(vm._id).TEMPLATE["DISK"]["IMAGE_ID"]) == image._id
+    vm.disk_detach(0)
+    wait_vm_offline(vm._id)
+

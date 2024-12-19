@@ -68,3 +68,14 @@ class VirtualMachine:
 
     def unlock(self) -> None:
         _unlock(self._function, self._id)
+
+
+    def disk_attach(self, image_id: int):
+        run_command(f"sudo {self._function} disk-attach {self._id} -i {image_id}")
+
+
+    def disk_detach(self, disk_id: int) -> None:
+        run_command(f"sudo {self._function} disk-detach {self._id} {disk_id}")
+
+
+    

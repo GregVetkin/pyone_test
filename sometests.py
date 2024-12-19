@@ -4,7 +4,7 @@ from api            import One
 from config         import API_URI, ADMIN_NAME
 
 
-brestadm_auth = ADMIN_NAME+":"+"145958aaa8d89a5c9ba6eed3a146fda9a4634425b8c3942b913faf6e4ff085d2"
+brestadm_auth = ADMIN_NAME+":"+"70057021d19af04aac15dea6bacf1205b3767e794d7b4921428c984ac8314063"
 
 
 one  = One(pyone.OneServer(API_URI, brestadm_auth))
@@ -12,7 +12,7 @@ one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
-res2 = one.vm.attach(181, "DISK=[IMAGE_ID=52]")
+
 
 
 
