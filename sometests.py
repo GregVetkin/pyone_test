@@ -9,8 +9,7 @@ brestadm_auth = ADMIN_NAME+":"+"70057021d19af04aac15dea6bacf1205b3767e794d7b4921
 
 one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
-
-one.vm.action("terminate-hard", 25)
+one.vm.resize(32, "CPU=5.1")
 
 
 
