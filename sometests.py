@@ -10,8 +10,9 @@ brestadm_auth = ADMIN_NAME+":"+"70057021d19af04aac15dea6bacf1205b3767e794d7b4921
 one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
-
-
+_id = one.vm.diskresize(8, 0, "35")
+print(_id)
+print(one.vm.info(8).TEMPLATE["DISK"]["SIZE"])
 
 
 
