@@ -1,6 +1,6 @@
 from utils                  import run_command
 from time                   import sleep   
-from one_cli._base_commands import _info, _exist, _create, _info, _lock, _unlock
+from one_cli._base_commands import _info, _exist, _create, _info, _lock, _unlock, _update
 from one_cli.vm._common     import VirtualMachineInfo, parse_vm_info_from_xml
 
 
@@ -83,3 +83,9 @@ class VirtualMachine:
 
     def nic_detach(self, nic_id: int) -> None:
         run_command(f"sudo {self._function} nic-detach {self._id} {nic_id}")
+
+    
+    def update(self, template: str, append: bool = False) -> None:
+        _update(self._function, self._id, template, append)
+
+        
