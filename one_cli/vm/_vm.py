@@ -78,4 +78,8 @@ class VirtualMachine:
         run_command(f"sudo {self._function} disk-detach {self._id} {disk_id}")
 
 
-    
+    def nic_attach(self, vnet_id: int) -> None:
+        run_command(f"sudo {self._function} nic-attach {self._id} -n {vnet_id}")
+
+    def nic_detach(self, nic_id: int) -> None:
+        run_command(f"sudo {self._function} nic-detach {self._id} {nic_id}")
