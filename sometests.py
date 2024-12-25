@@ -4,12 +4,14 @@ from api            import One
 from config         import API_URI, ADMIN_NAME
 
 
-brestadm_auth = ADMIN_NAME+":"+"70057021d19af04aac15dea6bacf1205b3767e794d7b4921428c984ac8314063"
+brestadm_auth = ADMIN_NAME+":"+"fa20ef55f090e3e00980a25b2f3876725b4aa6c6d32239410c802e5912487715"
 
 
 one  = One(pyone.OneServer(API_URI, brestadm_auth))
 
-one.vm.resize(32, "CPU=5.1")
+#pyone.OneServer(API_URI, brestadm_auth).vm.updateconf(25, "OS=[ARCH=x82-64,\nMACHINE=pc]")
+print(one.vm.info(26).TEMPLATE)
+
 
 
 

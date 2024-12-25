@@ -10,11 +10,11 @@ methods = [
     ("one.vm.disksnapshotdelete", False, 1, 3),
     ("one.vm.disksnapshotrevert", False, 1, 3),
     ("one.vm.disksnapshotrename", False, 1, 3),
-    ("one.vm.attach", False, 1, 1),
-    ("one.vm.detach", False, 1, 1),
-    ("one.vm.diskresize", False, 1, 1),
-    ("one.vm.attachnic", False, 1, 1),
-    ("one.vm.detachnic", False, 1, 1),
+    ("one.vm.attach", True, 1, 1),
+    ("one.vm.detach", True, 1, 1),
+    ("one.vm.diskresize", True, 1, 1),
+    ("one.vm.attachnic", True, 1, 1),
+    ("one.vm.detachnic", True, 1, 1),
     ("one.vm.updatenic", False, 1, 2),
     ("one.vm.allocate", True, 1, 1),
     ("one.vm.info", False, 1, 3),
@@ -24,8 +24,8 @@ methods = [
     ("one.vm.snapshotcreate", False, 2, 3),
     ("one.vm.snapshotdelete", False, 2, 3),
     ("one.vm.snapshotrevert", False, 2, 3),
-    ("one.vm.resize", False, 1, 2),
-    ("one.vm.update", False, 1, 2),
+    ("one.vm.resize", True, 1, 2),
+    ("one.vm.update", True, 1, 2),
     ("one.vm.recover", False, 2, 3),
     ("one.vm.updateconf", False, 2, 3),
     ("one.vmpool.info", False, 2, 4),
@@ -43,3 +43,4 @@ for _ in methods:
     
     if not _[1] and (_[2] == 1) and (_[3] < 3):
         print(_[0])
+
