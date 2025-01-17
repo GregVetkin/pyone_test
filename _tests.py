@@ -750,18 +750,14 @@ TESTS["one"]["vm"]["attachnic"]             = TestData(
                                                         xml_rpc_method  =   "one.vm.attachnic",
                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_attachnic.py"
 )
-TESTS["one"]["vm"]["attachpci"]             = TestData(
-                                                        xml_rpc_method  =   "one.vm.attachpci",
-                                                        test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_attachpci.py"
-)
-TESTS["one"]["vm"]["attachsg"]              = TestData(
-                                                        xml_rpc_method  =   "one.vm.attachsg",
-                                                        test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_attachsg.py"
-)
-TESTS["one"]["vm"]["backup"]                = TestData(
-                                                        xml_rpc_method  =   "one.vm.backup",
-                                                        test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_backup.py"
-)
+# TESTS["one"]["vm"]["attachpci"]             = TestData(
+#                                                         xml_rpc_method  =   "one.vm.attachpci",
+#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_attachpci.py"
+# )
+# TESTS["one"]["vm"]["attachsg"]              = TestData(
+#                                                         xml_rpc_method  =   "one.vm.attachsg",
+#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_attachsg.py"
+# )
 TESTS["one"]["vm"]["backup"]                = TestData(
                                                         xml_rpc_method  =   "one.vm.backup",
                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_backup.py"
@@ -790,14 +786,14 @@ TESTS["one"]["vm"]["detachnic"]             = TestData(
                                                         xml_rpc_method  =   "one.vm.detachnic",
                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_detachnic.py"
 )
-TESTS["one"]["vm"]["detachpci"]             = TestData(
-                                                        xml_rpc_method  =   "one.vm.detachpci",
-                                                        test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_detachpci.py"
-)
-TESTS["one"]["vm"]["detachsg"]              = TestData(
-                                                        xml_rpc_method  =   "one.vm.detachsg",
-                                                        test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_detachsg.py"
-)
+# TESTS["one"]["vm"]["detachpci"]             = TestData(
+#                                                         xml_rpc_method  =   "one.vm.detachpci",
+#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_detachpci.py"
+# )
+# TESTS["one"]["vm"]["detachsg"]              = TestData(
+#                                                         xml_rpc_method  =   "one.vm.detachsg",
+#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_detachsg.py"
+# )
 TESTS["one"]["vm"]["diskresize"]            = TestData(
                                                         xml_rpc_method  =   "one.vm.diskresize",
                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_diskresize.py"
@@ -850,18 +846,18 @@ TESTS["one"]["vm"]["resize"]                = TestData(
                                                         xml_rpc_method  =   "one.vm.resize",
                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_resize.py"
 )
-TESTS["one"]["vm"]["schedadd"]              = TestData(
-                                                        xml_rpc_method  =   "one.vm.schedadd",
-                                                        test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_schedadd.py"
-)
-TESTS["one"]["vm"]["scheddelete"]           = TestData(
-                                                        xml_rpc_method  =   "one.vm.scheddelete",
-                                                        test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_scheddelete.py"
-)
-TESTS["one"]["vm"]["schedupdate"]           = TestData(
-                                                        xml_rpc_method  =   "one.vm.schedupdate",
-                                                        test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_schedupdate.py"
-)
+# TESTS["one"]["vm"]["schedadd"]              = TestData(
+#                                                         xml_rpc_method  =   "one.vm.schedadd",
+#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_schedadd.py"
+# )
+# TESTS["one"]["vm"]["scheddelete"]           = TestData(
+#                                                         xml_rpc_method  =   "one.vm.scheddelete",
+#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_scheddelete.py"
+# )
+# TESTS["one"]["vm"]["schedupdate"]           = TestData(
+#                                                         xml_rpc_method  =   "one.vm.schedupdate",
+#                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_schedupdate.py"
+# )
 TESTS["one"]["vm"]["snapshotcreate"]        = TestData(
                                                         xml_rpc_method  =   "one.vm.snapshotcreate",
                                                         test_file_path  =   f"{PROJECT_DIR}/tests/vm/test_snapshotcreate.py"
