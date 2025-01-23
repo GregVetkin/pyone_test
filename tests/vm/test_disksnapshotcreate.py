@@ -51,24 +51,37 @@ def vm_with_disk(image: Image):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_vm_not_exist(one: One):
+    vm_id         = 99999
+    disk_id       = 0
+    snapshot_name = get_unic_name()
+
     with pytest.raises(OneException):
-        one.vm.disksnapshotcreate(99999, 0, "Test")
+        one.vm.disksnapshotcreate(vm_id, disk_id, snapshot_name)
+
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_disk_not_exist(one: One, vm_with_disk: VirtualMachine):
+    vm_id         = vm_with_disk._id
+    disk_id       = 999999
+    snapshot_name = get_unic_name()
+
     with pytest.raises(OneException):
-        one.vm.disksnapshotcreate(vm_with_disk._id, 999999, "Test")
+        one.vm.disksnapshotcreate(vm_id, disk_id, snapshot_name)
     
+
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_create_disk_snapshot(one: One, vm_with_disk: VirtualMachine):
     assert not one.vm.info(vm_with_disk._id).SNAPSHOTS
 
+    vm_id         = vm_with_disk._id
+    disk_id       = 0
     snapshot_name = get_unic_name()
-    snapshot_id   = one.vm.disksnapshotcreate(vm_with_disk._id, 0, snapshot_name)
-    sleep(1)
-    snapshots     = one.vm.info(vm_with_disk._id).SNAPSHOTS
+    snapshot_id   = one.vm.disksnapshotcreate(vm_id, disk_id, snapshot_name)
+
+    sleep(3)
+    snapshots = one.vm.info(vm_with_disk._id).SNAPSHOTS
     
     assert snapshots[0].SNAPSHOT[0]
     assert snapshots[0].SNAPSHOT[0].ACTIVE  == "YES"

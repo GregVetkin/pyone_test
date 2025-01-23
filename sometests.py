@@ -16,4 +16,4 @@ one = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
-print(one.vm.disksnapshotdelete(68, 1, 1))
+print(one.vm.updatenic())

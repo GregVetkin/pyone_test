@@ -6,8 +6,8 @@ from time               import sleep
 from pyone              import OneException
 from api                import One
 from utils              import get_unic_name
-from one_cli.image      import Image, create_image
-from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
+from one_cli.image      import Image
+from one_cli.vm         import VirtualMachine
 from config             import ADMIN_NAME
 
 
@@ -49,7 +49,7 @@ def vm(one: One):
 
     yield VirtualMachine(vm_id)
 
-    one.vm.action("terminate", vm_id)
+    one.vm.action("terminate-hard", vm_id)
     await_vm_status_code(one, vm_id, 6)
 
 
@@ -96,24 +96,36 @@ def vm_with_disk_snapshots(one: One, image: Image, vm: VirtualMachine):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_vm_not_exist(one: One):
+    vm_id       = 99999
+    disk_id     = 0
+    snapshot_id = 0
+
     with pytest.raises(OneException):
-        one.vm.disksnapshotdelete(99999, 0, 0)
+        one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
 
 
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_disk_not_exist(one: One, vm_with_disk: VirtualMachine):
+    vm_id       = vm_with_disk._id
+    disk_id     = 99999
+    snapshot_id = 0
+
     with pytest.raises(OneException):
-        one.vm.disksnapshotdelete(vm_with_disk._id, 99999, 0)
+        one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
 
 
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_disksnapshot_not_exist(one: One, vm_with_disk: VirtualMachine):
+    vm_id       = vm_with_disk._id
+    disk_id     = 0
+    snapshot_id = 99999
+
     with pytest.raises(OneException):
-        one.vm.disksnapshotdelete(vm_with_disk._id, 0, 99999)
+        one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
     
 
 
