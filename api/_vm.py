@@ -126,6 +126,10 @@ class OneVm:
         """Unlocks a Virtual Machine"""
         return self._one_vm.unlock(vm_id)
     
+    # def backup(self, vm_id: int, datastore_id: int, name: str) -> int:
+    #     """Creates a new backup image for the VM"""
+    #     return self._one_vm.backup(vm_id, datastore_id, name)
+    
     # def attachsg(self, vm_id: int, nic_id: int, sg_id: int) -> int:
     #     """Attaches a security group to a network interface of a VM, if the VM is running it updates the associated rules"""
     #     return self._one_vm.attachsg(vm_id, nic_id, sg_id)
