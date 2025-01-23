@@ -14,8 +14,8 @@ API_URI = "http://bufn1.brest.local:2633/RPC2"
 one = One(pyone.OneServer(API_URI, brestadm_auth))
 
 vm_id = 76
-disks_snapshots     = {disk_snapshots_info.DISK_ID : {snapshot_info.ID: snapshot_info.NAME for snapshot_info in disk_snapshots_info.SNAPSHOT}
+disks_snapshots     = {disk_snapshots_info.DISK_ID : {snapshot_info.ID: snapshot_info.ACTIVE for snapshot_info in disk_snapshots_info.SNAPSHOT}
                             for disk_snapshots_info in one.vm.info(vm_id).SNAPSHOTS}
 
 
-print(disks_snapshots)
+print(one.vm.disksnapshotrevert(76, 3, 2))

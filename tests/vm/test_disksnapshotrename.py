@@ -142,8 +142,8 @@ def test_rename_snapshot(one: One, vm_with_disk_snapshots: VirtualMachine):
 
 
     _id = one.vm.disksnapshotrename(vm_id, target_disk_id, target_snapshot_id, new_snapshot_name)
-    assert _id == vm_id
     sleep(3)
+    assert _id == vm_id
     
     disks_snapshot_names_after = {disk_snapshots_info.DISK_ID : {snapshot_info.ID: snapshot_info.NAME for snapshot_info in disk_snapshots_info.SNAPSHOT}
                                     for disk_snapshots_info in one.vm.info(vm_id).SNAPSHOTS}

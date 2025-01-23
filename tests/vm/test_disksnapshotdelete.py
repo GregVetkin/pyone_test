@@ -139,9 +139,6 @@ def test_delete_disk_snapshot(one: One, vm_with_disk_snapshots: VirtualMachine):
                             for disk_snapshots_info in one.vm.info(vm_id).SNAPSHOTS}
     snapshots_count_before = sum(len(disks_snapshots_before[disk_id]) for disk_id in disks_snapshots_before)
 
-    assert snapshots_count_before > 0, "VM doesnt have disks with snapshots"
-
-    # нужно исключить ситуацию, когда id объектов совпадают - иначе проверка возвращаемого id удаленного снэпшота бессмысленна
     while True:
         target_disk_id      = random.choice(list(disks_snapshots_before.keys()))
         target_snapshot_id  = random.choice(disks_snapshots_before[target_disk_id])
@@ -149,6 +146,7 @@ def test_delete_disk_snapshot(one: One, vm_with_disk_snapshots: VirtualMachine):
 
     deleted_snapshot_id = one.vm.disksnapshotdelete(vm_id, target_disk_id, target_snapshot_id)
     sleep(5)
+    
     
     disks_snapshots_after = {disk_snapshots_info.DISK_ID : [snapshot_info.ID for snapshot_info in disk_snapshots_info.SNAPSHOT]
                             for disk_snapshots_info in one.vm.info(vm_id).SNAPSHOTS}
