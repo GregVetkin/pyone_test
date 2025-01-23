@@ -84,7 +84,7 @@ def test_vm_not_exist(one: One):
 
 
 
-@pytest.mark.skip(reason="Test crashing Opennebula")
+
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_disk_not_exist(one: One, vm: VirtualMachine):
     vm_id       = vm._id
