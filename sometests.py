@@ -1,20 +1,20 @@
 import pyone
+import time
 
 from api            import One
 from config         import API_URI, ADMIN_NAME
 
 
-brestadm_auth = ADMIN_NAME+":"+"fa20ef55f090e3e00980a25b2f3876725b4aa6c6d32239410c802e5912487715"
+brestadm_auth = ADMIN_NAME+":"+"35b72dfa951b2b7e210cf2a84f55bf12d7e37a1c290e3d34f12c07b35cbcdac0"
+
+API_URI = "http://raft.brest.local:2633/RPC2"
 
 
-# one = pyone.OneServer(API_URI, brestadm_auth)
-# print(one.vm.disksaveas(10, 0, "saved_disk", "OS", -1))
-
-API_URI = "http://bufn1.brest.local:2633/RPC2"
 one = One(pyone.OneServer(API_URI, brestadm_auth))
 
-vm_id = 76
 
 
 
-print(one.vm.backup(76, 2, "somename"))
+
+
+one.vm.action("resume", 0)

@@ -1,9 +1,11 @@
+import os
 import sys
 import subprocess
 
 from tests              import TestData
 from _tests             import TESTS, PROJECT_DIR
 from utils.printing     import pretty_print_test_result
+from utils              import run_command
 
 
 
@@ -52,8 +54,16 @@ def run_test(test: TestData) -> None:
         
 
 
+def venv_exist() -> bool:
+    return os.path.isdir(os.path.join(PROJECT_DIR, '.venv'))
+
+
 
 if __name__ == "__main__":
+    if not venv_exist():
+        prepare_script_path = os.path.join(PROJECT_DIR, "prepare.sh")
+        run_command(f"bash {prepare_script_path}")
+
     if len(sys.argv) > 1:
         method = sys.argv[1]
     else:
