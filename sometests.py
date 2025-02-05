@@ -5,16 +5,13 @@ from api            import One
 from config         import API_URI, ADMIN_NAME
 
 
-brestadm_auth = ADMIN_NAME+":"+"35b72dfa951b2b7e210cf2a84f55bf12d7e37a1c290e3d34f12c07b35cbcdac0"
+brestadm_auth = ADMIN_NAME+":"+"fa20ef55f090e3e00980a25b2f3876725b4aa6c6d32239410c802e5912487715"
 
-API_URI = "http://raft.brest.local:2633/RPC2"
+API_URI = "http://bufn1.brest.local:2633/RPC2"
 
 
 one = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
 
-
-
-
-one.vm.action("resume", 0)
+one.vm.action("terminate-hard", 16)

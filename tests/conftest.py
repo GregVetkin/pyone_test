@@ -2,7 +2,7 @@ import pytest
 
 from pyone              import OneServer
 from api                import One
-from config             import API_URI, RAFT_CONFIG
+from config             import API_URI, RAFT_CONFIG, RAFT_API_URI
 from utils              import get_user_auth, restart_opennebula, run_command
 from utils.opennebula   import _get_federation_mode, _change_federation_mode
 
