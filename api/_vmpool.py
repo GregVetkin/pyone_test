@@ -15,7 +15,7 @@ class OneVmpool:
         """Retrieves information for all or part of the VMs in the pool"""
         return self._one_vmpool.infoextended(filter_flag, start_id, end_id, vm_state_filter, key_value_filter)
     
-    def infoset(self, vm_set: str, extended: bool = False) -> str:
+    def infoset(self, vm_set: str, extended: bool = False) -> VM_POOLSub:
         """Retrieves information for a specific set of VMs"""
         return self._one_vmpool.infoset(vm_set, extended)
     
