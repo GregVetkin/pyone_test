@@ -38,3 +38,12 @@ def test_show_all_vms(one: One, vms: List[VirtualMachine]):
     vmpool_ids      = [vm.ID for vm in vmpool]
     
     assert set(created_vm_ids).issubset(vmpool_ids)
+
+
+
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+def test_all_vms_except_done(one: One, vms: List[VirtualMachine]):
+    vmpool = one.vmpool.info(vm_state_filter=-1).VM
+    
+    for vm in vmpool:
+        assert vm.STATE != 6
