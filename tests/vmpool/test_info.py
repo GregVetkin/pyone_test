@@ -42,8 +42,46 @@ def test_show_all_vms(one: One, vms: List[VirtualMachine]):
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_all_vms_except_done(one: One, vms: List[VirtualMachine]):
+def test_vms_except_done(one: One, vms: List[VirtualMachine]):
     vmpool = one.vmpool.info(vm_state_filter=-1).VM
     
     for vm in vmpool:
         assert vm.STATE != 6
+
+
+
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+def test_start_id_filter(one: One, vms: List[VirtualMachine]):
+    created_vm_ids  = [vm._id for vm in vms]
+    filter_start_id = created_vm_ids[2]
+    vmpool          = one.vmpool.info(start_id=filter_start_id).VM
+
+    for vm in vmpool:
+        assert vm.ID >= filter_start_id
+    
+
+
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+def test_end_id_filter(one: One, vms: List[VirtualMachine]):
+    created_vm_ids  = [vm._id for vm in vms]
+    filter_end_id   = created_vm_ids[4]
+    vmpool          = one.vmpool.info(end_id=filter_end_id).VM
+
+    for vm in vmpool:
+        assert vm.ID <= filter_end_id
+
+
+
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+def test_range_id_filter(one: One, vms: List[VirtualMachine]):
+    created_vm_ids  = [vm._id for vm in vms]
+    filter_start_id = created_vm_ids[2]
+    filter_end_id   = created_vm_ids[4]
+    vmpool          = one.vmpool.info(start_id=filter_start_id, end_id=filter_end_id).VM
+
+    for vm in vmpool:
+        assert vm.ID >= filter_start_id and vm.ID <= filter_end_id
+
+
+
+
