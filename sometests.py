@@ -11,7 +11,7 @@ API_URI = "http://bufn1.brest.local:2633/RPC2"
 
 
 one = One(pyone.OneServer(API_URI, brestadm_auth))
+print(one.vm.info(26).TEMPLATE.get("SNAPSHOT"))
 
-
-
-one.vm.action("terminate-hard", 16)
+s = {}
+s.get("ss", [])

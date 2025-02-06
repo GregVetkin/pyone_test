@@ -88,4 +88,5 @@ class VirtualMachine:
     def update(self, template: str, append: bool = False) -> None:
         _update(self._function, self._id, template, append)
 
-        
+    def resume(self) -> None:
+        run_command(f"sudo {self._function} resume {self._id}")

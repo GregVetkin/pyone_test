@@ -2,7 +2,9 @@
 
 API_URI             = "http://bufn1.brest.local:2633/RPC2"
 RAFT_API_URI        = "http://10.0.70.20:2633/RPC2"
+
 ADMIN_NAME          = "brestadm"
+ADMIN_PASSWORD      = "Qwe!2345"
 
 BAD_SYMBOLS         = ['$', '#', '&', '\"', '\'', '>', '<', '/', '\\', '|']
 LOCK_LEVELS         = [1, 2, 3, 4]
