@@ -101,7 +101,7 @@ def test_delete_snapshot(one: One, vm_with_snapshots: VirtualMachine):
     target_snapshot         = random.choice(snapshots_before)
 
     _id = one.vm.snapshotdelete(vm_id, target_snapshot)
-    time.sleep(10)
+    time.sleep(5)
 
     snapshots_after         = [int(snapshot["SNAPSHOT_ID"]) for snapshot in one.vm.info(vm_id).TEMPLATE.get("SNAPSHOT", [])]
     snapshots_count_after   = len(snapshots_after)
