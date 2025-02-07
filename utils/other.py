@@ -33,7 +33,7 @@ def get_unic_name(prefix: str = "api_test_", postfix: str = ""):
     return f"{prefix}{time_ns()}{postfix}"
 
 
-def kinit(user: str, password: str, host: str = "HOSTNAME"):
+def kinit(user: str, password: str, host: str = "$HOSTNAME"):
     kinit_command = f"echo '{password}' | kinit"
     ssh_command   = f"sshpass -p '{password}' ssh {user}@{host} \"{kinit_command}\""
     run_command(ssh_command)

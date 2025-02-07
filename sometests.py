@@ -11,7 +11,7 @@ API_URI = "http://bufn1.brest.local:2633/RPC2"
 
 
 one = One(pyone.OneServer(API_URI, brestadm_auth))
-print(one.vm.info(26).TEMPLATE.get("SNAPSHOT"))
 
-s = {}
-s.get("ss", [])
+snapshots_before = [int(_id["SNAPSHOT_ID"]) for _id in one.vm.info(10).TEMPLATE.get("SNAPSHOT", [])]
+
+print(snapshots_before)
