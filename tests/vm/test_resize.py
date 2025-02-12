@@ -54,12 +54,22 @@ def test_vm_resize(one: One, vm: VirtualMachine):
 
 
 
+@pytest.mark.parametrize("check_capacity", [True, False])
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_vm_resize_check_over_host_capacity(one: One, vm: VirtualMachine):
-    with pytest.raises(OneException):
-        one.vm.resize(vm._id, "CPU=9999", True)
+def test_vm_resize_check_over_host_capacity(one: One, vm: VirtualMachine, check_capacity: bool):
+    vm_id = vm._id
+    target_cpu_count = 999
+    target_mem_count = 9999999999
 
-    with pytest.raises(OneException):
-        one.vm.resize(vm._id, "MEMORY=99999999", True)
+    if check_capacity:
+        with pytest.raises(OneException):
+            one.vm.resize(vm_id, f"CPU={target_cpu_count}", check_capacity)
 
-    
+        with pytest.raises(OneException):
+            one.vm.resize(vm_id, f"MEMORY={target_mem_count}", check_capacity)
+
+    else:
+        _id = one.vm.resize(vm_id, f"CPU={target_cpu_count}", check_capacity)
+        assert _id == vm_id
+        _id = one.vm.resize(vm_id, f"MEMORY={target_mem_count}", check_capacity)
+        assert _id == vm_id

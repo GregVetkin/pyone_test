@@ -13,6 +13,5 @@ API_URI = "http://bufn1.brest.local:2633/RPC2"
 one = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
-
-
-print(type(one.vm.info(0).HISTORY_RECORDS.HISTORY[-1].DS_ID))
+a = one.vm.resize(24, "CPU=9999", False)
+print(a)
