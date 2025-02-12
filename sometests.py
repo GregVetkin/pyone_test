@@ -13,14 +13,10 @@ API_URI = "http://bufn1.brest.local:2633/RPC2"
 one = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
-# vm_id = 15
+vm_id = 0
 
-
-# one.vm.snapshotdelete(vm_id, 0)
-# while one.vm.info(vm_id).LCM_STATE !=3:
-#     print("SNAPSHOT state, please await")
-
-# print("All done")
+snapshot_ids = [int(_id["SNAPSHOT_ID"]) for _id in one.vm.info(vm_id).TEMPLATE.get("SNAPSHOT", [])]
+print(snapshot_ids)
 
 
 

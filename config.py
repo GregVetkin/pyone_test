@@ -22,7 +22,7 @@ RAFT_CONFIG         = "/etc/one/one.d/raft.conf"
 # Virtual Machine states
 # https://wiki.astralinux.ru/brest/3.2/statusy-vm-v-pk-sv-brest-311346813.html
 
-class VmState:
+class VmStates:
     INIT            = 0
     PENDING         = 1
     HOLD            = 2
@@ -35,7 +35,7 @@ class VmState:
     CLONING         = 10
     CLONING_FAILURE = 11
 
-class VmLcmState:
+class VmLcmStates:
     LCM_INIT                        = 0
     PROLOG                          = 1
     BOOT                            = 2

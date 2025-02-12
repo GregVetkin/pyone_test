@@ -4,9 +4,9 @@ import time
 from pyone              import OneException
 from api                import One
 from utils              import get_unic_name, kinit, run_command
-from one_cli.image      import Image, create_image
-from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
-from config             import ADMIN_NAME, ADMIN_PASSWORD
+from one_cli.image      import Image
+from one_cli.vm         import VirtualMachine
+from config             import ADMIN_NAME, ADMIN_PASSWORD, VmLcmStates, VmStates
 
 
 
@@ -38,15 +38,13 @@ def vm_with_disk(one: One, image: Image):
     vm_id = one.vm.allocate(template)
     time.sleep(3)
 
-    while one.vm.info(vm_id).STATE != 8:
-        time.sleep(1)
+    while one.vm.info(vm_id).STATE != VmStates.POWEROFF: time.sleep(0.1)
 
     yield VirtualMachine(vm_id)
 
     run_command(f"sudo -u brestadm onevm terminate --hard {vm_id}")
 
-    while one.vm.info(vm_id).STATE != 6:
-        time.sleep(1)
+    while one.vm.info(vm_id).STATE != VmStates.DONE: time.sleep(0.1)
 
 
 
@@ -66,20 +64,20 @@ def test_vm_not_exist(one: One):
 def test_create_snapshot(one: One, vm_with_disk: VirtualMachine):
     vm_id            = vm_with_disk._id
     snapshot_name    = get_unic_name()
+    
     next_snapshot_id = 0
     snapshots_count  = 0
 
 
     kinit(ADMIN_NAME, ADMIN_PASSWORD, "bufn1")
     run_command(f"sudo -u brestadm onevm resume {vm_id}")
+    while one.vm.info(vm_id).LCM_STATE != VmLcmStates.RUNNING: time.sleep(0.1)
 
-    time.sleep(30)
-
-
-    assert not one.vm.info(vm_id).SNAPSHOTS
 
     _id = one.vm.snapshotcreate(vm_id, snapshot_name)
-    time.sleep(5)
+    assert one.vm.info(vm_id).LCM_STATE == VmLcmStates.HOTPLUG_SNAPSHOT
+
+    while one.vm.info(vm_id).LCM_STATE != VmLcmStates.RUNNING: time.sleep(0.1)
 
     assert _id == next_snapshot_id
     next_snapshot_id += 1
