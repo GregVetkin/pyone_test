@@ -1,5 +1,5 @@
 from api.one        import OneServer
-from pyone.bindings import VM_POOLSub
+from pyone.bindings import VM_POOLSub, MONITORING_DATASub
 
 
 
@@ -19,7 +19,7 @@ class OneVmpool:
         """Retrieves information for a specific set of VMs"""
         return self._one_vmpool.infoset(vm_set, extended)
     
-    def monitoring(self, filter_flag: int = -2, last_seconds: int = -1) -> str:
+    def monitoring(self, filter_flag: int = -2, last_seconds: int = -1) -> MONITORING_DATASub:
         """Returns all the virtual machine monitoring records"""
         return self._one_vmpool.monitoring(filter_flag, last_seconds)
     

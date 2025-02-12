@@ -1,5 +1,5 @@
 from api.one        import OneServer
-from pyone.bindings import VMSub
+from pyone.bindings import VMSub, MONITORING_DATASub
 
 
 
@@ -114,7 +114,7 @@ class OneVm:
         """Retrieves information for the virtual machine"""
         return self._one_vm.info(vm_id, decrypt_secrets)
 
-    def monitoring(self, vm_id: int) -> str:
+    def monitoring(self, vm_id: int) -> MONITORING_DATASub:
         """Returns the virtual machine monitoring records"""
         return self._one_vm.monitoring(vm_id)
     

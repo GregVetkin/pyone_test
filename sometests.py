@@ -13,16 +13,16 @@ API_URI = "http://bufn1.brest.local:2633/RPC2"
 one = One(pyone.OneServer(API_URI, brestadm_auth))
 
 
-vm_id = 0
 
-snapshot_ids = [int(_id["SNAPSHOT_ID"]) for _id in one.vm.info(vm_id).TEMPLATE.get("SNAPSHOT", [])]
-print(snapshot_ids)
-
+records = one.vmpool.monitoring().MONITORING
+print(len(records))
 
 
+counter = 0
 
-
-
-
-
+while True:
+    records = one.vmpool.monitoring().MONITORING
+    time.sleep(1)
+    counter += 1
+    print("Second ", counter, " | ", "Records: ", len(records))
 
