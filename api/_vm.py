@@ -94,9 +94,9 @@ class OneVm:
         """Deletes a virtual machine snapshot"""
         return self._one_vm.snapshotdelete(vm_id, snapshot_id)
     
-    def resize(self, vm_id: int, template: str, host_capacity_check: bool = True) -> int:
+    def resize(self, vm_id: int, template: str, enforce_host_capacity: bool = True) -> int:
         """Changes the capacity of the virtual machine"""
-        return self._one_vm.resize(vm_id, template, host_capacity_check)
+        return self._one_vm.resize(vm_id, template, enforce_host_capacity)
 
     def update(self, vm_id: int, template: str, replace: bool = False) -> int:
         """Replaces the user template contents"""

@@ -1,11 +1,13 @@
 import pytest
 import random
+import pyone
+import time
 
 from api                import One
 from one_cli.vm         import VirtualMachine, create_vm
-from config             import ADMIN_NAME
+from config             import ADMIN_NAME, API_URI
 from pyone              import OneException
-
+from utils              import run_command
 
 
 @pytest.fixture(scope="module")
@@ -46,7 +48,7 @@ def test_vm_resize(one: One, vm: VirtualMachine):
 
     _id = one.vm.resize(vm._id, template, False)
     assert _id == vm._id
-
+    time.sleep(3)
     vm_new_template = one.vm.info(vm._id).TEMPLATE
     assert float(vm_new_template["CPU"])    == new_cpu
     assert int(vm_new_template["VCPU"])     == new_vcpu
@@ -54,22 +56,29 @@ def test_vm_resize(one: One, vm: VirtualMachine):
 
 
 
-@pytest.mark.parametrize("check_capacity", [True, False])
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_vm_resize_check_over_host_capacity(one: One, vm: VirtualMachine, check_capacity: bool):
+
+@pytest.mark.parametrize("enforce", [True, False])
+def test_oneadmin_enforce_host_capacity(vm: VirtualMachine, enforce: bool):
+    oneadmin_auth = run_command("sudo oneuser login oneadmin")
+    one = One(pyone.OneServer(API_URI, oneadmin_auth))
+    time.sleep(3)
     vm_id = vm._id
     target_cpu_count = 999
     target_mem_count = 9999999999
 
-    if check_capacity:
-        with pytest.raises(OneException):
-            one.vm.resize(vm_id, f"CPU={target_cpu_count}", check_capacity)
-
-        with pytest.raises(OneException):
-            one.vm.resize(vm_id, f"MEMORY={target_mem_count}", check_capacity)
+    if enforce:
+        _id = one.vm.resize(vm_id, f"CPU={target_cpu_count}", enforce)
+        assert _id == vm_id
+        time.sleep(1)
+        _id = one.vm.resize(vm_id, f"MEMORY={target_mem_count}", enforce)
+        assert _id == vm_id
+        time.sleep(1)
+        vm_new_template = one.vm.info(vm_id).TEMPLATE
+        assert float(vm_new_template["CPU"]) == target_cpu_count
+        assert int(vm_new_template["MEMORY"])== target_mem_count
 
     else:
-        _id = one.vm.resize(vm_id, f"CPU={target_cpu_count}", check_capacity)
-        assert _id == vm_id
-        _id = one.vm.resize(vm_id, f"MEMORY={target_mem_count}", check_capacity)
-        assert _id == vm_id
+        with pytest.raises(OneException):
+            one.vm.resize(vm_id, f"CPU={target_cpu_count}", enforce)
+        with pytest.raises(OneException):
+            one.vm.resize(vm_id, f"MEMORY={target_mem_count}", enforce)
