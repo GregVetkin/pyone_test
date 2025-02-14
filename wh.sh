@@ -10,7 +10,7 @@ function choose_parent_method_window() {
     done
 
     local PARENT_METHOD=$(whiptail --title  "XML-RPC TEST" --radiolist \
-        "Choose one- parent method" 30 50 20 \
+        "Choose one- parent method" 0 0 0 \
         "${whiptail_args[@]}" 3>&1 1>&2 2>&3)
         
         if [[ -n "$PARENT_METHOD" ]];  then
@@ -32,12 +32,11 @@ function choose_method_window() {
     done
 
     local METHOD=$(whiptail --title  "XML-RPC TEST" --radiolist \
-        "Choose one.$PARENT_METHOD method" 30 50 20 \
+        "Choose one.$PARENT_METHOD method" 0 0 0 \
         "${whiptail_args[@]}" 3>&1 1>&2 2>&3)
         
         if [[ -n "$METHOD" ]];  then
             python3 ~/brest/pyone_test/test.py one.$PARENT_METHOD.$METHOD
-            choose_method_window $PARENT_METHOD
         else
             choose_parent_method_window
         fi
