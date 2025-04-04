@@ -1,4 +1,5 @@
 import pytest
+import base64
 
 from pyone              import OneServer
 from api                import One
@@ -13,7 +14,7 @@ from utils.opennebula   import _get_federation_mode, _change_federation_mode
 @pytest.fixture
 def one(request):
     username  = request.param
-    server    = OneServer(API_URI, get_user_auth(username))
+    server    = OneServer(API_URI, base64.b64encode(get_user_auth(username).encode()).decode())
     one       = One(server)
     
     yield one

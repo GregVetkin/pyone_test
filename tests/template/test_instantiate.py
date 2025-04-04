@@ -183,7 +183,7 @@ def test_create_as_persistent_vm(one: One, vmtemplate_with_images: Template, pur
         disk_info = disk.info()
         assert image_exist(disk._id)
         assert vm_id in disk_info.VMS
-        assert disk_info.STATE == 2
+        assert disk_info.STATE == 8 # pers PERS_USED
         assert disk_info.PERSISTENT
         
     

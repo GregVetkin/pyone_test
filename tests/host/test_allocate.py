@@ -44,7 +44,7 @@ def test_allocate_host_kvm_kvm(one: One):
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_create_host_with_certain_cluster(one: One, cluster: Cluster):
-    _id  = one.host.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs", cluster_id=cluster._id)
+    _id  = one.host.allocate(hostname=get_unic_name(), cluster_id=cluster._id)
     host = Host(_id)
     assert host_exist(_id)
     assert cluster._id == host.info().CLUSTER_ID

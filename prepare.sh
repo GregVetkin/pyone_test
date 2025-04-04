@@ -42,21 +42,13 @@ function install_python_packages_in_venv_with_pip() {
 
 
 function add_base_repository() {
-    local BUILD_VERSION=$(cat /etc/astra/build_version)
-
-    local MAJOR=$(echo "${BUILD_VERSION}" | cut -d'.' -f1)
-    local MINOR=$(echo "${BUILD_VERSION}" | cut -d'.' -f2)
-    local PATCH=$(echo "${BUILD_VERSION}" | cut -d'.' -f3)
-
-    local REPO_DATA="deb ${REPO}/${MAJOR}.${MINOR}/${MAJOR}.${MINOR}.${PATCH}/_REPO/base-repository ${MAJOR}.${MINOR}_x86-64 main contrib non-free"
-
-    echo "${REPO_DATA}" | sudo tee -a /etc/apt/sources.list
+    local UPDATE_REPO=$(sudo cat /etc/apt/sources.list | grep update-repository)
+    echo "${UPDATE_REPO/update/base}" | sudo tee -a /etc/apt/sources.list
     sudo apt update
 }
 
 
 
-REPO="https://releases.devos.astralinux.ru/stable/"
 
 DIR=$(dirname "$(realpath "$0")")
 PACKAGE="python3-venv"
