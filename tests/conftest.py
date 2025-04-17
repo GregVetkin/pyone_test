@@ -9,12 +9,12 @@ from utils.opennebula   import _get_federation_mode, _change_federation_mode
 
 
 
-
+#base64.b64encode(get_user_auth(username).encode()).decode()
 
 @pytest.fixture
 def one(request):
     username  = request.param
-    server    = OneServer(API_URI, base64.b64encode(get_user_auth(username).encode()).decode())
+    server    = OneServer(API_URI, get_user_auth(username))
     one       = One(server)
     
     yield one
