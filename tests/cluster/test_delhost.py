@@ -38,9 +38,10 @@ def cluster_with_host(host):
     yield cluster
     try:
         cluster.delhost(host._id)
+        cluster.delete()
     except Exception:
         pass
-    cluster.delete()
+    
 
 
 

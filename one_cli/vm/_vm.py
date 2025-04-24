@@ -2,6 +2,7 @@ from utils                  import run_command
 from time                   import sleep   
 from one_cli._base_commands import _info, _exist, _create, _info, _lock, _unlock, _update
 from one_cli.vm._common     import VirtualMachineInfo, parse_vm_info_from_xml
+from config                 import BREST_VERSION
 
 
 FUNCTION_NAME = "onevm"
@@ -53,8 +54,8 @@ class VirtualMachine:
 
 
     def backup(self, datastore_id: int = -1, backup_name: str = "") -> None:
-        backup_name     = f"-n {backup_name}" if backup_name else ""
-        datastore_id    = f"-d {datastore_id}" if datastore_id != -1 else ""
+        backup_name         = f"-n {backup_name}" if backup_name else ""
+        datastore_id        = f"-d {datastore_id}" if datastore_id != -1 else ""
         run_command(f"sudo {self._function} backup {self._id} {datastore_id} {backup_name}")
 
 

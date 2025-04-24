@@ -2,11 +2,12 @@ import pytest
 import xmlrpc.client
 import xml.etree.ElementTree as xmlTree
 import random
+import base64
 
 from api                    import One
 from utils                  import get_unic_name, get_user_auth
 from one_cli.group          import Group, create_group
-from config                 import ADMIN_NAME, API_URI
+from config                 import ADMIN_NAME, API_URI, BREST_VERSION
 from one_cli.group._common  import ImageQuotaInfo, NetworkQuotaInfo, DatastoreQuotaInfo, DefaultGroupQuotasInfo, parse_default_group_quotas
 
 
@@ -43,6 +44,8 @@ def test_update_default_quotas(one: One, group: Group):
     # pyone плохо работает с one.groupquota (возвращает обрубок xml), поэтому проверка через прямой xmlrpc запрос
     server    = xmlrpc.client.ServerProxy(API_URI)
     session   = get_user_auth(ADMIN_NAME)
+    if BREST_VERSION == 4:
+        session = base64.b64encode(session.encode()).decode()
     response  = server.one.groupquota.update(session, default_quota_template)
 
     assert response[0], "Вызов метода one.groupquota.update завершился ошибкой"

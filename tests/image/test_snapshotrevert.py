@@ -59,10 +59,11 @@ def image_with_snapshots(image_datastore: Datastore, system_datastore: Datastore
         NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
+        PERSISTENT = YES
     """
     image_id = create_image(image_datastore._id, image_template, True)
     image    = Image(image_id)
-    image.persistent()
+    # image.persistent()
     vm_tempalte = f"""
         NAME    = {get_unic_name()}
         CPU     = 1

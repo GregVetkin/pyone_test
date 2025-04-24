@@ -43,9 +43,11 @@ def cluster_with_datastore(datastore):
     cluster.adddatastore(datastore._id)
     yield cluster
 
-    if cluster_exist(cluster_id):
+    try:
         cluster.deldatastore(datastore._id)
         cluster.delete()
+    except Exception:
+        pass
 
 
 @pytest.fixture
@@ -64,9 +66,11 @@ def cluster_with_host(host):
     cluster.addhost(host._id)
     yield cluster
 
-    if cluster_exist(cluster_id):
+    try:
         cluster.delhost(host._id)
         cluster.delete()
+    except Exception:
+        pass
 
 
 
@@ -89,10 +93,11 @@ def cluster_with_vnet(vnet):
     cluster    = Cluster(cluster_id)
     cluster.addvnet(vnet._id)
     yield cluster
-    if cluster_exist(cluster_id):
+    try:
         cluster.delvnet(vnet._id)
         cluster.delete()
-
+    except Exception:
+        pass
 
 
 

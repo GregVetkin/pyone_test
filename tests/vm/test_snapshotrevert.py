@@ -101,3 +101,5 @@ def test_revert_snapshot(one: One, vm_with_snapshots: VirtualMachine):
     assert _id == vm_id
     while one.vm.info(vm_id).LCM_STATE != VmLcmStates.RUNNING: time.sleep(0.1)
 
+    assert not one.vm.info(vm_id).USER_TEMPLATE.get("ERROR")
+

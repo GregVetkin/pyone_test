@@ -1,17 +1,26 @@
 import os
 from utils          import run_command
+import subprocess
+from config import BREST_VERSION
 
 
 
 def _create(function_name: str, template: str) -> int:
-    template_file = "/tmp/test_template_file"
-    with open(template_file, "w") as file:
-        file.write(template)
+    if BREST_VERSION < 4 or function_name in ("onevm", "onezone", "onevntemplate", "onesecgroup", "onehost"):
+        template_file = "/tmp/test_template_file"
+        with open(template_file, "w") as file:
+            file.write(template)
+        _id = int(run_command(f"sudo {function_name} create {template_file}" + " | awk '{print $2}'"))
+        os.remove(template_file)
+        return _id
 
-    #run_command(f"sudo cat <<EOF > {file}\n{template}\nEOF")
-    _id = int(run_command(f"sudo {function_name} create {template_file}" + " | awk '{print $2}'"))
-    os.remove(template_file)
-    return _id
+    output =  subprocess.run(f"sudo {function_name} create",
+                            input=template,
+                            stdout=subprocess.PIPE, 
+                            text=True, 
+                            shell=True)
+    output =  output.stdout.strip().split()
+    return int(output[-1])
 
 
 def _exist_in_show(function_name: str, object_id: int) -> bool:

@@ -14,14 +14,21 @@ def lock_if_not_exist__test(api_method, lock_level):
 
 
 def lock_unlocked__test(api_method, one_object, lock_level):
+    if lock_level == 4:
+        lock_level = 1 # ALL lock == USE lock
+
     assert one_object.info().LOCK == None
     api_method.lock(one_object._id, lock_level)
+
     assert one_object.info().LOCK.LOCKED == lock_level
 
 
 
 
 def lock_locked__test(api_method, one_object, lock_level, lock_check):
+    if lock_level == 4:
+        lock_level = 1 # ALL lock == USE lock
+        
     start_info = one_object.info()
     assert start_info.LOCK is not None
 

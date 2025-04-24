@@ -1,4 +1,5 @@
-
+ALSE_VERSION        = 1.8
+BREST_VERSION       = 4
 
 API_URI             = "http://bufn1.brest.local:2633/RPC2"
 RAFT_API_URI        = "http://10.0.70.20:2633/RPC2"

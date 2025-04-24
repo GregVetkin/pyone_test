@@ -58,11 +58,14 @@ def venv_exist() -> bool:
     return os.path.isdir(os.path.join(PROJECT_DIR, '.venv'))
 
 
+def prepare_venv() -> None:
+    prepare_script_path = os.path.join(PROJECT_DIR, "prepare.sh")
+    subprocess.run(["bash", prepare_script_path], stdin=None, stdout=None)
+
 
 if __name__ == "__main__":
     if not venv_exist():
-        prepare_script_path = os.path.join(PROJECT_DIR, "prepare.sh")
-        run_command(f"bash {prepare_script_path}")
+        prepare_venv()
 
     if len(sys.argv) > 1:
         method = sys.argv[1]

@@ -36,7 +36,7 @@ function choose_method_window() {
         "${whiptail_args[@]}" 3>&1 1>&2 2>&3)
         
         if [[ -n "$METHOD" ]];  then
-            python3 ~/brest/pyone_test/test.py one.$PARENT_METHOD.$METHOD
+            python3 ~/brest/api/pyone/test.py one.$PARENT_METHOD.$METHOD
         else
             choose_parent_method_window
         fi
