@@ -5,11 +5,11 @@ from time            import sleep
 from api             import One
 from utils           import get_unic_name
 from one_cli.vm      import VirtualMachine
-from config          import ADMIN_NAME, VmStates, VmLcmStates
+from config          import ADMIN_NAME, VmStates, VmLcmStates, ALSE_VERSION, ADMIN_PASSWORD
+from utils           import run_command
 
 
-
-@pytest.fixture()
+@pytest.fixture
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def vm(one: One):
     vm_id = one.vm.allocate(f"NAME={get_unic_name()}\nCPU=1\nMEMORY=1\n", False)
@@ -22,7 +22,7 @@ def vm(one: One):
 
 
 
-@pytest.fixture()
+@pytest.fixture
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def large_vm(one: One):
     vm_id   = one.vm.allocate(f"NAME={get_unic_name()}\nCPU=999\nMEMORY=999999\n", True)
@@ -37,7 +37,17 @@ def large_vm(one: One):
 
 
 
+@pytest.fixture
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+def running_vm(one: One, vm: VirtualMachine):
+    vm_id = vm._id
 
+    if ALSE_VERSION > 1.7:
+        admin_name = ADMIN_NAME + "@brest.local"
+
+    run_command(f"sshpass -p '{ADMIN_PASSWORD}' ssh {admin_name}@$HOSTNAME \"echo 'Qwe!2345' | kinit {ADMIN_NAME} ; onevm resume {vm._id}\"")
+    while one.vm.info(vm_id).LCM_STATE != VmLcmStates.RUNNING: sleep(0.5)
+    yield VirtualMachine(vm._id)
 
 
 # =================================================================================================
@@ -151,3 +161,15 @@ def test_host_capacity_check(one: One, large_vm: VirtualMachine, check_capacity:
         assert one.vm.info(vm_id).HISTORY_RECORDS.HISTORY[-1].HID == target_host_id
 
 
+
+
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+def test_live_migration(one: One, running_vm: VirtualMachine):
+    vm_id           = running_vm._id
+    current_host_id = next(host.ID for host in one.hostpool.info().HOST if vm_id in host.VMS.ID)
+    target_host_id  = random.choice([host.ID for host in one.hostpool.info().HOST if current_host_id != host.ID])
+
+    _id = one.vm.migrate(vm_id, target_host_id, live_migration=True, migration_type=0)
+    assert _id == vm_id
+    assert one.vm.info(vm_id).HISTORY_RECORDS.HISTORY[-1].HID == target_host_id
+    sleep(20)
