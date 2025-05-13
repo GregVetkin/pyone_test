@@ -38,6 +38,21 @@ def file_datastore():
     datastore.delete()
 
 
+@pytest.fixture
+def backup_datastore():
+    template = f"""
+        NAME={get_unic_name()}
+        DS_MAD=rsync
+        RSYNC_HOST=10.0.70.21
+        RSYNC_USER=oneadmin
+        TYPE=BACKUP_DS
+    """
+    datastore_id = create_datastore(template)
+    datastore    = Datastore(datastore_id)
+    yield datastore
+    datastore.delete()
+
+
 @pytest.fixture(scope="module")
 def system_datastore():
     template = f"""
