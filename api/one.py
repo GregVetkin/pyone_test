@@ -20,41 +20,48 @@ from api._userpool          import OneUserpool
 from api._userquota         import OneUserquota
 from api._vm                import OneVm
 from api._vmpool            import OneVmpool
+from api._vn                import OneVn
 
+import base64
+from utils.connection_data  import ApiConnectionData
 
 
 class One():
-    def __init__(self, one_server: OneServer) -> None:
-        self._one_api = one_server
+    def __init__(self, api_connection_data: ApiConnectionData) -> None:
+        uri     = api_connection_data.uri
+        session = api_connection_data.session
+        self._server = OneServer(uri, session)
 
-        self.system         = OneSystem(self._one_api)
 
-        self.image          = OneImage(self._one_api)
-        self.imagepool      = OneImagepool(self._one_api)
+        self.system         = OneSystem(self._server)
 
-        self.datastore      = OneDatastore(self._one_api)
-        self.datastorepool  = OneDatastorepool(self._one_api)
+        self.image          = OneImage(self._server)
+        self.imagepool      = OneImagepool(self._server)
 
-        self.host           = OneHost(self._one_api)
-        self.hostpool       = OneHostpool(self._one_api)
+        self.datastore      = OneDatastore(self._server)
+        self.datastorepool  = OneDatastorepool(self._server)
 
-        self.template       = OneTemplate(self._one_api)
-        self.templatepool   = OneTemplatepool(self._one_api)
+        self.host           = OneHost(self._server)
+        self.hostpool       = OneHostpool(self._server)
 
-        self.zone           = OneZone(self._one_api)
-        self.zonepool       = OneZonepool(self._one_api)
+        self.template       = OneTemplate(self._server)
+        self.templatepool   = OneTemplatepool(self._server)
 
-        self.cluster        = OneCluster(self._one_api)
-        self.clusterpool    = OneClusterpool(self._one_api)
+        self.zone           = OneZone(self._server)
+        self.zonepool       = OneZonepool(self._server)
 
-        self.group          = OneGroup(self._one_api)
-        self.grouppool      = OneGrouppool(self._one_api)
-        self.groupquota     = OneGroupquota(self._one_api)
+        self.cluster        = OneCluster(self._server)
+        self.clusterpool    = OneClusterpool(self._server)
 
-        self.user           = OneUser(self._one_api)
-        self.userpool       = OneUserpool(self._one_api)
-        self.userquota      = OneUserquota(self._one_api)
+        self.group          = OneGroup(self._server)
+        self.grouppool      = OneGrouppool(self._server)
+        self.groupquota     = OneGroupquota(self._server)
 
-        self.vm             = OneVm(self._one_api)
-        self.vmpool         = OneVmpool(self._one_api)
+        self.user           = OneUser(self._server)
+        self.userpool       = OneUserpool(self._server)
+        self.userquota      = OneUserquota(self._server)
+
+        self.vm             = OneVm(self._server)
+        self.vmpool         = OneVmpool(self._server)
         
+        self.vn             = OneVn(self._server)

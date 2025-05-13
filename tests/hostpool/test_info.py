@@ -1,30 +1,21 @@
 import pytest
-
-from api                import One
-from utils              import get_unic_name
-from one_cli.host       import Host, create_host
-from config             import ADMIN_NAME
-from typing             import List
-
-
-
+from api            import One
+from utils.other    import get_unic_name
 
 
 
 @pytest.fixture
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def hosts(one: One):
-    host_list = []
+def host_ids(one: One):
+    host_ids_list = []
     for _ in range(5):
-        host_name = f"{get_unic_name()}"
+        host_name = get_unic_name()
         host_id   = one.host.allocate(host_name)
-        host      = Host(host_id)
-        host_list.append(host)
+        host_ids_list.append(host_id)
 
-    yield host_list
+    yield host_ids_list
 
-    for host in host_list:
-        host.delete()
+    for host_id in host_ids_list:
+        one.host.delete(host_id)
 
 
 
@@ -35,10 +26,7 @@ def hosts(one: One):
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_show_all_hosts(one: One, hosts: List[Host]):
-    host_ids     = [host.info().ID for host in hosts]
-    hostpool     = one.hostpool.info().HOST
-    hostpool_ids = [host.ID for host in hostpool]
+def test_show_all_hosts(one: One, host_ids):
+    hostpool_ids = [host.ID for host in one.hostpool.info().HOST]
     assert set(host_ids).issubset(hostpool_ids)
 

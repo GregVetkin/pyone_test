@@ -2,40 +2,21 @@ import os
 import sys
 import subprocess
 
-from tests              import TestData
-from _tests             import TESTS, PROJECT_DIR
-from utils.printing     import pretty_print_test_result
-from utils              import run_command
+
+from utils.printing  import pretty_print_test_result
+from utils.commands  import run_command
+
+
+from config.base    import VENV_DIRECTORY_PATH, PREPARE_SCRIPT_PATH, VENV_PYTHON_3_PATH, TESTS_DIRECTORY_PATH
 
 
 
 
-def dfs_tests(test_tree, dotted_key):
-    keys = dotted_key.split(".")
-    node = test_tree
-
-    for key in keys:
-        if key in node:
-             node = node[key]
-        else:
-            print("Method not found")
-            return
-    
-
-    def _dfs(node, current_path):
-        if isinstance(node, dict):
-            for key, value in node.items():
-                yield from _dfs(value, current_path + [key])
-        else:
-            yield node
-
-    yield from _dfs(node, keys)
 
 
 
-
-def run_test(test: TestData) -> None:
-    command = f"{PROJECT_DIR}/.venv/bin/python3 -m pytest {test.test_file_path}"
+def run_test(test_path):
+    command = f"{VENV_PYTHON_3_PATH} -m pytest \"{test_path}\""
 
     result = subprocess.run(
         command,
@@ -45,32 +26,49 @@ def run_test(test: TestData) -> None:
     )
 
     if result.returncode == 0:
-        test_passed = True
+        test_is_passed = True
     else:
-        test_passed = False
-        print(result.stdout.decode())
+        test_is_passed = False
     
-    pretty_print_test_result(test.xml_rpc_method, test_passed)
+    return (test_is_passed, result.stdout.decode())
         
 
 
-def venv_exist() -> bool:
-    return os.path.isdir(os.path.join(PROJECT_DIR, '.venv'))
 
-
-def prepare_venv() -> None:
-    prepare_script_path = os.path.join(PROJECT_DIR, "prepare.sh")
-    subprocess.run(["bash", prepare_script_path], stdin=None, stdout=None)
 
 
 if __name__ == "__main__":
-    if not venv_exist():
-        prepare_venv()
 
-    if len(sys.argv) > 1:
-        method = sys.argv[1]
-    else:
-        method = "one"
+    if not os.path.isdir(VENV_DIRECTORY_PATH):
+        run_command(f"bash \"{PREPARE_SCRIPT_PATH}\"")
 
-    for test in dfs_tests(TESTS, method):
-        run_test(test)
+    xmlrpc_method = "one"
+    test_function = None
+
+    if len(sys.argv) == 3:
+        xmlrpc_method = sys.argv[1]
+        test_function = sys.argv[2]
+
+    elif len(sys.argv) == 2:
+        xmlrpc_method = sys.argv[1]
+
+
+    tests_start_dir = xmlrpc_method.split(".")
+    tests_start_dir[0] = TESTS_DIRECTORY_PATH
+
+    if len(tests_start_dir) == 3:
+        tests_start_dir[2] = f"test_{tests_start_dir[2]}.py"
+
+    test_to_run = "/".join(tests_start_dir)
+
+    if test_function:
+        test_to_run = test_to_run + f"::{test_function}"
+
+    test_is_passed, test_output = run_test(test_to_run)
+
+    pretty_print_test_result(xmlrpc_method, test_is_passed)
+
+    if not test_is_passed:
+        print(test_output)
+
+

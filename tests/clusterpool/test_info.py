@@ -1,28 +1,23 @@
 import pytest
-
-from api                import One
-from utils              import get_unic_name
-from one_cli.cluster    import Cluster, create_cluster
-from config             import ADMIN_NAME
-from typing             import List
-
-
+import random
+from api            import One
+from utils.other    import get_unic_name
 
 
 
 
 @pytest.fixture
-def clusters():
-    cluster_list = []
-    for _ in range(5):
-        cluster_id = create_cluster(get_unic_name())
-        cluster    = Cluster(cluster_id)
-        cluster_list.append(cluster)
+def cluster_ids(one: One):
+    cluster_ids_list = []
+    for _ in range(random.randint(3, 10)):
+        cluster_name = get_unic_name()
+        cluster_id   = one.cluster.allocate(cluster_name)
+        cluster_ids_list.append(cluster_id)
 
-    yield cluster_list
+    yield cluster_ids_list
 
-    for cluster in cluster_list:
-        cluster.delete()
+    for cluster_id in cluster_ids_list:
+        one.cluster.delete(cluster_id)
 
 
 
@@ -33,9 +28,8 @@ def clusters():
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_show_all_clusters(one: One, clusters: List[Cluster]):
-    cluster_ids     = [cluster._id for cluster in clusters]
+
+def test_show_all_clusters(one: One, cluster_ids):
     clusterpool     = one.clusterpool.info().CLUSTER
     clusterpool_ids = [cluster.ID for cluster in clusterpool]
     

@@ -1,12 +1,8 @@
 import pytest
 
-from api                import One
-from pyone              import OneException
-from utils              import get_unic_name
-from one_cli.cluster    import Cluster, cluster_exist
-from config             import ADMIN_NAME
-
-
+from api            import One
+from pyone          import OneException
+from utils.other    import get_unic_name
 
 
 
@@ -17,23 +13,25 @@ from config             import ADMIN_NAME
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_cluster_name_is_taken(one: One):
+
+def test_name_is_taken(one: One):
+    taken_name = one.clusterpool.info().CLUSTER[0].NAME
     with pytest.raises(OneException):
-        one.cluster.allocate("default")
+        one.cluster.allocate(taken_name)
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_cluster_name_is_empty(one: One):
+
+def test_name_is_empty(one: One):
     with pytest.raises(OneException):
         one.cluster.allocate("")
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_create_cluster(one: One):
-    _id = one.cluster.allocate(get_unic_name())
-    assert cluster_exist(_id)
-    Cluster(_id).delete()
+    cluster_name = get_unic_name()
+    cluster_id   = one.cluster.allocate(cluster_name)
+    assert cluster_name == one.cluster.info(cluster_id).NAME
+    one.cluster.delete(cluster_id)
 

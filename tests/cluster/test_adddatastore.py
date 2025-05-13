@@ -1,46 +1,21 @@
 import pytest
 
-from api                import One
-from pyone              import OneException
-from utils              import get_unic_name
-from one_cli.cluster    import Cluster, create_cluster, cluster_exist
-from one_cli.datastore  import Datastore, create_datastore
-from config             import ADMIN_NAME
+from api    import One
+from pyone  import OneNoExistsException
 
 
 
 
 @pytest.fixture
-def datastore():
-    datastore_template = f"""
-        NAME   = {get_unic_name()}
-        TYPE   = SYSTEM_DS
-        TM_MAD = ssh
-    """
-    datastore_id = create_datastore(datastore_template)
-    datastore    = Datastore(datastore_id)
-    yield datastore
-    datastore.delete()
+def cluster_with_datastore(one: One, dummy_datastore, dummy_cluster):
+    one.cluster.adddatastore(dummy_cluster, dummy_datastore)
+    yield dummy_cluster
+    try:
+        one.cluster.deldatastore(dummy_cluster, dummy_datastore)
+    except OneNoExistsException:
+        pass
 
 
-
-@pytest.fixture
-def cluster():
-    cluster_id = create_cluster(get_unic_name())
-    cluster    = Cluster(cluster_id)
-    yield cluster
-    cluster.delete()
-
-
-
-@pytest.fixture
-def cluster_with_datastore(datastore):
-    cluster_id = create_cluster(get_unic_name())
-    cluster    = Cluster(cluster_id)
-    cluster.adddatastore(datastore._id)
-    yield cluster
-    cluster.deldatastore(datastore._id)
-    cluster.delete()
 
 
 
@@ -49,35 +24,34 @@ def cluster_with_datastore(datastore):
 # =================================================================================================
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_cluster_not_exist(one: One, datastore: Datastore):
-    with pytest.raises(OneException):
-        one.cluster.adddatastore(999999, datastore._id)
+
+def test_cluster_not_exist(one: One, dummy_datastore):
+    with pytest.raises(OneNoExistsException):
+        one.cluster.adddatastore(999999, dummy_datastore)
    
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_datastore_not_exist(one: One, cluster: Cluster):
-    with pytest.raises(OneException):
-        one.cluster.adddatastore(cluster._id, 999999)
+def test_datastore_not_exist(one: One, dummy_cluster):
+    with pytest.raises(OneNoExistsException):
+        one.cluster.adddatastore(dummy_cluster, 999999)
    
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_add_datastore_to_cluster(one: One, cluster: Cluster, datastore: Datastore):
-    assert datastore._id not in cluster.info().DATASTORES
-    _id = one.cluster.adddatastore(cluster._id, datastore._id)
-    assert _id == cluster._id
-    assert datastore._id in cluster.info().DATASTORES
+def test_add_datastore_to_cluster(one: One, dummy_cluster, dummy_datastore):
+    cluster_id, datastore_id = dummy_cluster, dummy_datastore
+    assert datastore_id not in one.cluster.info(cluster_id).DATASTORES.ID
+    result = one.cluster.adddatastore(cluster_id, datastore_id)
+    assert result == cluster_id
+    assert datastore_id in one.cluster.info(cluster_id).DATASTORES.ID
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_add_added_datastore_to_cluster(one: One, cluster_with_datastore: Cluster):
-    old_cluster_datastores = cluster_with_datastore.info().DATASTORES
-    assert old_cluster_datastores
-    added_datastore_id = old_cluster_datastores[0]
 
-    _id = one.cluster.adddatastore(cluster_with_datastore._id, added_datastore_id)
-    assert _id == cluster_with_datastore._id
+def test_add_already_added_datastore(one: One, cluster_with_datastore):
+    cluster_id                  = cluster_with_datastore
+    init_cluster_datastore_ids  = one.cluster.info(cluster_id).DATASTORES.ID
+    added_datastore_id          = init_cluster_datastore_ids[-1]
 
-    new_cluster_datastores = cluster_with_datastore.info().DATASTORES
-    assert added_datastore_id in new_cluster_datastores
-    assert len(old_cluster_datastores) == len(new_cluster_datastores)
+    result = one.cluster.adddatastore(cluster_id, added_datastore_id)
+    assert result == cluster_id
+
+    new_cluster_datastore_ids = one.cluster.info(cluster_id).DATASTORES.ID
+    assert added_datastore_id in new_cluster_datastore_ids
+    assert len(init_cluster_datastore_ids) == len(new_cluster_datastore_ids)

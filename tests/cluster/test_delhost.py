@@ -1,47 +1,20 @@
 import pytest
-
-from api                import One
-from pyone              import OneException
-from utils              import get_unic_name
-from one_cli.cluster    import Cluster, create_cluster, cluster_exist
-from one_cli.host       import Host, create_host
-from config             import ADMIN_NAME
-
+import random
+from api    import One
+from pyone  import OneNoExistsException
 
 
 
 @pytest.fixture
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def host(one: One):
-    host_id = one.host.allocate(hostname=get_unic_name())
-    host    = Host(host_id)
-    yield host
-    host.delete()
-
-
-
-@pytest.fixture
-def cluster():
-    cluster_id = create_cluster(get_unic_name())
-    cluster    = Cluster(cluster_id)
-    yield cluster
-    cluster.delete()
-
-
-
-
-@pytest.fixture
-def cluster_with_host(host):
-    cluster_id = create_cluster(get_unic_name())
-    cluster    = Cluster(cluster_id)
-    cluster.addhost(host._id)
-    yield cluster
+def cluster_with_host(one: One, dummy_cluster, dummy_host):
+    one.cluster.addhost(dummy_cluster, dummy_host)
+    yield dummy_cluster
     try:
-        cluster.delhost(host._id)
-        cluster.delete()
-    except Exception:
+        one.cluster.delhost(dummy_cluster, dummy_host)
+    except OneNoExistsException:
         pass
     
+
 
 
 
@@ -51,27 +24,29 @@ def cluster_with_host(host):
 # =================================================================================================
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_cluster_not_exist(one: One, host: Host):
-    with pytest.raises(OneException):
-        one.cluster.delhost(999999, host._id)
+
+def test_cluster_not_exist(one: One, dummy_host):
+    host_id = dummy_host
+    with pytest.raises(OneNoExistsException):
+        one.cluster.delhost(999999, host_id)
    
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_host_not_exist(one: One, cluster: Cluster):
-    with pytest.raises(OneException):
-        one.cluster.delhost(cluster._id, 999999)
+
+def test_host_not_exist(one: One, dummy_cluster):
+    cluster_id = dummy_cluster
+    with pytest.raises(OneNoExistsException):
+        one.cluster.delhost(cluster_id, 999999)
    
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_remove_host_from_cluster(one: One, cluster_with_host: Cluster):
-    old_cluster_hosts = cluster_with_host.info().HOSTS
-    assert old_cluster_hosts
-    host_id = old_cluster_hosts[0]
 
-    _id = one.cluster.delhost(cluster_with_host._id, host_id)
-    assert _id == cluster_with_host._id
+def test_remove_host_from_cluster(one: One, cluster_with_host):
+    cluster_id              = cluster_with_host
+    init_cluster_host_ids   = one.cluster.info(cluster_id).HOSTS.ID
+    target_host_id          = random.choice(init_cluster_host_ids)
 
-    new_cluster_hosts = cluster_with_host.info().HOSTS
-    assert host_id not in new_cluster_hosts
-    assert len(new_cluster_hosts) == len(old_cluster_hosts) - 1
+    result = one.cluster.delhost(cluster_id, target_host_id)
+    assert result == cluster_id
+
+    new_cluster_host_ids = one.cluster.info(cluster_id).HOSTS.ID
+    assert target_host_id not in new_cluster_host_ids
+    assert len(new_cluster_host_ids) == len(init_cluster_host_ids) - 1

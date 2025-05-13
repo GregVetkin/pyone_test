@@ -1,5 +1,5 @@
 from api.one        import OneServer
-from pyone.bindings import VMSub, MONITORING_DATASub
+from pyone.bindings import VMSub
 
 
 
@@ -7,9 +7,9 @@ class OneVm:
     def __init__(self, one_api: OneServer) -> None:
         self._one_vm = one_api.vm
 
-    def allocate(self, tempalte: str, hold_vm: bool = False) -> int:
+    def allocate(self, template: str, hold_vm: bool = False) -> int:
         """Allocates a new virtual machine in OpenNebula"""
-        return self._one_vm.allocate(tempalte, hold_vm)
+        return self._one_vm.allocate(template, hold_vm)
     
     def deploy(self, vm_id: int, host_id: int, host_capacity_check: bool = True, datastore_id: int = -1, network_scheduling_template: str = "") -> int:
         """Initiates the instance of the given vmid on the target host"""
@@ -94,9 +94,9 @@ class OneVm:
         """Deletes a virtual machine snapshot"""
         return self._one_vm.snapshotdelete(vm_id, snapshot_id)
     
-    def resize(self, vm_id: int, template: str, enforce_host_capacity: bool = True) -> int:
+    def resize(self, vm_id: int, template: str, host_capacity_check: bool = True) -> int:
         """Changes the capacity of the virtual machine"""
-        return self._one_vm.resize(vm_id, template, enforce_host_capacity)
+        return self._one_vm.resize(vm_id, template, host_capacity_check)
 
     def update(self, vm_id: int, template: str, replace: bool = False) -> int:
         """Replaces the user template contents"""
@@ -114,7 +114,7 @@ class OneVm:
         """Retrieves information for the virtual machine"""
         return self._one_vm.info(vm_id, decrypt_secrets)
 
-    def monitoring(self, vm_id: int) -> MONITORING_DATASub:
+    def monitoring(self, vm_id: int) -> str:
         """Returns the virtual machine monitoring records"""
         return self._one_vm.monitoring(vm_id)
     

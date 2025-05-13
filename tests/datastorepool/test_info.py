@@ -1,34 +1,21 @@
 import pytest
-
-from api                import One
-from utils              import get_unic_name
-from one_cli.datastore  import Datastore, create_datastore
-from config             import ADMIN_NAME
-from typing             import List
-
+import random
+from api            import One
+from utils.other    import get_unic_name
 
 
 
 
 
 @pytest.fixture
-def datastores():
-    datastore_list = []
-    for _ in range(5):
-        template = f"""
-            NAME   = {get_unic_name()}
-            TYPE   = IMAGE_DS
-            TM_MAD = ssh
-            DS_MAD = fs
-        """
-        datastore_id = create_datastore(template)
-        datastore    = Datastore(datastore_id)
-        datastore_list.append(datastore)
-
-    yield datastore_list
-
-    for datastore in datastore_list:
-        datastore.delete()
+def datastore_ids(one: One):
+    datastore_ids_list = []
+    for _ in range(random.randint(3, 10)):
+        datastore_id = one.datastore.allocate(f"NAME={get_unic_name()}\nDS_MAD=dummy\nTM_MAD=dummy\nTYPE=IMAGE_DS")
+        datastore_ids_list.append(datastore_id)
+    yield datastore_ids_list
+    for ds_id in datastore_ids_list:
+        one.datastore.delete(ds_id)
 
 
 
@@ -39,11 +26,7 @@ def datastores():
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_show_all_datastores(one: One, datastores: List[Datastore]):
-    datastore_ids       = [datastore.info().ID for datastore in datastores]
-    datastorepool       = one.datastorepool.info().DATASTORE
-    datastorepool_ids   = [datastore.ID for datastore in datastorepool]
-    
+def test_show_all_datastores(one: One, datastore_ids):
+    datastorepool_ids = [datastore.ID for datastore in one.datastorepool.info().DATASTORE]
     assert set(datastore_ids).issubset(datastorepool_ids)
 

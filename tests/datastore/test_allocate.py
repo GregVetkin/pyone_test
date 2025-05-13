@@ -1,50 +1,56 @@
 import pytest
-from api                import One
-from pyone              import OneNoExistsException, OneInternalException
-from utils              import get_unic_name
-from one_cli.datastore  import Datastore, datastore_exist
-from one_cli.cluster    import Cluster, create_cluster
-from config             import ADMIN_NAME
+from api          import One
+from pyone        import OneNoExistsException, OneInternalException
+from utils.other  import get_unic_name
 
 
 
 
 
-@pytest.fixture
-def cluster():
-    _id = create_cluster(get_unic_name())
-    cluster = Cluster(_id)
-    yield cluster
-    cluster.delete()
 
-
-# =================================================================================================
-# TESTS
-# =================================================================================================
-
-
-
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_cluster_not_exist(one: One):
+    template    = f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs"
+    cluster_id  = 999999
+
     with pytest.raises(OneNoExistsException):
-        one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs", cluster_id=999999)
+        one.datastore.allocate(template, cluster_id)
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_datastore_creation(one: One):
-    _id  = one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs")
-    assert datastore_exist(_id)
-    Datastore(_id).delete()
+    tm_mad   = "ssh"
+    ds_mad   = "fs"
+    ds_name  = get_unic_name()
+    template = f"NAME={ds_name}\nTM_MAD={tm_mad}\nDS_MAD={ds_mad}"
+
+    datastore_id = one.datastore.allocate(template)
+
+    ds_info = one.datastore.info(datastore_id)
+    assert ds_info.TM_MAD == tm_mad
+    assert ds_info.DS_MAD == ds_mad
+    assert ds_info.NAME   == ds_name
+
+    one.datastore.delete(datastore_id)
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_datastore_creation_xml(one: One):
-    _id = one.datastore.allocate(f"<DATASTORE><NAME>{get_unic_name()}</NAME><TM_MAD>ssh</TM_MAD><DS_MAD>fs</DS_MAD></DATASTORE>")
-    assert datastore_exist(_id)
-    Datastore(_id).delete()
+    tm_mad   = "dummy"
+    ds_mad   = "dummy"
+    ds_name  = get_unic_name()
+    template = f"<DATASTORE><NAME>{ds_name}</NAME><TM_MAD>{tm_mad}</TM_MAD><DS_MAD>{ds_mad}</DS_MAD></DATASTORE>"
+
+    datastore_id = one.datastore.allocate(template)
+
+    ds_info = one.datastore.info(datastore_id)
+    assert ds_info.TM_MAD == tm_mad
+    assert ds_info.DS_MAD == ds_mad
+    assert ds_info.NAME   == ds_name
+
+    one.datastore.delete(datastore_id)
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_mandatory_params(one: One):
 
     with pytest.raises(OneInternalException):
@@ -60,7 +66,7 @@ def test_mandatory_params(one: One):
         one.datastore.allocate(f"NAME={get_unic_name()}\nDS_MAD=fs")
         
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_mandatory_params_xml(one: One):
 
     with pytest.raises(OneInternalException):
@@ -76,11 +82,15 @@ def test_mandatory_params_xml(one: One):
         one.datastore.allocate(f"""<DATASTORE><NAME>{get_unic_name()}</NAME><DS_MAD>fs</DS_MAD></DATASTORE>""")
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_datastore_create_with_certain_cluster(one: One, cluster: Cluster):
-    _id  = one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs", cluster_id=cluster._id)
-    datastore = Datastore(_id)
-    assert datastore_exist(_id)
-    assert cluster._id in datastore.info().CLUSTERS
-    datastore.delete()
+
+def test_certain_cluster(one: One, dummy_cluster):
+    cluster_id   = dummy_cluster
+    template     = f"NAME={get_unic_name()}\nTM_MAD=dummy\nDS_MAD=dummy"
+
+    datastore_id = one.datastore.allocate(template, cluster_id)
+
+    ds_info = one.datastore.info(datastore_id)
+    assert cluster_id in ds_info.CLUSTERS.ID 
+
+    one.datastore.delete(datastore_id)
 
