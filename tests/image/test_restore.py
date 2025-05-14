@@ -176,7 +176,7 @@ def test_restore_into_certain_storage_v3(one: One, backup_image: int, image_data
 
 @pytest.mark.skipif(BREST_VERSION < 4, reason="for Brest 4.x")
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_restore_without_template_v4(one: One, backup_image: int, image_datastore: int):
+def test_restore_without_template(one: One, backup_image: int, image_datastore: int):
     backup_image_info    = one.image.info(backup_image)
     vm_id                = backup_image_info.VMS.ID[-1]
     answer               = one.image.restore(backup_image, image_datastore)
@@ -190,5 +190,29 @@ def test_restore_without_template_v4(one: One, backup_image: int, image_datastor
 
     for restored_image_id in restored_image_ids:
         assert one.image.info(restored_image_id).NAME.startswith(str(vm_id))
+
+    one.template.delete(restored_template_id, delete_images=True)
+
+
+
+
+@pytest.mark.skipif(BREST_VERSION < 4, reason="for Brest 4.x")
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+def test_restore_with_template(one: One, backup_image: int, image_datastore: int):
+    name                 = get_unic_name()
+    template             = f"NAME={name}"
+    backup_image_info    = one.image.info(backup_image)
+    vm_id                = backup_image_info.VMS.ID[-1]
+    answer               = one.image.restore(backup_image, image_datastore, template)
+    ids                  = [int(_id) for _id in answer.split()]
+    restored_template_id = ids[0]
+    restored_image_ids   = ids[1:]
+
+    time.sleep(30)
+
+    assert one.template.info(restored_template_id).NAME == name
+
+    for restored_image_id in restored_image_ids:
+        assert one.image.info(restored_image_id).NAME.startswith(f"{name}-disk-")
 
     one.template.delete(restored_template_id, delete_images=True)
