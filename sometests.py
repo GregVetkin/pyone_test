@@ -4,7 +4,7 @@ from api            import One
 from config         import API_URI, ADMIN_NAME
 
 
-brestadm_auth = ADMIN_NAME+":"+"aa62f54795822bf96e087f3e98b0d6d01136585c3e00df5cec1307dd17dce1b0"
+brestadm_auth = ADMIN_NAME+":"+"bf9020549d2889d13514ad0f99d883e8b8288dad6e79b2bae0d1fb5b61910747"
 # brestadm_auth = ADMIN_NAME+"~"+"Qwe!2345"
 
 API_URI = "http://raft.brest.local:2633/RPC2"
@@ -63,4 +63,11 @@ import base64
 
 one = pyone.OneServer(API_URI, base64.b64encode(brestadm_auth.encode()).decode())
 res = one.acl.addrule("400000000", "1400000000", "1", "100000005")
-print(res)
+res = one.vm.info(2).TEMPLATE["DISK"]
+
+for disk in res:
+    disk_id = disk["DISK_ID"]
+    image_id = disk["IMAGE_ID"]
+    print(disk_id, " --> ", image_id)
+
+

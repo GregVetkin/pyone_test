@@ -2,57 +2,32 @@ import os
 import sys
 import subprocess
 
-from tests              import TestData
-from _tests             import TESTS, PROJECT_DIR
-from utils.printing     import pretty_print_test_result
-from utils              import run_command
+from config import PROJECT_DIR
 
 
 
 
-def dfs_tests(test_tree, dotted_key):
-    keys = dotted_key.split(".")
-    node = test_tree
+def method_to_test_path(method_name: str) -> str:
+    methods = method_name.split(".")
 
-    for key in keys:
-        if key in node:
-             node = node[key]
-        else:
-            print("Method not found")
-            return
-    
-
-    def _dfs(node, current_path):
-        if isinstance(node, dict):
-            for key, value in node.items():
-                yield from _dfs(value, current_path + [key])
-        else:
-            yield node
-
-    yield from _dfs(node, keys)
-
-
-
-
-def run_test(test: TestData) -> None:
-    command = f"{PROJECT_DIR}/.venv/bin/python3 -m pytest {test.test_file_path}"
-
-    result = subprocess.run(
-        command,
-        shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-
-    if result.returncode == 0:
-        test_passed = True
+    if len(methods) == 3:
+        tests_relative_path = f"tests/{methods[1]}/test_{methods[2]}.py"
+    elif len(methods) == 2:
+        tests_relative_path = f"tests/{methods[1]}"
     else:
-        test_passed = False
-        print(result.stdout.decode())
-    
-    pretty_print_test_result(test.xml_rpc_method, test_passed)
-        
+        tests_relative_path = f"tests"
 
+    test_path = os.path.join(PROJECT_DIR, tests_relative_path)
+    return test_path
+
+
+
+def start_test(test_path: str) -> None:
+    python_interpreter = os.path.join(PROJECT_DIR, ".venv/bin/python3")
+    command = f"{python_interpreter} -m pytest -v {test_path}"
+    subprocess.run(command, shell=True)
+
+        
 
 def venv_exist() -> bool:
     return os.path.isdir(os.path.join(PROJECT_DIR, '.venv'))
@@ -61,6 +36,12 @@ def venv_exist() -> bool:
 def prepare_venv() -> None:
     prepare_script_path = os.path.join(PROJECT_DIR, "prepare.sh")
     subprocess.run(["bash", prepare_script_path], stdin=None, stdout=None)
+
+
+
+def clear_terminal() -> None:
+    command = 'printf "\\033[0H\\033[$(tput lines)L"'
+    subprocess.run(command, shell=True)
 
 
 if __name__ == "__main__":
@@ -72,5 +53,7 @@ if __name__ == "__main__":
     else:
         method = "one"
 
-    for test in dfs_tests(TESTS, method):
-        run_test(test)
+    test_path = method_to_test_path(method)
+
+    clear_terminal()
+    start_test(test_path)

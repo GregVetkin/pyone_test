@@ -1,3 +1,7 @@
+import os
+
+PROJECT_DIR = os.path.dirname(os.path.abspath(__file__))
+
 ALSE_VERSION        = 1.8
 BREST_VERSION       = 4
 
