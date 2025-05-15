@@ -62,12 +62,5 @@ class ACL:
 import base64
 
 one = pyone.OneServer(API_URI, base64.b64encode(brestadm_auth.encode()).decode())
-res = one.acl.addrule("400000000", "1400000000", "1", "100000005")
-res = one.vm.info(2).TEMPLATE["DISK"]
-
-for disk in res:
-    disk_id = disk["DISK_ID"]
-    image_id = disk["IMAGE_ID"]
-    print(disk_id, " --> ", image_id)
-
-
+# res = one.acl.addrule("400000000", "1400000000", "1", "100000005")
+# res = one.image.restore(31, 1, "DISK_ID=2")

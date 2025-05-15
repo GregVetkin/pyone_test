@@ -36,8 +36,8 @@ def chown_group_not_exist__test(api_method, one_object):
 
 def chown_user_and_group_change__test(api_method, one_object, user: User, group: Group):
     api_method.chown(one_object._id, user._id, group._id)
-    new_one_object_info = one_object.info()
     sleep(1)
+    new_one_object_info = one_object.info()
     assert user._id  == new_one_object_info.UID
     assert group._id == new_one_object_info.GID
 
