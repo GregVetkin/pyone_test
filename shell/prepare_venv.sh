@@ -74,4 +74,4 @@ sed -i "s/^\(RAFT_ENABLED\s*=\s*\).*/\1${IS_RAFT_ON}/"    "${PROJECT_CONFIGS_DIR
 
 # Доменное имя
 DOMAIN_NAME=$(hostname -h)
-sed -i "s/^\(DOMAIN_NAME\s*=\s*\).*/\1$\"{DOMAIN_NAME}\"/"    "${PROJECT_CONFIGS_DIRECTORY}/base.py"
+sed -i "s/^\(DOMAIN_NAME\s*=\s*\).*/\1\"${DOMAIN_NAME}\"/"    "${PROJECT_CONFIGS_DIRECTORY}/base.py"
