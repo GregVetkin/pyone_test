@@ -64,3 +64,16 @@ import base64
 one = pyone.OneServer(API_URI, base64.b64encode(brestadm_auth.encode()).decode())
 # res = one.acl.addrule("400000000", "1400000000", "1", "100000005")
 # res = one.image.restore(31, 1, "DISK_ID=2")
+
+
+
+
+from api.one import WaitWrapper
+one = One(WaitWrapper(API_URI, base64.b64encode(brestadm_auth.encode()).decode()))
+
+
+
+
+print("start")
+print(one.system.version())
+print("end")

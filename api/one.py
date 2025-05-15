@@ -22,10 +22,22 @@ from api._vm                import OneVm
 from api._vmpool            import OneVmpool
 
 
+from time import sleep
 
-class One():
+class WaitWrapper(OneServer):
+    def __init__(self, uri, session, timeout=None, https_verify=True, **options):
+        super().__init__(uri, session, timeout, https_verify, **options)
+
+    def _ServerProxy__request(self, *args, **kwargs):
+        result= super()._ServerProxy__request(*args, **kwargs)
+        sleep(1)
+        return result
+
+
+
+class One:
     def __init__(self, one_server: OneServer) -> None:
-        self._one_api = one_server
+        self._one_api       = one_server
 
         self.system         = OneSystem(self._one_api)
 
@@ -57,4 +69,5 @@ class One():
 
         self.vm             = OneVm(self._one_api)
         self.vmpool         = OneVmpool(self._one_api)
+        
         

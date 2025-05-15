@@ -1,6 +1,4 @@
 import pytest
-import random
-from time       import sleep
 from typing     import Tuple
 from pyone      import OneNoExistsException, OneException
 
@@ -37,7 +35,6 @@ def chmod__test(api_method, one_object, rights: Tuple[int]):
     analog_rights = tuple(old_rights[i] if _ == -1 else _ for i, _ in enumerate(rights))
 
     api_method.chmod(one_object._id, *rights)
-    sleep(1)
     assert _rights_as_tuple(one_object) == analog_rights
 
 
@@ -46,7 +43,6 @@ def cant_be_chmod___test(api_method, one_object, rights: Tuple[int]):
     old_rights = _rights_as_tuple(one_object)
     with pytest.raises(OneException):
         api_method.chmod(one_object._id, *rights)
-    sleep(1)
     new_rights = _rights_as_tuple(one_object)
     assert old_rights == new_rights
     

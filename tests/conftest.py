@@ -3,13 +3,13 @@ import base64
 
 from pyone              import OneServer
 from api                import One
+from api.one            import WaitWrapper
 from config             import API_URI, RAFT_CONFIG, RAFT_API_URI, BREST_VERSION
 from utils              import get_user_auth, restart_opennebula, run_command
 from utils.opennebula   import _get_federation_mode, _change_federation_mode
 
 
 
-#base64.b64encode(get_user_auth(username).encode()).decode()
 
 @pytest.fixture
 def one(request):
@@ -19,7 +19,8 @@ def one(request):
     if BREST_VERSION == 4:
         session = base64.b64encode(session.encode()).decode()
         
-    server    = OneServer(API_URI, session)
+    # server    = OneServer(API_URI, session)
+    server    = WaitWrapper(API_URI, session)
     one       = One(server)
     
     yield one
