@@ -1,14 +1,18 @@
 import pytest
-from pyone              import OneNoExistsException
-from utils.other        import get_unic_name
-from utils.users        import get_api_connection_by_user_id
-from api                import One
+from pyone          import OneNoExistsException
+from utils.other    import get_unic_name
+from utils.users    import get_api_connection_by_user_id
+from api            import One
+
+
+
+
 
 
 
 @pytest.fixture
 def one(request):
-    user_id     = request.param
+    user_id     = 2
     conn_data   = get_api_connection_by_user_id(user_id)
     one_api     = One(conn_data)
 

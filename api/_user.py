@@ -20,9 +20,9 @@ class OneUser:
         """Changes the password for the given user"""
         return self._one_user.passwd(user_id, new_password)
     
-    def login(self, user_id: int, token: str = "", period: int = 0, group_id: int = -1) -> str:
+    def login(self, user_name: str, token: str = "", period: int = 0, group_id: int = -1) -> str:
         """Generates or sets a login token"""
-        return self._one_user.login(user_id, token, period, group_id)
+        return self._one_user.login(user_name, token, period, group_id)
     
     def update(self, user_id: int, template: str, replace: bool = False) -> int:
         """Replaces the user template contents"""

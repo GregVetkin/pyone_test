@@ -1,7 +1,6 @@
 import pytest
-
+import pyone
 from api                            import One
-from pyone                          import OneNoExistsException
 from tests._common_methods.delete   import delete__test
 from tests._common_methods.delete   import delete_if_not_exist__test
 from tests._common_methods.delete   import cant_be_deleted__test
@@ -13,7 +12,7 @@ def cluster_with_host(one: One, dummy_cluster, dummy_host):
     yield dummy_cluster
     try:
         one.cluster.delhost(dummy_cluster, dummy_host)
-    except OneNoExistsException:
+    except pyone.OneNoExistsException:
         pass
     
 
@@ -23,7 +22,7 @@ def cluster_with_vnet(one: One, dummy_cluster, dummy_vnet):
     yield dummy_cluster
     try:
         one.cluster.delvnet(dummy_cluster, dummy_vnet)
-    except OneNoExistsException:
+    except pyone.OneNoExistsException:
         pass
     
 
@@ -33,16 +32,12 @@ def cluster_with_datastore(one: One, dummy_datastore, dummy_cluster):
     yield dummy_cluster
     try:
         one.cluster.deldatastore(dummy_cluster, dummy_datastore)
-    except OneNoExistsException:
+    except pyone.OneNoExistsException:
         pass
 
 
 
 
-
-# =================================================================================================
-# TESTS
-# =================================================================================================
 
 
 

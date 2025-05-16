@@ -1,8 +1,6 @@
 import pytest
-
-from api                import One
-from pyone              import OneNoExistsException
-
+import pyone
+from api        import One
 
 
 
@@ -13,27 +11,21 @@ def cluster_with_host(one: One, dummy_cluster, dummy_host):
     yield dummy_cluster
     try:
         one.cluster.delhost(dummy_cluster, dummy_host)
-    except OneNoExistsException:
+    except pyone.OneNoExistsException:
         pass
     
 
 
 
 
-# =================================================================================================
-# TESTS
-# =================================================================================================
-
-
-
 def test_cluster_not_exist(one: One, dummy_host):
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.cluster.addhost(999999, dummy_host)
    
 
 
 def test_host_not_exist(one: One, dummy_cluster):
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.cluster.addhost(dummy_cluster, 999999)
    
 
@@ -49,13 +41,13 @@ def test_add_host_to_cluster(one: One, dummy_cluster, dummy_host):
 
 
 def test_add_already_added_host(one: One, cluster_with_host):
-    cluster_id              = cluster_with_host
-    init_cluster_host_ids   = one.cluster.info(cluster_id).HOSTS.ID
-    added_host_id           = init_cluster_host_ids[-1]
+    cluster_id       = cluster_with_host
+    cluster_host_ids = one.cluster.info(cluster_id).HOSTS.ID
+    added_host_id    = cluster_host_ids[-1]
 
     result = one.cluster.addhost(cluster_id, added_host_id)
     assert result == cluster_id
 
     new_cluster_host_ids = one.cluster.info(cluster_id).HOSTS.ID
     assert added_host_id in new_cluster_host_ids
-    assert len(init_cluster_host_ids) == len(new_cluster_host_ids)
+    assert len(cluster_host_ids) == len(new_cluster_host_ids)
