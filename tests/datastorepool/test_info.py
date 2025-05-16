@@ -5,8 +5,6 @@ from utils.other    import get_unic_name
 
 
 
-
-
 @pytest.fixture
 def datastore_ids(one: One):
     datastore_ids_list = []
@@ -20,13 +18,9 @@ def datastore_ids(one: One):
 
 
 
-# =================================================================================================
-# TESTS
-# =================================================================================================
 
 
-
-def test_show_all_datastores(one: One, datastore_ids):
+def test_get_all_datastores_info(one: One, datastore_ids):
     datastorepool_ids = [datastore.ID for datastore in one.datastorepool.info().DATASTORE]
     assert set(datastore_ids).issubset(datastorepool_ids)
 

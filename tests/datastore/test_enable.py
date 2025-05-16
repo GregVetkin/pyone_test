@@ -1,6 +1,6 @@
 import pytest
+import pyone
 from api            import One
-from pyone          import OneInternalException, OneNoExistsException
 from utils.other    import get_unic_name
 
 
@@ -44,38 +44,36 @@ def file_datastore(one: One):
 
 
 
-# =================================================================================================
-# TESTS
-# =================================================================================================
+
 
 
 def test_datastore_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.datastore.enable(999999)
 
 
 
-def test_cant_enable_disable_file_datastore(one: One, file_datastore):
+def test_cant_enable_or_disable_file_datastore(one: One, file_datastore):
     file_ds_id = file_datastore
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.disable(file_ds_id)
     assert one.datastore.info(file_ds_id).STATE == 0
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.enable(file_ds_id)
     assert one.datastore.info(file_ds_id).STATE == 0
 
 
 
-def test_cant_enable_disable_image_datastore(one: One, image_datastore):
+def test_cant_enable_or_disable_image_datastore(one: One, image_datastore):
     image_ds_id = image_datastore
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.disable(image_ds_id)
     assert one.datastore.info(image_ds_id).STATE == 0
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.enable(image_ds_id)
     assert one.datastore.info(image_ds_id).STATE == 0
 

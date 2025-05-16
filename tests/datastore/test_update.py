@@ -8,7 +8,7 @@ from tests._common_methods.update   import update_if_not_exist__test
 
 
 
-def test_not_exist(one: One):
+def test_datastore_not_exist(one: One):
     update_if_not_exist__test(one.datastore)
 
 

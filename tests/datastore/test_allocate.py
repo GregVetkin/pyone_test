@@ -1,6 +1,6 @@
 import pytest
+import pyone
 from api          import One
-from pyone        import OneNoExistsException, OneInternalException
 from utils.other  import get_unic_name
 
 
@@ -12,7 +12,7 @@ def test_cluster_not_exist(one: One):
     template    = f"NAME={get_unic_name()}\nTM_MAD=ssh\nDS_MAD=fs"
     cluster_id  = 999999
 
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.datastore.allocate(template, cluster_id)
 
 
@@ -53,32 +53,32 @@ def test_datastore_creation_xml(one: One):
 
 def test_mandatory_params(one: One):
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.allocate("")
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.allocate(f"NAME={get_unic_name()}")
     
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.allocate(f"NAME={get_unic_name()}\nTM_MAD=ssh")
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.allocate(f"NAME={get_unic_name()}\nDS_MAD=fs")
         
 
 
 def test_mandatory_params_xml(one: One):
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.allocate("<DATASTORE></DATASTORE>")
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.allocate(f"""<DATASTORE><NAME>{get_unic_name()}</NAME></DATASTORE>""")
     
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.allocate(f"""<DATASTORE><NAME>{get_unic_name()}</NAME><TM_MAD>ssh</TM_MAD></DATASTORE>""")
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.datastore.allocate(f"""<DATASTORE><NAME>{get_unic_name()}</NAME><DS_MAD>fs</DS_MAD></DATASTORE>""")
 
 

@@ -1,4 +1,5 @@
 import pytest
+import time
 from pyone          import OneNoExistsException
 from utils.other    import get_unic_name
 from utils.users    import get_api_connection_by_user_id
@@ -8,16 +9,15 @@ from api            import One
 
 
 
-
-
 @pytest.fixture
-def one(request):
+def one():
     user_id     = 2
     conn_data   = get_api_connection_by_user_id(user_id)
     one_api     = One(conn_data)
 
     yield one_api
     one_api._server.server_close()
+
 
 
 @pytest.fixture
@@ -38,6 +38,7 @@ def dummy_datastore(one: One):
         pass
 
 
+
 @pytest.fixture
 def dummy_image(one: One, dummy_datastore):
     """Creates datablock image in dummy_datastore, returns its id"""
@@ -52,8 +53,10 @@ def dummy_image(one: One, dummy_datastore):
     yield image_id
     try:
         one.image.delete(image_id)
+        time.sleep(1)
     except OneNoExistsException:
         pass
+
 
 
 @pytest.fixture
@@ -73,6 +76,7 @@ def dummy_vm(one: One):
         pass
 
 
+
 @pytest.fixture
 def dummy_group(one: One):
     """Creates group without users, returns its id"""
@@ -83,6 +87,7 @@ def dummy_group(one: One):
         one.group.delete(group_id)
     except OneNoExistsException:
         pass
+
 
 
 @pytest.fixture
@@ -97,6 +102,7 @@ def dummy_user(one: One):
         pass
 
 
+
 @pytest.fixture
 def dummy_cluster(one: One):
     """Creates cluster (empty), returns its id"""
@@ -109,6 +115,7 @@ def dummy_cluster(one: One):
         pass
 
 
+
 @pytest.fixture
 def dummy_host(one: One):
     """Creates host (unreachable), returns its id"""
@@ -119,6 +126,7 @@ def dummy_host(one: One):
         one.host.delete(host_id)
     except OneNoExistsException:
         pass
+
 
 
 @pytest.fixture
@@ -134,6 +142,7 @@ def dummy_template(one: One):
         one.template.delete(template_id, False)
     except OneNoExistsException:
         pass
+
 
 
 @pytest.fixture

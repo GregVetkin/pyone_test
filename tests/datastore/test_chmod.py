@@ -1,5 +1,5 @@
 import pytest
-from pyone                          import OneNoExistsException
+import pyone
 from api                            import One
 from tests._common_methods.chmod    import random_permissions__test
 
@@ -8,7 +8,7 @@ from tests._common_methods.chmod    import random_permissions__test
 
 
 def test_datastore_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.datastore.chmod(99999)
 
 

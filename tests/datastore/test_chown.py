@@ -10,10 +10,6 @@ from tests._common_methods.chown    import group_change__test
 
 
 
-
-
-
-
 def test_datastore_not_exist(one: One):
     object_not_exist__test(one.datastore)
 
