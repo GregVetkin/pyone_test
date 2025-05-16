@@ -22,14 +22,9 @@ def cluster_ids(one: One):
 
 
 
-# =================================================================================================
-# TESTS
-# =================================================================================================
 
 
-
-
-def test_show_all_clusters(one: One, cluster_ids):
+def test_get_all_clusters_info(one: One, cluster_ids):
     clusterpool     = one.clusterpool.info().CLUSTER
     clusterpool_ids = [cluster.ID for cluster in clusterpool]
     
