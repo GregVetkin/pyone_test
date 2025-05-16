@@ -1,74 +1,68 @@
 import os
 import sys
 import subprocess
+import shutil
 
-
-from utils.printing  import pretty_print_test_result
-from utils.commands  import run_command
-
-
-from config.base    import VENV_DIRECTORY_PATH, PREPARE_SCRIPT_PATH, VENV_PYTHON_3_PATH, TESTS_DIRECTORY_PATH
+from config.base import TESTS_DIRECTORY_PATH, VENV_DIRECTORY_PATH, VENV_PYTHON_3_PATH, PREPARE_SCRIPT_PATH
 
 
 
 
+def method_to_test_path(method_name: str) -> str:
+    methods = method_name.split(".")
 
-
-
-def run_test(test_path):
-    command = f"{VENV_PYTHON_3_PATH} -m pytest \"{test_path}\""
-
-    result = subprocess.run(
-        command,
-        shell=True,
-        stdout=subprocess.PIPE,
-        stderr=subprocess.PIPE,
-    )
-
-    if result.returncode == 0:
-        test_is_passed = True
+    if len(methods) == 3:
+        return os.path.join(TESTS_DIRECTORY_PATH, f"{methods[1]}/test_{methods[2]}.py")
+    elif len(methods) == 2:
+        return os.path.join(TESTS_DIRECTORY_PATH, methods[1])
     else:
-        test_is_passed = False
-    
-    return (test_is_passed, result.stdout.decode())
+        return TESTS_DIRECTORY_PATH
+
+
+
+def start_test(test_path: str) -> None:
+    command = f"{VENV_PYTHON_3_PATH} -m pytest -v {test_path}"
+    subprocess.run(command, shell=True)
+
+
+def print_testing_method(method_name: str):
+    bold            = "\033[1m"
+    orange_color    = "\033[38;5;208m"
+    no_color        = "\033[0m"
+    terminal_width  = shutil.get_terminal_size().columns
+    centered_text   = method_name.center(terminal_width)
+
+    print()
+    print(f"{bold}{orange_color}{centered_text}{no_color}")
+    print()
+
         
 
+def venv_exist() -> bool:
+    return os.path.isdir(VENV_DIRECTORY_PATH)
 
 
+def prepare_venv() -> None:
+    subprocess.run(["bash", PREPARE_SCRIPT_PATH])
+
+
+
+def clear_terminal() -> None:
+    command = 'printf "\\033[0H\\033[$(tput lines)L"'
+    subprocess.run(command, shell=True)
 
 
 if __name__ == "__main__":
+    if not venv_exist():
+        prepare_venv()
 
-    if not os.path.isdir(VENV_DIRECTORY_PATH):
-        run_command(f"bash \"{PREPARE_SCRIPT_PATH}\"")
+    if len(sys.argv) > 1:
+        method = sys.argv[1]
+    else:
+        method = "one"
 
-    xmlrpc_method = "one"
-    test_function = None
+    test_path = method_to_test_path(method)
 
-    if len(sys.argv) == 3:
-        xmlrpc_method = sys.argv[1]
-        test_function = sys.argv[2]
-
-    elif len(sys.argv) == 2:
-        xmlrpc_method = sys.argv[1]
-
-
-    tests_start_dir = xmlrpc_method.split(".")
-    tests_start_dir[0] = TESTS_DIRECTORY_PATH
-
-    if len(tests_start_dir) == 3:
-        tests_start_dir[2] = f"test_{tests_start_dir[2]}.py"
-
-    test_to_run = "/".join(tests_start_dir)
-
-    if test_function:
-        test_to_run = test_to_run + f"::{test_function}"
-
-    test_is_passed, test_output = run_test(test_to_run)
-
-    pretty_print_test_result(xmlrpc_method, test_is_passed)
-
-    if not test_is_passed:
-        print(test_output)
-
-
+    clear_terminal()
+    print_testing_method(method)
+    start_test(test_path)

@@ -22,8 +22,8 @@ from api._vm                import OneVm
 from api._vmpool            import OneVmpool
 from api._vn                import OneVn
 
-import base64
-from utils.connection_data  import ApiConnectionData
+
+from utils.connection  import ApiConnectionData
 
 
 class One():

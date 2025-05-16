@@ -1,19 +1,17 @@
 import pytest
-from pyone          import OneNoExistsException
-from utils.other    import get_unic_name
-from api            import One
-from utils.users    import admin_api_connection_data
+from pyone              import OneNoExistsException
+from utils.other        import get_unic_name
+from utils.users        import get_api_connection_by_user_id
+from api                import One
 
 
 
 @pytest.fixture
 def one(request):
-    if hasattr(request, "param"):
-        connection_data = request.param
-    else:
-        connection_data = admin_api_connection_data()
+    user_id     = request.param
+    conn_data   = get_api_connection_by_user_id(user_id)
+    one_api     = One(conn_data)
 
-    one_api = One(connection_data)
     yield one_api
     one_api._server.server_close()
 

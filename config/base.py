@@ -16,7 +16,7 @@ RAFT_CONFIG             = "/etc/one/one.d/raft.conf"
 
 
 
-PROJECT_DIRECTORY       = os.path.dirname(os.path.abspath(__file__))
+PROJECT_DIRECTORY       = os.path.join(os.path.dirname(os.path.abspath(__file__)),   "../")
 SHELL_SCRIPTS_PATH      = os.path.join(PROJECT_DIRECTORY,   "shell")
 PREPARE_SCRIPT_PATH     = os.path.join(SHELL_SCRIPTS_PATH,  "prepare_venv.sh")
 VENV_DIRECTORY_PATH     = os.path.join(PROJECT_DIRECTORY,   ".venv")
