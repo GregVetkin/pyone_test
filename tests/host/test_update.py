@@ -6,11 +6,6 @@ from tests._common_methods.update   import update_if_not_exist__test
 
 
 
-# =================================================================================================
-# TESTS
-# =================================================================================================
-
-
 
 def test_host_not_exist(one: One):
     update_if_not_exist__test(one.host)

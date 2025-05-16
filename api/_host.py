@@ -19,18 +19,6 @@ class OneHost:
         """Sets the status of the host"""
         return self._one_host.status(host_id, status_code)
     
-    def _enable(self, host_id: int) -> int:
-        """Sets the status of the host to enable"""
-        return self.status(host_id, 0)
-    
-    def _disable(self, host_id: int) -> int:
-        """Sets the status of the host to disable"""
-        return self.status(host_id, 1)
-    
-    def _offline(self, host_id: int) -> int:
-        """Sets the status of the host to offline"""
-        return self.status(host_id, 2)
-    
     def update(self, host_id: int, template: str, replace: bool = False) -> int:
         """Replaces the host's template contents"""
         return self._one_host.update(host_id, template, 0 if replace else 1)

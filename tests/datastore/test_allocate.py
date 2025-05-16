@@ -83,7 +83,7 @@ def test_mandatory_params_xml(one: One):
 
 
 
-def test_certain_cluster(one: One, dummy_cluster):
+def test_specific_cluster(one: One, dummy_cluster):
     cluster_id   = dummy_cluster
     template     = f"NAME={get_unic_name()}\nTM_MAD=dummy\nDS_MAD=dummy"
 

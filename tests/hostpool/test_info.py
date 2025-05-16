@@ -20,13 +20,10 @@ def host_ids(one: One):
 
 
 
-# =================================================================================================
-# TESTS
-# =================================================================================================
 
 
 
-def test_show_all_hosts(one: One, host_ids):
+def test_get_all_hosts_info(one: One, host_ids):
     hostpool_ids = [host.ID for host in one.hostpool.info().HOST]
     assert set(host_ids).issubset(hostpool_ids)
 
