@@ -157,5 +157,6 @@ def dummy_vnet(one: One):
     yield vnet_id
     try:
         one.vn.delete(vnet_id)
+        time.sleep(1)
     except OneNoExistsException:
         pass
