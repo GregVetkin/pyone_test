@@ -49,7 +49,7 @@ def test_image_not_exist(one: One):
 
 
 
-def test_image_snapshot_not_exist(one: One, dummy_image: int):
+def test_snapshot_not_exist(one: One, dummy_image: int):
     image_id    = dummy_image
     snapshot_id = 99999
 
@@ -59,22 +59,27 @@ def test_image_snapshot_not_exist(one: One, dummy_image: int):
 
 
 
-def test_delete_unactive_snapshot(one: One, image_with_snapshots: int):
+def test_unactive_snapshot(one: One, image_with_snapshots: int):
     image_id  = image_with_snapshots
     snapshots = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
-    unactive_snapshot_id = next((snapshot.ID for snapshot in snapshots if not snapshot.ACTIVE))
+    
+    no_parent_snapshot_id = next((snapshot.ID for snapshot in snapshots if snapshot.PARENT == -1))
+    one.image.snapshotrevert(image_id, no_parent_snapshot_id)
+    time.sleep(5)
 
-    _id = one.image.snapshotdelete(image_id, unactive_snapshot_id)
-    assert _id == unactive_snapshot_id
+    snapshot_id = next((snapshot.ID for snapshot in snapshots if (not snapshot.ACTIVE) and (not snapshot.CHILDREN)))
+
+    _id = one.image.snapshotdelete(image_id, snapshot_id)
+    assert _id == snapshot_id
     time.sleep(5)
     
     snapshots_ids = [snapshot.ID for snapshot in one.image.info(image_id).SNAPSHOTS.SNAPSHOT]
-    assert unactive_snapshot_id not in snapshots_ids
+    assert snapshot_id not in snapshots_ids
 
 
 
 
-def test_delete_active_snapshot(one: One, image_with_snapshots: int):
+def test_active_snapshot(one: One, image_with_snapshots: int):
     image_id  = image_with_snapshots
     snapshots = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
     active_snapshot_id = next((snapshot.ID for snapshot in snapshots if snapshot.ACTIVE))
@@ -89,6 +94,15 @@ def test_delete_active_snapshot(one: One, image_with_snapshots: int):
 
 
 
+def test_snapshot_with_children(one: One, image_with_snapshots: int):
+    image_id  = image_with_snapshots
+    snapshots = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
+    snapshot_id = next((snapshot.ID for snapshot in snapshots if (not snapshot.ACTIVE) and (snapshot.CHILDREN)))
+
+    with pytest.raises(OneException):
+        one.image.snapshotdelete(image_id, snapshot_id)
     
-
-
+    time.sleep(5)
+    
+    snapshots_ids = [snapshot.ID for snapshot in one.image.info(image_id).SNAPSHOTS.SNAPSHOT]
+    assert snapshot_id in snapshots_ids
