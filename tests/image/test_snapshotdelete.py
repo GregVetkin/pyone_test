@@ -1,7 +1,7 @@
 import pytest
-
+import time
 from api                import One
-from pyone              import OneNoExistsException, OneActionException
+from pyone              import OneNoExistsException, OneActionException, OneException
 from utils              import get_unic_name
 from one_cli.vm         import VirtualMachine, create_vm, wait_vm_offline
 from one_cli.image      import Image, create_image, wait_image_ready
@@ -53,7 +53,7 @@ def image(image_datastore: Datastore):
 
 
 @pytest.fixture
-def image_with_snapshot(image_datastore: Datastore, system_datastore: Datastore):
+def image_with_snapshots(image_datastore: Datastore, system_datastore: Datastore):
     image_template = f"""
         NAME = {get_unic_name()}
         TYPE = DATABLOCK
@@ -73,7 +73,12 @@ def image_with_snapshot(image_datastore: Datastore, system_datastore: Datastore)
     """
     vm_id = create_vm(vm_tempalte, await_vm_offline=True)
     vm    = VirtualMachine(vm_id)
-    vm.create_disk_snapshot(0, get_unic_name())
+
+    for _ in range(3):
+        vm.create_disk_snapshot(0, get_unic_name())
+        time.sleep(10)
+
+
     wait_vm_offline(vm_id)
     vm.terminate()
     wait_image_ready(image_id)
@@ -105,10 +110,36 @@ def test_image_snapshot_not_exist(one: One, image: Image):
 
 
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_delete_image_snapshot(one: One, image_with_snapshot: Image):
-    image_snapshots = image_with_snapshot.info().SNAPSHOTS
-    assert image_snapshots
-    snap_id = image_snapshots[0].ID
-    one.image.snapshotdelete(image_with_snapshot._id, snap_id)
-    image_snap_ids = [snapshot.ID for snapshot in image_with_snapshot.info().SNAPSHOTS]
-    assert snap_id not in image_snap_ids
+def test_delete_unactive_snapshot(one: One, image_with_snapshots: Image):
+    image_id  = image_with_snapshots._id
+    snapshots = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
+    unactive_snapshot_id = next((snapshot.ID for snapshot in snapshots if not snapshot.ACTIVE))
+
+    _id = one.image.snapshotdelete(image_id, unactive_snapshot_id)
+    assert _id == unactive_snapshot_id
+    time.sleep(5)
+    
+    snapshots_ids = [snapshot.ID for snapshot in one.image.info(image_id).SNAPSHOTS.SNAPSHOT]
+    assert unactive_snapshot_id not in snapshots_ids
+
+
+
+@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+def test_delete_active_snapshot(one: One, image_with_snapshots: Image):
+    image_id  = image_with_snapshots._id
+    snapshots = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
+    active_snapshot_id = next((snapshot.ID for snapshot in snapshots if snapshot.ACTIVE))
+
+    with pytest.raises(OneException):
+        one.image.snapshotdelete(image_id, active_snapshot_id)
+    
+    time.sleep(5)
+    
+    snapshots_ids = [snapshot.ID for snapshot in one.image.info(image_id).SNAPSHOTS.SNAPSHOT]
+    assert active_snapshot_id in snapshots_ids
+
+
+
+    
+
+
