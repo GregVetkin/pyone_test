@@ -2,62 +2,38 @@ import pytest
 from typing                 import List
 from random                 import randint
 from api                    import One
-from pyone                  import OneException
-from utils                  import get_unic_name
-from config                 import ADMIN_NAME
-from one_cli.group          import Group, group_exist, create_group
-from one_cli.group._common  import ImageQuotaInfo, NetworkQuotaInfo, DatastoreQuotaInfo
-from one_cli.datastore      import Datastore, create_datastore
-from one_cli.image          import Image, create_image
-from one_cli.vnet           import Vnet, create_vnet
+from pyone                  import OneNoExistsException, OneInternalException, OneActionException
+from utils.other            import get_unic_name
+
 
 
 
 
 @pytest.fixture
-def group():
-    _id     = create_group(get_unic_name())
-    group   = Group(_id)
-    yield group
-    group.delete()
+def images(one: One, dummy_datastore: int):
+    image_datastore_id  = dummy_datastore
+    image_ids_list      = []
 
-
-@pytest.fixture(scope="module")
-def image_datastore():
-    datastore_template = f"""
-        NAME   = {get_unic_name()}
-        TYPE   = IMAGE_DS
-        TM_MAD = ssh
-        DS_MAD = fs
-    """
-    datastore_id = create_datastore(datastore_template)
-    datastore    = Datastore(datastore_id)
-    yield datastore
-    datastore.delete()
-
-
-@pytest.fixture
-def images(image_datastore: Datastore):
-    image_list = []
     for _ in range(5):
         template = f"""
             NAME = {get_unic_name()}
             TYPE = DATABLOCK
             SIZE = 1
         """
-        image_id = create_image(image_datastore._id, template, False)
-        image    = Image(image_id)
-        image_list.append(image)
+        image_id = one.image.allocate(template, image_datastore_id, False)
+        image_ids_list.append(image_id)
 
-    yield image_list
+    yield image_ids_list
 
-    for image in image_list:
-        image.delete()
+    for image_id in image_ids_list:
+        one.image.delete(image_id)
+
 
 
 @pytest.fixture
-def datastores():
-    datastore_list = []
+def datastores(one: One):
+    datastore_ids_list = []
+
     for _ in range(5):
         template = f"""
             NAME   = {get_unic_name()}
@@ -65,32 +41,31 @@ def datastores():
             TM_MAD = ssh
             DS_MAD = fs
         """
-        datastore_id = create_datastore(template)
-        datastore    = Datastore(datastore_id)
-        datastore_list.append(datastore)
+        datastore_id = one.datastore.allocate(template, -1)
+        datastore_ids_list.append(datastore_id)
 
-    yield datastore_list
+    yield datastore_ids_list
 
-    for datastore in datastore_list:
-        datastore.delete()
+    for datastore_id in datastore_ids_list:
+        one.datastore.delete(datastore_id)
+
 
 
 @pytest.fixture
-def vnets():
-    vnet_list = []
+def vnets(one: One):
+    vnet_ids_list = []
     for _ in range(5):
         vnet_template = f"""
             NAME   = {get_unic_name()}
             VN_MAD = bridge
         """
-        vnet_id = create_vnet(vnet_template)
-        vnet    = Vnet(vnet_id)
-        vnet_list.append(vnet)
+        vnet_id = one.vn.allocate(vnet_template, -1)
+        vnet_ids_list.append(vnet_id)
 
-    yield vnet_list
+    yield vnet_ids_list
 
-    for vnet in vnet_list:
-        vnet.delete()
+    for vnet_id in vnet_ids_list:
+        one.vn.delete(vnet_id)
 
 
 # =================================================================================================
@@ -98,14 +73,19 @@ def vnets():
 # =================================================================================================
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_group_not_exist(one: One):
-    with pytest.raises(OneException):
-        one.group.quota(999999, "")
+    group_id = 99999
+    template = ""
+
+    with pytest.raises(OneNoExistsException):
+        one.group.quota(group_id, template)
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_vm_quota(one: One, group: Group):
+
+def test_vm_quota(one: One, dummy_group: int):
+    group_id = dummy_group
+
     vms                 = randint(1, 1024)
     cpu                 = randint(1, 1024)
     memory              = randint(1, 1024)
@@ -125,29 +105,30 @@ def test_vm_quota(one: One, group: Group):
             RUNNING_VMS=        "{running_vms}"
         ]
     """
-    _id = one.group.quota(group._id, vm_quota_template)
-    assert _id == group._id
+    _id = one.group.quota(group_id, vm_quota_template)
+    assert _id == group_id
 
-    group_info = group.info()
-    assert group_info.VM_QUOTA
-    assert not group_info.DATASTORE_QUOTA
-    assert not group_info.IMAGE_QUOTA
-    assert not group_info.NETWORK_QUOTA
 
-    assert group_info.VM_QUOTA.VMS              == vms
-    assert group_info.VM_QUOTA.CPU              == cpu
-    assert group_info.VM_QUOTA.MEMORY           == memory
-    assert group_info.VM_QUOTA.SYSTEM_DISK_SIZE == system_disk_size
-    assert group_info.VM_QUOTA.RUNNING_CPU      == running_cpu
-    assert group_info.VM_QUOTA.RUNNING_MEMORY   == running_memory
-    assert group_info.VM_QUOTA.RUNNING_VMS      == running_vms
+    group_info = one.group.info(group_id)
+    assert group_info.VM_QUOTA.VM
+    assert not group_info.DATASTORE_QUOTA.DATASTORE
+    assert not group_info.IMAGE_QUOTA.IMAGE
+    assert not group_info.NETWORK_QUOTA.NETWORK
+
+    assert group_info.VM_QUOTA.VM.VMS               == vms
+    assert group_info.VM_QUOTA.VM.CPU               == cpu
+    assert group_info.VM_QUOTA.VM.MEMORY            == memory
+    assert group_info.VM_QUOTA.VM.SYSTEM_DISK_SIZE  == system_disk_size
+    assert group_info.VM_QUOTA.VM.RUNNING_CPU       == running_cpu
+    assert group_info.VM_QUOTA.VM.RUNNING_MEMORY    == running_memory
+    assert group_info.VM_QUOTA.VM.RUNNING_VMS       == running_vms
 
   
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_storage_quota(one: One, group: Group, datastores: List[Datastore]):
+
+def test_storage_quota(one: One, dummy_group: int, datastores: List[int]):
     ds_quotas = {}
     ds_quota_template = ""
     for _ in range(len(datastores)):
@@ -184,7 +165,7 @@ def test_storage_quota(one: One, group: Group, datastores: List[Datastore]):
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_image_quota(one: One, group: Group, images: List[Image]):
     img_quotas = {}
     img_quota_template = ""
@@ -217,7 +198,7 @@ def test_image_quota(one: One, group: Group, images: List[Image]):
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_network_quota(one: One, group: Group, vnets: List[Vnet]):
     vnet_quotas = {}
     vnet_quota_template = ""
