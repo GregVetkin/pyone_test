@@ -12,7 +12,7 @@ class SshConnectionData:
     host:       str
 
     def __post_init__(self):
-        if self.user != LocalAdmin.USERNAME and Version(ASTRA_VERSION) > Version("1.7"):
+        if self.user != LocalAdmin.USERNAME and Version(ASTRA_VERSION) >= Version("1.8"):
             self.user += f"@{DOMAIN_NAME}"
 
 
@@ -27,7 +27,7 @@ class ApiConnectionData:
     def __post_init__(self):
         self.session = f"{self.user}:{self.token}"
 
-        if Version(BREST_VERSION) > Version("3"):
+        if Version(BREST_VERSION) >= Version("4"):
             self.session = base64.b64encode(self.session.encode()).decode()
 
 
