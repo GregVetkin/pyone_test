@@ -60,13 +60,13 @@ def test_snapshot_not_exist(one: One, dummy_image: int):
 
 
 def test_unactive_snapshot(one: One, image_with_snapshots: int):
-    image_id  = image_with_snapshots
-    snapshots = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
-    
-    no_parent_snapshot_id = next((snapshot.ID for snapshot in snapshots if snapshot.PARENT == -1))
-    one.image.snapshotrevert(image_id, no_parent_snapshot_id)
+    image_id    = image_with_snapshots
+    snapshots   = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
+    snapshot_id = next((snapshot.ID for snapshot in snapshots if snapshot.PARENT == -1))
+    one.image.snapshotrevert(image_id, snapshot_id)
     time.sleep(5)
 
+    snapshots   = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
     snapshot_id = next((snapshot.ID for snapshot in snapshots if (not snapshot.ACTIVE) and (not snapshot.CHILDREN)))
 
     _id = one.image.snapshotdelete(image_id, snapshot_id)
