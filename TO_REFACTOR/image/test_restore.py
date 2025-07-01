@@ -1,5 +1,6 @@
 import pytest
 import time
+from utils.version      import Version
 from api                import One
 from pyone              import OneNoExistsException, OneException
 from utils              import get_unic_name, run_command
@@ -101,16 +102,18 @@ def vm_with_disk(one: One, system_datastore: int, image: int):
 
 
 @pytest.fixture(params=[
-    pytest.param("backup_datastore", marks=pytest.mark.skipif(BREST_VERSION < 4 ,   reason="for Brest 4.x")),
-    pytest.param("file_datastore",   marks=pytest.mark.skipif(BREST_VERSION > 3,    reason="for Brest 3.x"))
+    pytest.param("backup_datastore", marks=pytest.mark.skipif( Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")),
+    pytest.param("file_datastore",   marks=pytest.mark.skipif( Version(BREST_VERSION) >= Version("4"), reason="Brest 3.x only"))
 ])
 def backup_image(one: One, vm_with_disk: int, request):
     backup_ds_id = request.getfixturevalue(request.param)
     run_command(f"sudo onevm backup {vm_with_disk} -d {backup_ds_id}")
-    if BREST_VERSION < 4:
+
+    if Version(BREST_VERSION) < Version("4"):
         time.sleep(120)
     else:
         time.sleep(20)
+
     backups = [image.ID for image in one.imagepool.info().IMAGE if image.TYPE == 6]
     backup_id = max(backups)
     yield backup_id
@@ -150,7 +153,7 @@ def test_backup_datastore_not_exist(one: One, backup_image: int):
 
 
 
-@pytest.mark.skipif(BREST_VERSION > 3, reason="for Brest 3.x")
+@pytest.mark.skipif(Version(BREST_VERSION) >= Version("4"), reason="Brest 3.x only")
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_restore_into_certain_storage_v3(one: One, backup_image: int, image_datastore: int):
     backup_info = one.image.info(backup_image)
@@ -174,7 +177,7 @@ def test_restore_into_certain_storage_v3(one: One, backup_image: int, image_data
 
 
 
-@pytest.mark.skipif(BREST_VERSION < 4, reason="for Brest 4.x")
+@pytest.mark.skipif(Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_restore_without_template(one: One, backup_image: int, image_datastore: int):
     backup_image_info    = one.image.info(backup_image)
@@ -196,7 +199,7 @@ def test_restore_without_template(one: One, backup_image: int, image_datastore: 
 
 
 
-@pytest.mark.skipif(BREST_VERSION < 4, reason="for Brest 4.x")
+@pytest.mark.skipif(Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")
 @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_restore_with_template(one: One, backup_image: int, image_datastore: int):
     name                 = get_unic_name()
