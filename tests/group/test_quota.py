@@ -84,8 +84,7 @@ def test_group_not_exist(one: One):
 
 
 def test_vm_quota(one: One, dummy_group: int):
-    group_id = dummy_group
-
+    group_id            = dummy_group
     vms                 = randint(1, 1024)
     cpu                 = randint(1, 1024)
     memory              = randint(1, 1024)
@@ -93,7 +92,6 @@ def test_vm_quota(one: One, dummy_group: int):
     running_cpu         = randint(1, 1024)
     running_memory      = randint(1, 1024)
     running_vms         = randint(1, 1024)
-    
     vm_quota_template   = f"""
         VM=[
             VMS=                "{vms}",
@@ -105,16 +103,13 @@ def test_vm_quota(one: One, dummy_group: int):
             RUNNING_VMS=        "{running_vms}"
         ]
     """
+
     _id = one.group.quota(group_id, vm_quota_template)
     assert _id == group_id
 
-
     group_info = one.group.info(group_id)
-    assert group_info.VM_QUOTA.VM
-    assert not group_info.DATASTORE_QUOTA.DATASTORE
-    assert not group_info.IMAGE_QUOTA.IMAGE
-    assert not group_info.NETWORK_QUOTA.NETWORK
 
+    assert group_info.VM_QUOTA.VM
     assert group_info.VM_QUOTA.VM.VMS               == vms
     assert group_info.VM_QUOTA.VM.CPU               == cpu
     assert group_info.VM_QUOTA.VM.MEMORY            == memory
@@ -123,112 +118,95 @@ def test_vm_quota(one: One, dummy_group: int):
     assert group_info.VM_QUOTA.VM.RUNNING_MEMORY    == running_memory
     assert group_info.VM_QUOTA.VM.RUNNING_VMS       == running_vms
 
-  
+    assert not group_info.DATASTORE_QUOTA.DATASTORE
+    assert not group_info.IMAGE_QUOTA.IMAGE
+    assert not group_info.NETWORK_QUOTA.NETWORK
 
 
 
 
-def test_storage_quota(one: One, dummy_group: int, datastores: List[int]):
-    ds_quotas = {}
-    ds_quota_template = ""
-    for _ in range(len(datastores)):
-        _id       = datastores[_]._id
-        _images   = randint(1, 1024)
-        _size     = randint(1, 1024)
-        ds_quotas[_id] = DatastoreQuotaInfo(
-                                        ID=          _id,
-                                        IMAGES=      _images,
-                                        SIZE=        _size,
-                                        IMAGES_USED= 0,
-                                        SIZE_USED=   0,
-                                    )
-        ds_quota_template += f"""
-            DATASTORE=[
-                ID=     "{_id}",
-                IMAGES= "{_images}",
-                SIZE=   "{_size}"
+
+
+def test_storage_quota(one: One, dummy_group: int, dummy_datastore: int):
+    group_id        = dummy_group
+    datastore_id    = dummy_datastore
+    images          = randint(1, 1024)
+    size            = randint(1, 1024)
+    quota_template  = f"""
+        DATASTORE=[
+            ID=     "{datastore_id}",
+            IMAGES= "{images}",
+            SIZE=   "{size}"
         ]
-        """
+    """
     
-    _id = one.group.quota(group._id, ds_quota_template)
-    assert _id == group._id
+    _id = one.group.quota(group_id, quota_template)
+    assert _id == group_id
 
-    group_info = group.info()
-    assert group_info.DATASTORE_QUOTA
-    assert not group_info.VM_QUOTA
-    assert not group_info.IMAGE_QUOTA
-    assert not group_info.NETWORK_QUOTA
+    group_info = one.group.info(group_id)
+    
+    assert group_info.DATASTORE_QUOTA.DATASTORE
+    assert group_info.DATASTORE_QUOTA.DATASTORE[-1].ID      == str(datastore_id)
+    assert group_info.DATASTORE_QUOTA.DATASTORE[-1].IMAGES  == str(images)
+    assert group_info.DATASTORE_QUOTA.DATASTORE[-1].SIZE    == str(size)
 
-    for ds_quota in group_info.DATASTORE_QUOTA:
-        assert ds_quotas[ds_quota.ID] == ds_quota
+    assert not group_info.VM_QUOTA.VM
+    assert not group_info.IMAGE_QUOTA.IMAGE
+    assert not group_info.NETWORK_QUOTA.NETWORK
 
 
 
-
-
-def test_image_quota(one: One, group: Group, images: List[Image]):
-    img_quotas = {}
-    img_quota_template = ""
-    for _ in range(len(images)):
-        _id   = images[_]._id
-        _rvms = randint(1, 1024)
-        img_quotas[_id] = ImageQuotaInfo(
-                                        ID=         _id,
-                                        RVMS=       _rvms,
-                                        RVMS_USED=  0,
-                                    )
-        img_quota_template += f"""
-            IMAGE=[
-                ID=     "{_id}",
-                RVMS=   "{_rvms}"
+def test_image_quota(one: One, dummy_group: int, dummy_image: int):
+    group_id        = dummy_group
+    image_id        = dummy_image
+    rvms            = randint(1, 1024)
+    quota_template  = f"""
+        IMAGE=[
+            ID=     "{image_id}",
+            RVMS=   "{rvms}"
             ]
         """
     
-    _id = one.group.quota(group._id, img_quota_template)
-    assert _id == group._id
+    _id = one.group.quota(group_id, quota_template)
+    assert _id == group_id
 
-    group_info = group.info()
-    assert  group_info.IMAGE_QUOTA
-    assert not group_info.DATASTORE_QUOTA
-    assert not group_info.VM_QUOTA
-    assert not group_info.NETWORK_QUOTA
+    group_info = one.group.info(group_id)
 
-    for img_quota in group_info.IMAGE_QUOTA:
-        assert img_quotas[img_quota.ID] == img_quota
+    assert group_info.IMAGE_QUOTA.IMAGE
+    assert group_info.IMAGE_QUOTA.IMAGE[-1].ID   == str(image_id)
+    assert group_info.IMAGE_QUOTA.IMAGE[-1].RVMS == str(rvms)
+
+    assert not group_info.VM_QUOTA.VM
+    assert not group_info.NETWORK_QUOTA.NETWORK
+    assert not group_info.DATASTORE_QUOTA.DATASTORE
 
 
 
 
-def test_network_quota(one: One, group: Group, vnets: List[Vnet]):
-    vnet_quotas = {}
-    vnet_quota_template = ""
-    for _ in range(len(vnets)):
-        _id     = vnets[_]._id
-        _leases = randint(1, 1024)
-        vnet_quotas[_id] = NetworkQuotaInfo(
-                                        ID=          _id,
-                                        LEASES=      _leases,
-                                        LEASES_USED= 0,
-                                    )
-        vnet_quota_template += f"""
-            NETWORK=[
-                ID=     "{_id}",
-                LEASES= "{_leases}"
-            ]
-        """
+
+
+def test_network_quota(one: One, dummy_group: int, dummy_vnet: int):
+    group_id        = dummy_group
+    vnet_id         = dummy_vnet
+    leases          = randint(1, 1024)
+    quota_template  = f"""
+        NETWORK=[
+            ID=     "{vnet_id}",
+            LEASES= "{leases}"
+        ]
+    """
     
-    _id = one.group.quota(group._id, vnet_quota_template)
-    assert _id == group._id
+    _id = one.group.quota(group_id, quota_template)
+    assert _id == group_id
 
-    group_info = group.info()
-    assert  group_info.NETWORK_QUOTA
-    assert not group_info.IMAGE_QUOTA
-    assert not group_info.DATASTORE_QUOTA
-    assert not group_info.VM_QUOTA
-
-
-    for vnet_quota in group_info.NETWORK_QUOTA:
-        assert vnet_quotas[vnet_quota.ID] == vnet_quota
+    group_info = one.group.info(group_id)
+    assert group_info.NETWORK_QUOTA.NETWORK
+    assert group_info.NETWORK_QUOTA.NETWORK[-1].ID      == str(vnet_id)
+    assert group_info.NETWORK_QUOTA.NETWORK[-1].LEASES  == str(leases)
+    assert not group_info.VM_QUOTA.VM
+    assert not group_info.IMAGE_QUOTA.IMAGE
+    assert not group_info.DATASTORE_QUOTA.DATASTORE
+    
 
 
 
