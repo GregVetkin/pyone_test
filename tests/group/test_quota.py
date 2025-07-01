@@ -9,64 +9,6 @@ from utils.other            import get_unic_name
 
 
 
-@pytest.fixture
-def images(one: One, dummy_datastore: int):
-    image_datastore_id  = dummy_datastore
-    image_ids_list      = []
-
-    for _ in range(5):
-        template = f"""
-            NAME = {get_unic_name()}
-            TYPE = DATABLOCK
-            SIZE = 1
-        """
-        image_id = one.image.allocate(template, image_datastore_id, False)
-        image_ids_list.append(image_id)
-
-    yield image_ids_list
-
-    for image_id in image_ids_list:
-        one.image.delete(image_id)
-
-
-
-@pytest.fixture
-def datastores(one: One):
-    datastore_ids_list = []
-
-    for _ in range(5):
-        template = f"""
-            NAME   = {get_unic_name()}
-            TYPE   = IMAGE_DS
-            TM_MAD = ssh
-            DS_MAD = fs
-        """
-        datastore_id = one.datastore.allocate(template, -1)
-        datastore_ids_list.append(datastore_id)
-
-    yield datastore_ids_list
-
-    for datastore_id in datastore_ids_list:
-        one.datastore.delete(datastore_id)
-
-
-
-@pytest.fixture
-def vnets(one: One):
-    vnet_ids_list = []
-    for _ in range(5):
-        vnet_template = f"""
-            NAME   = {get_unic_name()}
-            VN_MAD = bridge
-        """
-        vnet_id = one.vn.allocate(vnet_template, -1)
-        vnet_ids_list.append(vnet_id)
-
-    yield vnet_ids_list
-
-    for vnet_id in vnet_ids_list:
-        one.vn.delete(vnet_id)
-
 
 # =================================================================================================
 # TESTS

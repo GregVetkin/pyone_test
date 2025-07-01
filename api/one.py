@@ -28,9 +28,9 @@ from utils.connection  import ApiConnectionData
 
 class One():
     def __init__(self, api_connection_data: ApiConnectionData) -> None:
-        uri     = api_connection_data.uri
-        session = api_connection_data.session
-        self._server = OneServer(uri, session)
+        self._uri     = api_connection_data.uri
+        self._session = api_connection_data.session
+        self._server = OneServer(self._uri, self._session)
 
 
         self.system         = OneSystem(self._server)
