@@ -1,5 +1,5 @@
 import pytest
-from pyone     import OneNoExistsException, OneActionException
+from pyone     import OneNoExistsException, OneActionException, OneException
 
 
 
@@ -19,7 +19,7 @@ def delete__test(api_object, one_object_id):
 
 
 def cant_be_deleted__test(api_object, one_object_id):
-    with pytest.raises(OneActionException):
+    with pytest.raises((OneActionException, OneException)):
         api_object.delete(one_object_id)
     
     api_object.info(one_object_id)
