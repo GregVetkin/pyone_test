@@ -1,4 +1,7 @@
 import random
+import pytest
+from pyone        import OneNoExistsException, OneException
+
 
 
 def __get_random_rights():
@@ -30,14 +33,41 @@ def __permissions_changed_correctly(old_permissions, new_permissions, establishe
 
 
 
+def object_not_exist__test(api_object):
+    one_object_id   = 99999
+    permissions     = (0, 0, 0, 0, 0, 0, 0, 0, 0)
 
-def random_permissions__test(api_object, one_object_id):
-    old_permissions = api_object.info(one_object_id).PERMISSIONS
-    right_to_set    = __get_random_rights()
+    with pytest.raises(OneNoExistsException):
+        api_object.chmod(one_object_id, *permissions)
 
-    _id = api_object.chmod(one_object_id, *right_to_set)
+
+
+def cant_be_chmod__test(api_object, one_object_id, permissions):
+    # Когда-нибудь тут будет конкретное исключение
+    with pytest.raises(OneException):
+        api_object.chmod(one_object_id, *permissions)
+
+
+
+def chmod__test(api_object, one_object_id, permissions):
+    old_permissions     = api_object.info(one_object_id).PERMISSIONS
+
+    _id = api_object.chmod(one_object_id, *permissions)
     assert _id == one_object_id
 
     new_permissions = api_object.info(one_object_id).PERMISSIONS
 
-    assert __permissions_changed_correctly(old_permissions, new_permissions, right_to_set)
+    assert __permissions_changed_correctly(old_permissions, new_permissions, permissions)
+
+
+
+def random_permissions__test(api_object, one_object_id):
+    old_permissions     = api_object.info(one_object_id).PERMISSIONS
+    permissions_to_set  = __get_random_rights()
+
+    _id = api_object.chmod(one_object_id, *permissions_to_set)
+    assert _id == one_object_id
+
+    new_permissions = api_object.info(one_object_id).PERMISSIONS
+
+    assert __permissions_changed_correctly(old_permissions, new_permissions, permissions_to_set)
