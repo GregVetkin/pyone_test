@@ -6,11 +6,13 @@ from pyone     import OneNoExistsException, OneException
 
 
 def update_if_not_exist__test(api_object):
-    with pytest.raises(OneNoExistsException):
-        api_object.update(999999, template="", replace=True)
+    one_object_id   = 99999
+    template        = ""
+    
+    for replace in [True, False]:
+        with pytest.raises(OneNoExistsException):
+            api_object.update(one_object_id, template, replace)
 
-    with pytest.raises(OneNoExistsException):
-        api_object.update(999999, template="", replace=False)
 
 
 
@@ -19,9 +21,12 @@ def cant_be_updated__test(api_object, one_object_id):
     template        = f"{attribute_name} = TEST_DATA"
 
     with pytest.raises(OneException):
-        api_object.update(one_object_id, template)
+        api_object.update(one_object_id, template, True)
+    
+    with pytest.raises(OneException):
+        api_object.update(one_object_id, template, False)
 
-    assert api_object.info().TEMPLATE.get(attribute_name)
+    assert not api_object.info(one_object_id).TEMPLATE.get(attribute_name)
 
 
 
