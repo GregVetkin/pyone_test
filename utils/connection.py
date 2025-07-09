@@ -27,8 +27,8 @@ class ApiConnectionData:
     def __post_init__(self):
         self.session = f"{self.user}:{self.token}"
 
-        if Version(BREST_VERSION) >= Version("4"):
-            self.session = base64.b64encode(self.session.encode()).decode()
+    #     if Version(BREST_VERSION) >= Version("4"):
+    #         self.session = base64.b64encode(self.session.encode()).decode()
 
 
 

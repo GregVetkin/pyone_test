@@ -1,11 +1,14 @@
 import pytest
 import time
+
 from utils.version      import Version
 from api                import One
 from pyone              import OneNoExistsException, OneException
-from utils              import get_unic_name, run_command
-from config             import ADMIN_NAME, BREST_VERSION
-
+from config.opennebula  import ImageStates, VmStates
+from config.base        import BREST_VERSION
+from utils.other        import wait_until, get_unic_name
+from utils.connection   import brest_admin_ssh_conn
+from utils.commands     import run_command_via_ssh
 
 
 @pytest.fixture
@@ -18,9 +21,11 @@ def image_datastore(one: One):
     """
     datastore_id = one.datastore.allocate(template)
     time.sleep(3)
+
     yield datastore_id
-    time.sleep(3)
+
     one.datastore.delete(datastore_id)
+    time.sleep(3)
 
 
 @pytest.fixture
@@ -33,9 +38,11 @@ def file_datastore(one: One):
     """
     datastore_id = one.datastore.allocate(template)
     time.sleep(3)
+
     yield datastore_id
-    time.sleep(3)
+
     one.datastore.delete(datastore_id)
+    time.sleep(3)
 
 
 @pytest.fixture
@@ -49,9 +56,11 @@ def backup_datastore(one: One):
     """
     datastore_id = one.datastore.allocate(template)
     time.sleep(3)
+
     yield datastore_id
-    time.sleep(3)
+
     one.datastore.delete(datastore_id)
+    time.sleep(3)
 
 
 @pytest.fixture
@@ -63,9 +72,11 @@ def system_datastore(one: One):
     """
     datastore_id = one.datastore.allocate(template)
     time.sleep(3)
+
     yield datastore_id
-    time.sleep(3)
+
     one.datastore.delete(datastore_id)
+    time.sleep(3)
 
 
 @pytest.fixture
@@ -76,27 +87,32 @@ def image(one: One, image_datastore: int):
         SIZE = 1
     """
     image_id = one.image.allocate(template, image_datastore)
-    while one.image.info(image_id).STATE != 1: time.sleep(1)
+    wait_until(lambda: one.image.info(image_id).STATE == ImageStates.READY)
+
     yield image_id
-    time.sleep(3)
+
     one.image.delete(image_id)
+    wait_until(lambda: image_id not in [image.ID for image in one.imagepool.info().IMAGE])
 
 
 
 @pytest.fixture
-def vm_with_disk(one: One, system_datastore: int, image: int):
+def vm_with_disk(one: One, image: int, system_datastore: int):
+    image_id = image
     template = f"""
         NAME = {get_unic_name()}
         CPU = 1
         MEMORY = 32
-        DISK = [IMAGE_ID={image}]
+        VCPU = 1
+        DISK=[IMAGE_ID={image_id}]
     """
-    vm_id = one.vm.allocate(template)
-    time.sleep(5)
-    while one.vm.info(vm_id).STATE != 8: time.sleep(1)
+    vm_id = one.vm.allocate(template, False)
+    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF)
+
     yield vm_id
-    one.vm.action("terminate-hard", vm_id)
-    while one.vm.info(vm_id).STATE != 6: time.sleep(1)
+
+    one.vm.recover(vm_id, 3)
+    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.DONE)
 
 
 
@@ -107,7 +123,8 @@ def vm_with_disk(one: One, system_datastore: int, image: int):
 ])
 def backup_image(one: One, vm_with_disk: int, request):
     backup_ds_id = request.getfixturevalue(request.param)
-    run_command(f"sudo onevm backup {vm_with_disk} -d {backup_ds_id}")
+
+    run_command_via_ssh(brest_admin_ssh_conn, f"onevm backup {vm_with_disk} -d {backup_ds_id}")
 
     if Version(BREST_VERSION) < Version("4"):
         time.sleep(120)
@@ -117,9 +134,9 @@ def backup_image(one: One, vm_with_disk: int, request):
     backups = [image.ID for image in one.imagepool.info().IMAGE if image.TYPE == 6]
     backup_id = max(backups)
     yield backup_id
-    time.sleep(3)
-    one.image.delete(backup_id)
 
+    one.image.delete(backup_id)
+    wait_until(lambda: backup_id not in [image.ID for image in one.imagepool.info().IMAGE])
 
 
 
@@ -129,61 +146,74 @@ def backup_image(one: One, vm_with_disk: int, request):
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_backup_image_not_exist(one: One, image_datastore: int):
+
+def test_backup_image_not_exist(one: One, dummy_datastore: int):
+    image_id     = 999999
+    datastore_id = dummy_datastore
+
     with pytest.raises(OneNoExistsException):
-        one.image.restore(999999, image_datastore)
+        one.image.restore(image_id, datastore_id)
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_wrong_image_type(one: One, image: int, image_datastore: int):
-    assert one.image.info(image).TYPE != 6
+
+def test_wrong_image_type(one: One, dummy_image: int, dummy_datastore: int):
+    image_id     = dummy_image
+    datastore_id = dummy_datastore
+
+    assert one.image.info(image_id).TYPE != 6
+
     with pytest.raises(OneException):
-        one.image.restore(image, image_datastore)
+        one.image.restore(image_id, datastore_id)
 
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_backup_datastore_not_exist(one: One, backup_image: int):
-    assert one.image.info(backup_image).TYPE == 6
+    image_id     = backup_image
+    datastore_id = 99999
+
+    assert one.image.info(image_id).TYPE == 6
+
     with pytest.raises(OneNoExistsException):
-        one.image.restore(backup_image, 999999)
+        one.image.restore(image_id, datastore_id)
 
 
 
 @pytest.mark.skipif(Version(BREST_VERSION) >= Version("4"), reason="Brest 3.x only")
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_restore_into_certain_storage_v3(one: One, backup_image: int, image_datastore: int):
-    backup_info = one.image.info(backup_image)
+def test_restore_into_certain_storage_v3(one: One, backup_image: int, dummy_datastore: int):
+    image_id     = backup_image
+    datastore_id = dummy_datastore
+
+    backup_info = one.image.info(image_id)
     assert backup_info.TYPE == 6
 
     backuped_vm_id      = int(backup_info.TEMPLATE["ONEVMID"])
     restored_vm_id      = backuped_vm_id + 1
     restored_image_id   = backup_image + 1
 
-    one.image.restore(backup_image, image_datastore)
-    time.sleep(30)
+    one.image.restore(backup_image, datastore_id)
+    wait_until(lambda: one.vm.info(restored_vm_id).STATE == VmStates.POWEROFF)
 
-    assert image_datastore == one.image.info(restored_image_id).DATASTORE_ID
-    assert one.vm.info(restored_vm_id)
+    assert one.image.info(restored_image_id).DATASTORE_ID == datastore_id
 
     one.vm.action("terminate-hard", restored_vm_id)
-    while one.vm.info(restored_vm_id).STATE != 6: time.sleep(1)
+    wait_until(lambda: one.vm.info(restored_vm_id).STATE == VmStates.DONE)
+
     one.image.delete(restored_image_id)
-    time.sleep(5)
+    wait_until(lambda: restored_image_id not in [image.ID for image in one.imagepool.info().IMAGE])
 
 
 
 
 @pytest.mark.skipif(Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_restore_without_template(one: One, backup_image: int, image_datastore: int):
-    backup_image_info    = one.image.info(backup_image)
-    vm_id                = backup_image_info.VMS.ID[-1]
-    answer               = one.image.restore(backup_image, image_datastore)
-    ids                  = [int(_id) for _id in answer.split()]
+def test_restore_without_template(one: One, backup_image: int, dummy_datastore: int):
+    image_id             = backup_image
+    datastore_id         = dummy_datastore
+    backup_info          = one.image.info(image_id)
+    vm_id                = backup_info.VMS.ID[-1]
+    api_response         = one.image.restore(backup_image, datastore_id)
+    ids                  = [int(_id) for _id in api_response.split()]
     restored_template_id = ids[0]
     restored_image_ids   = ids[1:]
 
@@ -196,18 +226,20 @@ def test_restore_without_template(one: One, backup_image: int, image_datastore: 
 
     one.template.delete(restored_template_id, delete_images=True)
 
+    time.sleep(10)
 
 
 
 @pytest.mark.skipif(Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_restore_with_template(one: One, backup_image: int, image_datastore: int):
+def test_restore_with_template(one: One, backup_image: int, dummy_datastore: int):
+    image_id             = backup_image
+    datastore_id         = dummy_datastore
     name                 = get_unic_name()
     template             = f"NAME={name}"
-    backup_image_info    = one.image.info(backup_image)
-    vm_id                = backup_image_info.VMS.ID[-1]
-    answer               = one.image.restore(backup_image, image_datastore, template)
-    ids                  = [int(_id) for _id in answer.split()]
+    backup_info          = one.image.info(backup_image)
+    vm_id                = backup_info.VMS.ID[-1]
+    api_response         = one.image.restore(image_id, datastore_id, template)
+    ids                  = [int(_id) for _id in api_response.split()]
     restored_template_id = ids[0]
     restored_image_ids   = ids[1:]
 
@@ -219,3 +251,5 @@ def test_restore_with_template(one: One, backup_image: int, image_datastore: int
         assert one.image.info(restored_image_id).NAME.startswith(f"{name}-disk-")
 
     one.template.delete(restored_template_id, delete_images=True)
+
+    time.sleep(10)
