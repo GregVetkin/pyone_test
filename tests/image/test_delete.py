@@ -11,14 +11,10 @@ from tests._common_methods.delete   import cant_be_deleted__test
 
 
 
-import time
-
 @pytest.fixture
 def used_image(one: One, dummy_vm: int, dummy_image: int):
     vm_id    = dummy_vm
     image_id = dummy_image
-
-    time.sleep(30)
 
     wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
     one.vm.attach(vm_id, f"DISK=[IMAGE_ID={image_id}]")

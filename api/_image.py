@@ -42,13 +42,13 @@ class OneImage:
         """Enables or disables an image"""
         return self._one_image.enable(image_id, enable)
 
-    def _enable(self, image_id: int) -> int:
-        """Enables an image"""
-        return self.enable(image_id, True)
+    # def _enable(self, image_id: int) -> int:
+    #     """Enables an image"""
+    #     return self.enable(image_id, True)
     
-    def _disable(self, image_id: int) -> int:
-        """Disables an image"""
-        return self.enable(image_id, False)
+    # def _disable(self, image_id: int) -> int:
+    #     """Disables an image"""
+    #     return self.enable(image_id, False)
     
     def persistent(self, image_id: int, persistent: bool) -> int:
         """Sets the Image as persistent or not persistent"""
