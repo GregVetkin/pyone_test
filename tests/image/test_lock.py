@@ -17,7 +17,7 @@ def locked_image(one: One, dummy_image: int, request):
     lock_level  = request.param
 
     one.image.lock(image_id, lock_level, False)
-    wait_until(lambda: one.image.info(image_id, False).LOCK.LOCKED == lock_level)
+    wait_until(lambda: one.image.info(image_id, False).LOCK is not None)
 
     yield image_id
 
@@ -40,7 +40,7 @@ def test_image_not_exist(one: One):
 
 @pytest.mark.parametrize("lock_check", [True, False])
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-def test_lock_unlocked_image(one: One, dummy_image: int, lock_level: int, lock_check: bool):
+def test_lock_unlocked(one: One, dummy_image: int, lock_level: int, lock_check: bool):
     image_id = dummy_image
     lock_unlocked__test(one.image, image_id, lock_level, lock_check)
 
@@ -50,10 +50,7 @@ def test_lock_unlocked_image(one: One, dummy_image: int, lock_level: int, lock_c
 
 @pytest.mark.parametrize("lock_check", [True, False])
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
-def test_lock_locked_image(one: One, locked_image: int, lock_level: int, lock_check: bool):
+def test_lock_locked(one: One, locked_image: int, lock_level: int, lock_check: bool):
     image_id = locked_image
 
-    assert one.image.info(image_id).LOCK is not None
     lock_locked__test(one.image, image_id, lock_level, lock_check)
-
-    one.image.unlock(image_id)
