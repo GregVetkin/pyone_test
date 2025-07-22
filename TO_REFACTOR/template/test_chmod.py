@@ -1,80 +1,36 @@
 import pytest
+import random
 from api                        import One
-from utils                      import get_unic_name
-from one_cli.template           import Template, create_template, template_exist
-from one_cli.image              import Image, create_image, image_exist
-from one_cli.datastore          import Datastore, create_datastore
-from config                     import ADMIN_NAME
-from tests._common_tests.chmod  import chmod__test, chmod_if_not_exist__test, _rights_tuples_list, _rights_as_tuple
+from utils.other                import get_unic_name, wait_until
 
 
 
+def images(one: One, dummy_datastore: int):
+    datastore_id = dummy_datastore
+    image_ids    = []
 
-@pytest.fixture(scope="module")
-def vmtemplate():
-    template = f"""
-        NAME    = {get_unic_name()}
-        CPU     = 1
-        VCPU    = 2
-        MEMORY  = 1024
-    """
-    _id = create_template(template)
-    the_template = Template(_id)
-    yield the_template
-    the_template.delete()
+    for _ in random.randint(2, 5):
+        template = f"""
+            NAME = {get_unic_name()}
+            TYPE = DATABLOCK
+            SIZE = 1
+        """
+        image_id = one.image.allocate(template, datastore_id)
+        image_ids.append(image_id)
     
+    yield image_ids
 
-
-@pytest.fixture(scope="module")
-def datastore():
-    template = f"""
-        NAME   = {get_unic_name()}
-        TYPE   = IMAGE_DS
-        TM_MAD = ssh
-        DS_MAD = fs
-    """
-    datastore_id = create_datastore(template)
-    datastore    = Datastore(datastore_id)
-    yield datastore
-    datastore.delete()
-
-
-@pytest.fixture(scope="module")
-def image(datastore: Datastore):
-    template = f"""
-        NAME = {get_unic_name()}
-        TYPE = DATABLOCK
-        SIZE = 1
-    """
-    image_id = create_image(datastore._id, template)
-    image    = Image(image_id)
-    yield image
-    if not image_exist(image_id):
-        return
-    if image.info().LOCK is not None:
-        image.unlock()
-    image.delete()
+    for image_id in image_ids:
+        one.image.delete(image_id, True)
     
-
-@pytest.fixture(scope="module")
-def image_2(datastore: Datastore):
-    template = f"""
-        NAME = {get_unic_name()}
-        TYPE = DATABLOCK
-        SIZE = 1
-    """
-    image_id = create_image(datastore._id, template)
-    image    = Image(image_id)
-    yield image
-    if not image_exist(image_id):
-        return
-    if image.info().LOCK is not None:
-        image.unlock()
-    image.delete()
+    wait_until(
+        lambda: one.datastore.info(datastore_id, False).IMAGES.ID is None
+        )
 
 
-@pytest.fixture(scope="module")
-def vmtemplate_with_many_images(image: Image, image_2: Image):
+
+@pytest.fixture
+def vmtemplate_with_images():
     template = f"""
         NAME    = {get_unic_name()}
         CPU     = 1
