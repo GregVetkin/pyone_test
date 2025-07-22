@@ -122,9 +122,10 @@ def test_clone_template_with_disks(one: One, vmtemplate_with_images: int, clone_
         assert len(template_disk_ids) == len(clone_disk_ids),       "The number of disks in the template clone differs"
         assert max(template_disk_ids) < min(clone_disk_ids),        "New images must have an id greater than the original template"
         assert not set(template_disk_ids) & set(clone_disk_ids),    "The clone template contains old template disks"
+        assert images_count_before + len(template_disk_ids) ==  len(one.imagepool.info().IMAGE)
 
         for clone_disk_id in clone_disk_ids:
             one.image.delete(clone_disk_id, True)
     else:
         assert set(template_disk_ids) == set(clone_disk_ids)
-
+        assert images_count_before == len(one.imagepool.info().IMAGE)
