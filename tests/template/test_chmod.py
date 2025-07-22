@@ -27,7 +27,12 @@ def images(one: One, dummy_datastore: int):
     for image_id in image_ids:
         one.image.delete(image_id, True)
     
-    wait_until(lambda: not one.datastore.info(datastore_id, False).IMAGES.ID)
+    deleted_ids_set = set(image_ids)
+
+    wait_until(
+        lambda: deleted_ids_set.isdisjoint(set(one.datastore.info(datastore_id, False).IMAGES.ID)),
+        timeout_message="Some images were not removed when the test was completed."
+        )
 
 
 
