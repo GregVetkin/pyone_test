@@ -102,7 +102,7 @@ def test_locked_template(one: One, locked_template: int):
 
 
 
-def test_template_and_its_images(one: One, vmtemplate_with_images: int):
+def test_template_and_images(one: One, vmtemplate_with_images: int):
     template_id        = vmtemplate_with_images
     template_image_ids = [int(disk["IMAGE_ID"]) for disk in one.template.info(template_id, False, False).TEMPLATE["DISK"]]
 

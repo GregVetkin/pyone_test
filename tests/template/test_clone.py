@@ -77,7 +77,7 @@ def test_template_not_exist(one: One):
 
 
 
-def test_clone_name_collisison(one: One, dummy_template: int):
+def test_name_collisison(one: One, dummy_template: int):
     template_id = dummy_template
     clone_name  = one.template.info(template_id).NAME
     name_collision__test(one.template, template_id, clone_name)
@@ -106,7 +106,7 @@ def test_clone_template_with_disks(one: One, vmtemplate_with_images: int, clone_
     template_id         = vmtemplate_with_images
     clone_name          = get_unic_name()
     images_count_before = len(one.imagepool.info().IMAGE)
-    template_disk_ids   = [int(disk["IMAGE_ID"]) for disk in one.template.info(template_id).TEMPLATE["DISK"]]
+    template_image_ids  = [int(disk["IMAGE_ID"]) for disk in one.template.info(template_id).TEMPLATE["DISK"]]
     clone_id            = one.template.clone(template_id, clone_name, clone_disks)
 
     wait_until(
@@ -114,18 +114,23 @@ def test_clone_template_with_disks(one: One, vmtemplate_with_images: int, clone_
         timeout_message=f"""The timeout for creating a template clone has expired. Clone template id: {clone_id}"""
         )
     clone_info          = one.template.info(clone_id)
-    clone_disk_ids      = [int(disk["IMAGE_ID"]) for disk in one.template.info(clone_id).TEMPLATE["DISK"]]
+    clone_image_ids     = [int(disk["IMAGE_ID"]) for disk in one.template.info(clone_id).TEMPLATE["DISK"]]
 
     assert clone_info.NAME == clone_name
 
     if clone_disks:
-        assert len(template_disk_ids) == len(clone_disk_ids),       "The number of disks in the template clone differs"
-        assert max(template_disk_ids) < min(clone_disk_ids),        "New images must have an id greater than the original template"
-        assert not set(template_disk_ids) & set(clone_disk_ids),    "The clone template contains old template disks"
-        assert images_count_before + len(template_disk_ids) ==  len(one.imagepool.info().IMAGE)
+        assert len(template_image_ids) == len(clone_image_ids),       "The number of disks in the template clone differs"
+        assert max(template_image_ids) < min(clone_image_ids),        "New images must have an id greater than the original template"
+        assert not set(template_image_ids) & set(clone_image_ids),    "The clone template contains old template disks"
+        assert images_count_before + len(template_image_ids) ==  len(one.imagepool.info().IMAGE)
 
-        for clone_disk_id in clone_disk_ids:
-            one.image.delete(clone_disk_id, True)
+        one.template.delete(clone_id, True)
+        wait_until(
+            lambda: set(clone_image_ids).isdisjoint(set([image.ID for image in one.imagepool.info().IMAGE])),
+            timeout_message="Some images were not removed when the test was completed."
+        )
+    
     else:
-        assert set(template_disk_ids) == set(clone_disk_ids)
+        assert set(template_image_ids) == set(clone_image_ids)
         assert images_count_before == len(one.imagepool.info().IMAGE)
+        one.template.delete(clone_id, False)

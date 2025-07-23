@@ -42,20 +42,20 @@ def test_template_not_exist(one: One):
 
 
 
-def test_update_template__replace(one: One, dummy_template: int):
+def test_update_by_replace(one: One, dummy_template: int):
     template_id = dummy_template
     update_and_replace__test(one.template, template_id)
 
 
 
-def test_update_template__merge(one: One, dummy_template: int):
+def test_update_by_merge(one: One, dummy_template: int):
     template_id = dummy_template
     update_and_merge__test(one.template, template_id)
 
 
 
 
-def test_update_locked_template(one: One, locked_template: int):
+def test_locked_template(one: One, locked_template: int):
     template_id = locked_template
     lock_level = one.template.info(template_id).LOCK.LOCKED
 

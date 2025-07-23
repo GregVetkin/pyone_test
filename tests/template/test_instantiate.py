@@ -119,7 +119,7 @@ def test_hold_vm(one: One, dummy_template: int, hold_vm: bool):
 
 
 
-def test_instantiane_with_extra_tempalte(one: One, dummy_template: int):
+def test_extra_tempalte(one: One, dummy_template: int):
     template_id     = dummy_template
     vm_name         = get_unic_name()
     hold_vm         = True
@@ -171,9 +171,10 @@ def test_private_persistent_copy(one: One, vmtemplate_with_images: int):
     vm_id = one.template.instantiate(template_id, vm_name, hold_vm, extra_template, pers_copy)
     wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info().VM])
 
-    vm_info          = one.vm.info(vm_id)
-    vm_user_template = vm_info.USER_TEMPLATE
-    vm_images_ids    = [int(disk["IMAGE_ID"]) for disk in one.vm.info(vm_id).TEMPLATE["DISK"]]
+    vm_info           = one.vm.info(vm_id)
+    vm_user_template  = vm_info.USER_TEMPLATE
+    vm_images_ids     = [int(disk["IMAGE_ID"]) for disk in one.vm.info(vm_id).TEMPLATE["DISK"]]
+    clone_template_id = int(vm_info.TEMPLATE["TEMPLATE_ID"])
 
     assert vm_info.NAME == vm_name
     assert vm_user_template[init_attr_name.upper()] == init_attr_value
@@ -191,14 +192,16 @@ def test_private_persistent_copy(one: One, vmtemplate_with_images: int):
     one.vm.recover(vm_id, VmRecoverOperations.DELETE)
     wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.DONE)
 
-    for image_id in vm_images_ids:
-        one.image.delete(image_id, True)
-    
-    deleted_ids_set = set(vm_images_ids)
+    # for image_id in vm_images_ids:
+    #     one.image.delete(image_id, True)
+
+    one.template.delete(clone_template_id, True)
     wait_until(
-        lambda: deleted_ids_set.isdisjoint(set([image.ID for image in one.imagepool.info().IMAGE])),
+        lambda: set(vm_images_ids).isdisjoint(set([image.ID for image in one.imagepool.info().IMAGE])),
         timeout_message="Some images were not removed when the test was completed."
         )
+    
+    
         
     
     
