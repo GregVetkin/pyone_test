@@ -5,15 +5,13 @@ from utils.other        import get_unic_name, wait_until
 from utils.commands     import run_command_via_ssh
 from utils.connection   import local_admin_ssh_conn
 from utils.opennebula   import federation_master, federation_standalone
-from config.base        import API_URI, RAFT_CONFIG
+from config.base        import API_URI
 from typing             import List
 
 
 
 def run_command_via_ssh_as_local_admin(command: str):
     return run_command_via_ssh(local_admin_ssh_conn, command)
-
-
 
 
 @pytest.fixture(scope="module")
