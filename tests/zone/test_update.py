@@ -6,10 +6,11 @@ from utils.connection   import local_admin_ssh_conn
 from utils.opennebula   import federation_master, federation_standalone
 from config.base        import API_URI
 
+from tests._common_methods.update   import update_and_merge__test
+from tests._common_methods.update   import update_and_replace__test
+from tests._common_methods.update   import update_if_not_exist__test
 
-from tests._common_methods.delete   import delete__test
-from tests._common_methods.delete   import delete_if_not_exist__test
-from tests._common_methods.delete   import cant_be_deleted__test
+
 
 
 
@@ -31,15 +32,11 @@ def dummy_zone(one: One, federation_master_mode):
         ENDPOINT = {API_URI}
     """
     zone_id = one.zone.allocate(template)
-
+    
     yield zone_id
 
     if zone_id in [zone.ID for zone in one.zonepool.info().ZONE]:
         one.zone.delete(zone_id)
-
-
-
-
 
 
 
@@ -50,20 +47,22 @@ def dummy_zone(one: One, federation_master_mode):
 
 
 
-
 def test_zone_not_exist(one: One):
-    delete_if_not_exist__test(one.zone)
+    update_if_not_exist__test(one.zone)
 
 
 
-
-def test_delete_zone(one: One,  dummy_zone: int):
+def test_update_by_replace(one: One, dummy_zone: int):
     zone_id = dummy_zone
-    delete__test(one.zone, zone_id)
+    update_and_replace__test(one.zone, zone_id)
 
 
 
-def test_delete_system_zone_0(one: One):
-    zone_id = 0
-    cant_be_deleted__test(one.zone, zone_id)
+
+def test_update_by_merge(one: One, dummy_zone: int):
+    zone_id = dummy_zone
+    update_and_merge__test(one.zone, zone_id)
+
+
+
 
