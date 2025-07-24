@@ -87,16 +87,19 @@ class PyoneWrap:
 
 
 if __name__ == '__main__':
-    endpoint = "10.0.70.20"
+    endpoint = "http://10.0.70.20:2633/RPC2"
     username = "brestadm"
     password = "Qwe!2345"
 
-    pw = PyoneWrap(endpoint, username, password)
-    client = pw.get_client()
+
+    # one = pyone.OneServer(endpoint, session=f"{username}:7b7d2f5dbd20988ce938deaf04a7979899f35a67a47dbb7461ba351edb7a9305")
+    # print(one.vm.action("reboot", 25))
+
+    # pw = PyoneWrap(endpoint, username, password)
+    # client = pw.get_client()
     
 
+    # res  = client.vm.action("reboot-hard", 25, pw.sessionDir)
+    # print(res)
 
-    res  = client.vm.action("resume", 17, pw.sessionDir)
-    print(res)
-
-    pw.run_one_vm_action()
+    # pw.run_one_vm_action()
