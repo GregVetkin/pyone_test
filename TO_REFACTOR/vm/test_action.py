@@ -2,26 +2,11 @@ import pytest
 import random
 import pyone
 
+from config.base    import API_URI
 
-from time            import sleep
-from api             import One
-from utils           import get_unic_name
-from one_cli.vm      import VirtualMachine
-from config          import ADMIN_NAME, VmStates
-
-
-
-
-@pytest.fixture
-# @pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def poweroff_vm(one: One):
-    vm_id = one.vm.allocate(f"NAME={get_unic_name()}\nCPU=1\nMEMORY=1\n")
-    while one.vm.info(vm_id).STATE != VmStates.POWEROFF: sleep(0.5)
-
-    yield VirtualMachine(vm_id)
-
-    one.vm.recover(vm_id, 3)
-    while one.vm.info(vm_id).STATE != VmStates.DONE: sleep(0.5)
+from pyone          import OneNoExistsException
+from pyone          import OneActionException
+from api            import One
 
 
 
@@ -34,75 +19,115 @@ def poweroff_vm(one: One):
 # =================================================================================================
 
 
-
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
 def test_vm_not_exist(one: One):
-    with pytest.raises(pyone.OneNoExistsException):
-        one.vm.action("terminate", 999999)
+    action = "terminate"
+    vm_id  = 99999
+
+    with pytest.raises(OneNoExistsException):
+        one.vm.action(action, vm_id)
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_action_not_exist(one: One, poweroff_vm: VirtualMachine):
-    pass
+def test_action_not_exist(one: One, dummy_vm: int):
+    action = "spamspamspam"
+    vm_id  = dummy_vm
+
+    with pytest.raises(OneActionException):
+        one.vm.action(action, vm_id)
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_terminate_hard(one: One):
-    pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_terminate(one: One):
-    pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_undeploy_hard(one: One):
-    pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_undeploy(one: One):
-    pass
+class TestTerminate:
+    action = "terminate"
+    def test_terminate_AIC(self, dummy_vm: int):
+        
+        assert self.action == "terminate"
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_poweroff(one: One):
-    pass
+class TestTerminateHard:
+    action = "terminate-hard"
+    def test_terminate_hard(self):
+        pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_poweroff_hard(one: One):
-    pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_reboot(one: One):
-    pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_reboot_hard(one: One):
-    pass
+class TestUndeploy:
+    action = "undeploy"
+    def test_undeploy(self):
+        pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_hold(one: One):
-    pass
+class TestUndeployHard:
+    action = "undeploy-hard"
+    def test_undeploy_hard(self):
+        pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_release(one: One):
-    pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_stop(one: One):
-    pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_suspend(one: One):
-    pass
+class TestPoweroff:
+    action = "poweroff"
+    def test_poweroff(self):
+        pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_resume(one: One):
-    pass
+class TestPoweroffHard:
+    action = "poweroff-hard"
+    def test_poweroff_hard(self):
+        pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_resched(one: One):
-    pass
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_unresched(one: One):
-    pass
+
+class TestReboot:
+    action = "reboot"
+    def test_reboot(self):
+        pass
+
+class TestRebootHard:
+    action = "reboot-hard"
+    def test_reboot_hard(self):
+        pass
+
+
+
+
+class TestHold:
+    action = "hold"
+    def test_hold(self):
+        pass
+
+
+class TestRelease:
+    action = "release"
+    def test_release(self):
+        pass
+
+
+class TestStop:
+    action = "stop"
+    def test_stop(self):
+        pass
+
+
+class TestSuspend:
+    action = "suspend"
+    def test_suspend(self):
+        pass
+
+
+class TestResume:
+    action = "resume"
+    def test_resume(self):
+        pass
+
+
+class TestResched:
+    action = "resched"
+    def test_resched(self):
+        pass
+
+
+class TestUnresched:
+    action = "unresched"
+    def test_unresched(self):
+        pass
+
+    
