@@ -1,7 +1,8 @@
 import subprocess
 import shlex
 
-from utils.connection import SshConnectionData
+from utils.connection import SshConnectionData, local_admin_ssh_conn
+
 
 
 def run_command(command: str) -> str:
@@ -33,3 +34,12 @@ def run_command_via_ssh(ssh_connection_data: SshConnectionData, command: str) ->
 
 
 
+def check_ping(ip: str, counts: int = 1, timeout: int = 1):
+    command = f"ping -c {counts} -W {timeout} {ip} &> /dev/null ; echo $?"
+    result  = run_command_via_ssh(local_admin_ssh_conn, command)
+    code    = int(result)
+    
+    if code == 0:
+        return True
+    
+    return False

@@ -3,16 +3,19 @@ import random
 import pyone
 import time
 
-from utils.commands     import run_command_via_ssh
+from pyone              import OneNoExistsException, OneActionException
+from api                import One
+
+from utils.commands     import run_command_via_ssh, check_ping
 from utils.connection   import brest_admin_ssh_conn, local_admin_ssh_conn
-from config.base        import API_URI, BrestAdmin, BREST_VERSION
-from config.opennebula  import VmStates, VmLcmStates, VmRecoverOperations, VmActions
 from utils.kerberos     import PyoneWrap
 from utils.other        import wait_until, get_unic_name
 from utils.version      import Version
-from pyone              import OneNoExistsException
-from pyone              import OneActionException
-from api                import One
+
+from config.base        import API_URI, BrestAdmin, BREST_VERSION
+from config.opennebula  import VmStates, VmLcmStates, VmRecoverOperations, VmActions
+
+
 
 
 
@@ -70,366 +73,407 @@ def hold_vm(one: One):
 # =================================================================================================
 
 
-# def test_vm_not_exist(one: One):
-#     action = "terminate"
-#     vm_id  = 99999
+def test_vm_not_exist(one: One):
+    action = "terminate"
+    vm_id  = 99999
 
-#     with pytest.raises(OneNoExistsException):
-#         one.vm.action(action, vm_id)
-
-
-# def test_action_not_exist(one: One, dummy_vm: int):
-#     action = "spamspamspam"
-#     vm_id  = dummy_vm
-
-#     with pytest.raises(OneActionException):
-#         one.vm.action(action, vm_id)
+    with pytest.raises(OneNoExistsException):
+        one.vm.action(action, vm_id)
 
 
-# @pytest.mark.parametrize('action', [VmActions.TERMINATE, VmActions.TERMINATE_HARD])
-# class TestTerminate:
-#     def test_terminate(self, one: One, poweroff_vm: int, action: str):
-#         vm_id = poweroff_vm
-#         _id   = one.vm.action(action, vm_id)
-#         assert _id == vm_id
+def test_action_not_exist(one: One, dummy_vm: int):
+    action = "spamspamspam"
+    vm_id  = dummy_vm
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.DONE,
-#             timeout_message=f"ВМ {vm_id} не была удалена"
-#         )
+    with pytest.raises(OneActionException):
+        one.vm.action(action, vm_id)
+
+
+@pytest.mark.parametrize('action', [VmActions.TERMINATE, VmActions.TERMINATE_HARD])
+class TestTerminate:
+    def test_terminate(self, one: One, poweroff_vm: int, action: str):
+        vm_id = poweroff_vm
+        _id   = one.vm.action(action, vm_id)
+        assert _id == vm_id
+
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.DONE,
+            timeout_message=f"ВМ {vm_id} не была удалена"
+        )
         
-#     @pytest.mark.KERBEROS
-#     def test_terminate_KERBEROS(self, poweroff_vm: int, action: str):
-#         vm_id   = poweroff_vm
-#         pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one     = pw.get_client()
-#         _id     = one.vm.action(action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
+    @pytest.mark.KERBEROS
+    def test_terminate_KERBEROS(self, poweroff_vm: int, action: str):
+        vm_id   = poweroff_vm
+        pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one     = pw.get_client()
+        _id     = one.vm.action(action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
 
-#         assert _id == vm_id
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.DONE,
-#             timeout_message=f"ВМ {vm_id} не была удалена"
-#         )
-
-
-# @pytest.mark.parametrize('action', [VmActions.UNDEPLOY, VmActions.UNDEPLOY_HARD])
-# class TestUndeploy:
-#     def test_undeploy(self, one: One, poweroff_vm: int, action: str):
-#         vm_id = poweroff_vm
-#         _id   = one.vm.action(action, vm_id)
-#         assert _id == vm_id
-
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.UNDEPLOYED,
-#             timeout_message=f"ВМ {vm_id} не получила статус 'Неразвернута'"
-#         )
-
-#     @pytest.mark.KERBEROS    
-#     def test_undeploy_KERBEROS(self, poweroff_vm: int, action: str):
-#         vm_id   = poweroff_vm
-#         pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one     = pw.get_client()
-#         _id     = one.vm.action(action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
-
-#         assert _id == vm_id
-
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.UNDEPLOYED,
-#             timeout_message=f"ВМ {vm_id} не получила статус 'Неразвернута'"
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.DONE,
+            timeout_message=f"ВМ {vm_id} не была удалена"
+        )
 
 
-# @pytest.mark.parametrize('action', [VmActions.POWEROFF, VmActions.POWEROFF_HARD])
-# class TestPoweroff:
-#     def test_poweroff(self, one: One, running_vm: int, action: str):
-#         vm_id = running_vm
-#         _id   = one.vm.action(action, vm_id)
-#         assert _id == vm_id
+@pytest.mark.parametrize('action', [VmActions.UNDEPLOY, VmActions.UNDEPLOY_HARD])
+class TestUndeploy:
+    def test_undeploy(self, one: One, poweroff_vm: int, action: str):
+        vm_id = poweroff_vm
+        _id   = one.vm.action(action, vm_id)
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF,
-#             timeout_message=f"ВМ {vm_id} не выключилась",
-#             timeout=180
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.UNDEPLOYED,
+            timeout_message=f"ВМ {vm_id} не получила статус 'Неразвернута'"
+        )
+
+    @pytest.mark.KERBEROS    
+    def test_undeploy_KERBEROS(self, poweroff_vm: int, action: str):
+        vm_id   = poweroff_vm
+        pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one     = pw.get_client()
+        _id     = one.vm.action(action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
+
+        assert _id == vm_id
+
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.UNDEPLOYED,
+            timeout_message=f"ВМ {vm_id} не получила статус 'Неразвернута'"
+        )
+
+
+@pytest.mark.parametrize('action', [VmActions.POWEROFF, VmActions.POWEROFF_HARD])
+class TestPoweroff:
+    def test_poweroff(self, one: One, running_vm: int, action: str):
+        vm_id = running_vm
+        _id   = one.vm.action(action, vm_id)
+        assert _id == vm_id
+
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF,
+            timeout_message=f"ВМ {vm_id} не выключилась",
+            timeout=180
+        )
     
-#     @pytest.mark.KERBEROS   
-#     def test_poweroff_KERBEROS(self, running_vm: int, action: str):
-#         vm_id   = running_vm
-#         pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one     = pw.get_client()
-#         _id     = one.vm.action(action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
+    @pytest.mark.KERBEROS   
+    def test_poweroff_KERBEROS(self, running_vm: int, action: str):
+        vm_id   = running_vm
+        pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one     = pw.get_client()
+        _id     = one.vm.action(action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
 
-#         assert _id == vm_id
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF,
-#             timeout_message=f"ВМ {vm_id} не выключилась",
-#             timeout=180
-#         )
-
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF,
+            timeout_message=f"ВМ {vm_id} не выключилась",
+            timeout=180
+        )
 
 
 @pytest.mark.parametrize('action', [VmActions.REBOOT, VmActions.REBOOT_HARD])
 class TestReboot:
 
-    def test_reboot(self):
-        pass
+    def test_reboot(self, one: One, running_vm: int, action: str):
+        vm_id = running_vm
+        vm_ip = one.vm.info(vm_id).TEMPLATE["NIC"]["IP"] # Если NIC несколько, то будет список словарей
+
+        wait_until(
+            lambda: check_ping(vm_ip),
+            timeout_message=f"Нет связи с ВМ ID:{vm_id} по адрессу {vm_ip}"
+        )
+
+        _id   = one.vm.action(action, vm_id)
+        assert _id == vm_id
+
+        wait_until(
+            lambda: not check_ping(vm_ip),
+            timeout_message=f"Не пропала связь с ВМ ID:{vm_id} ({vm_ip}). Команда на перезагрузку не выполнена"
+        )
+        time.sleep(10)
+        wait_until(
+            lambda: check_ping(vm_ip),
+            timeout_message=f"Нет связи с ВМ ID:{vm_id} ({vm_ip}) после перезагрузки"
+        )
+        
+
 
     @pytest.mark.KERBEROS
-    def test_reboot_KERBEROS(self):
-        pass
+    def test_reboot_KERBEROS(self, running_vm: int, action: str):
+        vm_id = running_vm
+        pw    = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one   = pw.get_client()
+        vm_ip = one.vm.info(vm_id, False).TEMPLATE["NIC"]["IP"]
+
+        wait_until(
+            lambda: check_ping(vm_ip),
+            timeout_message=f"Нет связи с ВМ ID:{vm_id} по адрессу {vm_ip}"
+        )
+
+        _id   = one.vm.action(action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
+        assert _id == vm_id
+
+        wait_until(
+            lambda: not check_ping(vm_ip),
+            timeout_message=f"Не пропала связь с ВМ ID:{vm_id} ({vm_ip}). Команда на перезагрузку не выполнена"
+        )
+        time.sleep(10)
+        wait_until(
+            lambda: check_ping(vm_ip),
+            timeout_message=f"Нет связи с ВМ ID:{vm_id} ({vm_ip}) после перезагрузки"
+        )
 
 
+class TestHold:
+    action = VmActions.HOLD
 
-# class TestHold:
-#     action = VmActions.HOLD
+    def test_hold(self, one: One, pending_vm: int):
+        vm_id = pending_vm
+        _id   = one.vm.action(self.action, vm_id)
+        assert _id == vm_id
 
-#     def test_hold(self, one: One, pending_vm: int):
-#         vm_id = pending_vm
-#         _id   = one.vm.action(self.action, vm_id)
-#         assert _id == vm_id
-
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.HOLD,
-#             timeout_message=f"ВМ {vm_id} не перешла в статус УДЕРЖАНИЕ",
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.HOLD,
+            timeout_message=f"ВМ {vm_id} не перешла в статус УДЕРЖАНИЕ",
+        )
     
-#     @pytest.mark.KERBEROS   
-#     def test_hold_KERBEROS(self, pending_vm: int):
-#         vm_id   = pending_vm
-#         pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one     = pw.get_client()
-#         _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
+    @pytest.mark.KERBEROS   
+    def test_hold_KERBEROS(self, pending_vm: int):
+        vm_id   = pending_vm
+        pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one     = pw.get_client()
+        _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
 
-#         assert _id == vm_id
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.HOLD,
-#             timeout_message=f"ВМ {vm_id} не перешла в статус УДЕРЖАНИЕ",
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.HOLD,
+            timeout_message=f"ВМ {vm_id} не перешла в статус УДЕРЖАНИЕ",
+        )
 
 
-# class TestRelease:
-#     action = VmActions.RELEASE
+class TestRelease:
+    action = VmActions.RELEASE
 
-#     def test_release(self, one: One, hold_vm: int):
-#         vm_id = hold_vm
-#         _id   = one.vm.action(self.action, vm_id)
-#         assert _id == vm_id
+    def test_release(self, one: One, hold_vm: int):
+        vm_id = hold_vm
+        _id   = one.vm.action(self.action, vm_id)
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.PENDING,
-#             timeout_message=f"ВМ {vm_id} не перешла в статус Ожидание",
-#         )
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF,
-#             timeout_message=f"ВМ {vm_id} не разместилась на узле",
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.PENDING,
+            timeout_message=f"ВМ {vm_id} не перешла в статус Ожидание",
+        )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF,
+            timeout_message=f"ВМ {vm_id} не разместилась на узле",
+        )
         
     
-#     @pytest.mark.KERBEROS   
-#     def test_release_KERBEROS(self, hold_vm: int):
-#         vm_id   = hold_vm
-#         pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one     = pw.get_client()
-#         _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
+    @pytest.mark.KERBEROS   
+    def test_release_KERBEROS(self, hold_vm: int):
+        vm_id   = hold_vm
+        pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one     = pw.get_client()
+        _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
 
-#         assert _id == vm_id
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.PENDING,
-#             timeout_message=f"ВМ {vm_id} не перешла в статус Ожидание",
-#         )
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF,
-#             timeout_message=f"ВМ {vm_id} не разместилась на узле",
-#         )
-
-
-# class TestStop:
-#     action = VmActions.STOP
-
-#     def test_stop(self, one: One, running_vm: int):
-#         vm_id = running_vm
-#         _id   = one.vm.action(self.action, vm_id)
-#         assert _id == vm_id
-
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.STOPPED,
-#             timeout_message=f"ВМ {vm_id} не перешла в статус ОСТАНОВЛЕНО",
-#         )
-
-        
-    
-#     @pytest.mark.KERBEROS   
-#     def test_stop_KERBEROS(self, running_vm: int):
-#         vm_id   = running_vm
-#         pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one     = pw.get_client()
-#         _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
-
-#         assert _id == vm_id
-
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.STOPPED,
-#             timeout_message=f"ВМ {vm_id} не перешла в статус ОСТАНОВЛЕНО",
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.PENDING,
+            timeout_message=f"ВМ {vm_id} не перешла в статус Ожидание",
+        )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF,
+            timeout_message=f"ВМ {vm_id} не разместилась на узле",
+        )
 
 
-# class TestSuspend:
-#     action = VmActions.SUSPEND
+class TestStop:
+    action = VmActions.STOP
 
-#     def test_suspend(self, one: One, running_vm: int):
-#         vm_id = running_vm
-#         _id   = one.vm.action(self.action, vm_id)
-#         assert _id == vm_id
+    def test_stop(self, one: One, running_vm: int):
+        vm_id = running_vm
+        _id   = one.vm.action(self.action, vm_id)
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.SUSPENDED,
-#             timeout_message=f"ВМ {vm_id} не перешла в статус ПРИОСТАНОВЛЕНА",
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.STOPPED,
+            timeout_message=f"ВМ {vm_id} не перешла в статус ОСТАНОВЛЕНО",
+        )
 
         
-#     @pytest.mark.KERBEROS   
-#     def test_suspend_KERBEROS(self, running_vm: int):
-#         vm_id   = running_vm
-#         pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one     = pw.get_client()
-#         _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
+    
+    @pytest.mark.KERBEROS   
+    def test_stop_KERBEROS(self, running_vm: int):
+        vm_id   = running_vm
+        pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one     = pw.get_client()
+        _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
 
-#         assert _id == vm_id
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).STATE == VmStates.SUSPENDED,
-#             timeout_message=f"ВМ {vm_id} не перешла в статус ПРИОСТАНОВЛЕНА",
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.STOPPED,
+            timeout_message=f"ВМ {vm_id} не перешла в статус ОСТАНОВЛЕНО",
+        )
 
 
-# class TestResume:
-#     action = VmActions.RESUME
+class TestSuspend:
+    action = VmActions.SUSPEND
 
-#     def test_resume(self, one: One, poweroff_vm: int):
-#         vm_id = poweroff_vm
-#         _id   = one.vm.action(self.action, vm_id)
-#         assert _id == vm_id
+    def test_suspend(self, one: One, running_vm: int):
+        vm_id = running_vm
+        _id   = one.vm.action(self.action, vm_id)
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).LCM_STATE == VmLcmStates.RUNNING,
-#             timeout_message=f"ВМ {vm_id} не запутилась",
-#         )
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.SUSPENDED,
+            timeout_message=f"ВМ {vm_id} не перешла в статус ПРИОСТАНОВЛЕНА",
+        )
+
+        
+    @pytest.mark.KERBEROS   
+    def test_suspend_KERBEROS(self, running_vm: int):
+        vm_id   = running_vm
+        pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one     = pw.get_client()
+        _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
+
+        assert _id == vm_id
+
+        wait_until(
+            lambda: one.vm.info(vm_id).STATE == VmStates.SUSPENDED,
+            timeout_message=f"ВМ {vm_id} не перешла в статус ПРИОСТАНОВЛЕНА",
+        )
+
+
+class TestResume:
+    action = VmActions.RESUME
+
+    def test_resume(self, one: One, poweroff_vm: int):
+        vm_id = poweroff_vm
+        _id   = one.vm.action(self.action, vm_id)
+        assert _id == vm_id
+
+        wait_until(
+            lambda: one.vm.info(vm_id).LCM_STATE == VmLcmStates.RUNNING,
+            timeout_message=f"ВМ {vm_id} не запутилась",
+        )
 
     
-#     @pytest.mark.KERBEROS   
-#     def test_resume_KERBEROS(self, poweroff_vm: int):
-#         vm_id   = poweroff_vm
-#         pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one     = pw.get_client()
-#         _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
+    @pytest.mark.KERBEROS   
+    def test_resume_KERBEROS(self, poweroff_vm: int):
+        vm_id   = poweroff_vm
+        pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one     = pw.get_client()
+        _id     = one.vm.action(self.action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
 
-#         assert _id == vm_id
+        assert _id == vm_id
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id).LCM_STATE == VmLcmStates.RUNNING,
-#             timeout_message=f"ВМ {vm_id} не запутилась",
-#         )
-
-
-# class TestResched:
-#     action = VmActions.RESCHED
-
-#     def test_resched(self, one: One, poweroff_vm: int):
-#         vm_id       = poweroff_vm
-#         host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-#         _id         = one.vm.action(self.action, vm_id)
-
-#         assert _id == vm_id
-#         assert one.vm.info(vm_id, True).RESCHED == 1
-
-#         wait_until(
-#             lambda: one.vm.info(vm_id, True).LCM_STATE == VmLcmStates.PROLOG_MIGRATE_POWEROFF,
-#             timeout_message=f"ВМ {vm_id} не была перенесена",
-#         )
-#         wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
-
-#         host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-#         assert host_after != host_before
+        wait_until(
+            lambda: one.vm.info(vm_id).LCM_STATE == VmLcmStates.RUNNING,
+            timeout_message=f"ВМ {vm_id} не запутилась",
+        )
 
 
+class TestResched:
+    action = VmActions.RESCHED
 
-    
-#     @pytest.mark.KERBEROS   
-#     def test_resched_KERBEROS(self, poweroff_vm: int):
-#         vm_id       = poweroff_vm
-#         pw          = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one         = pw.get_client()
-#         host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-#         _id         = one.vm.action(self.action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
+    def test_resched(self, one: One, poweroff_vm: int):
+        vm_id       = poweroff_vm
+        host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+        _id         = one.vm.action(self.action, vm_id)
 
-#         assert _id == vm_id
-#         assert one.vm.info(vm_id, True).RESCHED == 1
+        assert _id == vm_id
+        assert one.vm.info(vm_id, True).RESCHED == 1
 
-#         wait_until(
-#             lambda: one.vm.info(vm_id, True).LCM_STATE == VmLcmStates.PROLOG_MIGRATE_POWEROFF,
-#             timeout_message=f"ВМ {vm_id} не была перенесена",
-#         )
-#         wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
+        wait_until(
+            lambda: one.vm.info(vm_id, True).LCM_STATE == VmLcmStates.PROLOG_MIGRATE_POWEROFF,
+            timeout_message=f"ВМ {vm_id} не была перенесена",
+        )
+        wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
 
-#         host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-#         assert host_after != host_before
-
-
-# class TestUnresched:
-#     action = VmActions.UNRESCHED
-
-#     def test_unresched(self, one: One, poweroff_vm: int):
-#         vm_id       = poweroff_vm
-#         host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-
-#         one.vm.action(VmActions.RESCHED, vm_id)
-#         assert one.vm.info(vm_id, True).RESCHED == 1
-
-#         _id = one.vm.action(self.action, vm_id)
-#         assert _id == vm_id
-#         assert one.vm.info(vm_id, True).RESCHED == 0
-
-#         time.sleep(30)
-#         host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-#         assert host_after == host_before
+        host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+        assert host_after != host_before
 
 
 
     
-#     @pytest.mark.KERBEROS   
-#     def test_unresched_KERBEROS(self, poweroff_vm: int):
-#         vm_id       = poweroff_vm
-#         pw          = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#         one         = pw.get_client()
-#         host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+    @pytest.mark.KERBEROS   
+    def test_resched_KERBEROS(self, poweroff_vm: int):
+        vm_id       = poweroff_vm
+        pw          = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one         = pw.get_client()
+        host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+        _id         = one.vm.action(self.action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
 
-#         one.vm.action(VmActions.RESCHED, vm_id)
+        assert _id == vm_id
+        assert one.vm.info(vm_id, True).RESCHED == 1
 
-#         # Вот здесь timeout 5 сек - resched может планировщиком быть обработан раньше, чем его отменим. 
-#         # Нужно что-то придумать. Может передачу в функцию параметра таймаута? А по умолчанию 5 сек.
-#         # Либо заморочиться и сделать выполнение функции в отдельном потоке/процессе, но стоит ли?
-#         pw.run_one_vm_action()  
-#         assert one.vm.info(vm_id, True).RESCHED == 1
+        wait_until(
+            lambda: one.vm.info(vm_id, True).LCM_STATE == VmLcmStates.PROLOG_MIGRATE_POWEROFF,
+            timeout_message=f"ВМ {vm_id} не была перенесена",
+        )
+        wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
 
-#         _id = one.vm.action(self.action, vm_id, pw.sessionDir)
-#         pw.run_one_vm_action()
+        host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+        assert host_after != host_before
 
-#         assert _id == vm_id
-#         assert one.vm.info(vm_id, True).RESCHED == 0
 
-#         time.sleep(30)
-#         host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-#         assert host_after == host_before
+class TestUnresched:
+    action = VmActions.UNRESCHED
+
+    def test_unresched(self, one: One, poweroff_vm: int):
+        vm_id       = poweroff_vm
+        host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+
+        one.vm.action(VmActions.RESCHED, vm_id)
+        assert one.vm.info(vm_id, True).RESCHED == 1
+
+        _id = one.vm.action(self.action, vm_id)
+        assert _id == vm_id
+        assert one.vm.info(vm_id, True).RESCHED == 0
+
+        time.sleep(30)
+        host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+        assert host_after == host_before
+
+
+
+    
+    @pytest.mark.KERBEROS   
+    def test_unresched_KERBEROS(self, poweroff_vm: int):
+        vm_id       = poweroff_vm
+        pw          = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+        one         = pw.get_client()
+        host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+
+        one.vm.action(VmActions.RESCHED, vm_id)
+
+        # Вот здесь timeout 5 сек - resched может планировщиком быть обработан раньше, чем его отменим. 
+        # Нужно что-то придумать. Может передачу в функцию параметра таймаута? А по умолчанию 5 сек.
+        # Либо заморочиться и сделать выполнение функции в отдельном потоке/процессе, но стоит ли?
+        pw.run_one_vm_action()  
+        assert one.vm.info(vm_id, True).RESCHED == 1
+
+        _id = one.vm.action(self.action, vm_id, pw.sessionDir)
+        pw.run_one_vm_action()
+
+        assert _id == vm_id
+        assert one.vm.info(vm_id, True).RESCHED == 0
+
+        time.sleep(30)
+        host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+        assert host_after == host_before
