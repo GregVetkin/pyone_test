@@ -7,7 +7,7 @@ from utils.commands     import run_command_via_ssh
 from utils.connection   import brest_admin_ssh_conn, local_admin_ssh_conn
 from config.base        import API_URI, BrestAdmin, BREST_VERSION
 from config.opennebula  import VmStates, VmLcmStates, VmRecoverOperations, VmActions
-from utils.aic          import PyoneWrap
+from utils.kerberos     import PyoneWrap
 from utils.other        import wait_until, get_unic_name
 from utils.version      import Version
 from pyone              import OneNoExistsException
@@ -173,16 +173,16 @@ def hold_vm(one: One):
 
 
 
-# @pytest.mark.parametrize('action', [VmActions.REBOOT, VmActions.REBOOT_HARD])
-# @pytest.skip(reason="Тест не создан")
-# class TestReboot:
+@pytest.mark.parametrize('action', [VmActions.REBOOT, VmActions.REBOOT_HARD])
+class TestReboot:
 
-#     def test_reboot(self):
-#         pass
+    def test_reboot(self):
+        pass
 
-#     @pytest.mark.KERBEROS
-#     def test_reboot_KERBEROS(self):
-#         pass
+    @pytest.mark.KERBEROS
+    def test_reboot_KERBEROS(self):
+        pass
+
 
 
 # class TestHold:
@@ -343,59 +343,93 @@ def hold_vm(one: One):
 #         )
 
 
+# class TestResched:
+#     action = VmActions.RESCHED
 
+#     def test_resched(self, one: One, poweroff_vm: int):
+#         vm_id       = poweroff_vm
+#         host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+#         _id         = one.vm.action(self.action, vm_id)
 
+#         assert _id == vm_id
+#         assert one.vm.info(vm_id, True).RESCHED == 1
 
-class TestResched:
-    action = VmActions.RESCHED
+#         wait_until(
+#             lambda: one.vm.info(vm_id, True).LCM_STATE == VmLcmStates.PROLOG_MIGRATE_POWEROFF,
+#             timeout_message=f"ВМ {vm_id} не была перенесена",
+#         )
+#         wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
 
-    def test_resched(self, one: One, poweroff_vm: int):
-        vm_id       = poweroff_vm
-        host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-        _id         = one.vm.action(self.action, vm_id)
-
-        assert _id == vm_id
-        assert one.vm.info(vm_id, True).RESCHED == 1
-
-        wait_until(
-            lambda: one.vm.info(vm_id, True).LCM_STATE == VmLcmStates.PROLOG_MIGRATE_POWEROFF,
-            timeout_message=f"ВМ {vm_id} не была перенесена",
-        )
-        wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
-
-        host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-        assert host_after != host_before
+#         host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+#         assert host_after != host_before
 
 
 
     
-    @pytest.mark.KERBEROS   
-    def test_resched_KERBEROS(self, poweroff_vm: int):
-        vm_id       = poweroff_vm
-        pw          = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-        one         = pw.get_client()
-        host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-        _id         = one.vm.action(self.action, vm_id, pw.sessionDir)
-        pw.run_one_vm_action()
+#     @pytest.mark.KERBEROS   
+#     def test_resched_KERBEROS(self, poweroff_vm: int):
+#         vm_id       = poweroff_vm
+#         pw          = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+#         one         = pw.get_client()
+#         host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+#         _id         = one.vm.action(self.action, vm_id, pw.sessionDir)
+#         pw.run_one_vm_action()
 
-        assert _id == vm_id
-        assert one.vm.info(vm_id, True).RESCHED == 1
+#         assert _id == vm_id
+#         assert one.vm.info(vm_id, True).RESCHED == 1
 
-        wait_until(
-            lambda: one.vm.info(vm_id, True).LCM_STATE == VmLcmStates.PROLOG_MIGRATE_POWEROFF,
-            timeout_message=f"ВМ {vm_id} не была перенесена",
-        )
-        wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
+#         wait_until(
+#             lambda: one.vm.info(vm_id, True).LCM_STATE == VmLcmStates.PROLOG_MIGRATE_POWEROFF,
+#             timeout_message=f"ВМ {vm_id} не была перенесена",
+#         )
+#         wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
 
-        host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
-        assert host_after != host_before
-
+#         host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+#         assert host_after != host_before
 
 
 # class TestUnresched:
 #     action = VmActions.UNRESCHED
 
-#     def test_unresched(self):
-#         pass
+#     def test_unresched(self, one: One, poweroff_vm: int):
+#         vm_id       = poweroff_vm
+#         host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+
+#         one.vm.action(VmActions.RESCHED, vm_id)
+#         assert one.vm.info(vm_id, True).RESCHED == 1
+
+#         _id = one.vm.action(self.action, vm_id)
+#         assert _id == vm_id
+#         assert one.vm.info(vm_id, True).RESCHED == 0
+
+#         time.sleep(30)
+#         host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+#         assert host_after == host_before
+
+
 
     
+#     @pytest.mark.KERBEROS   
+#     def test_unresched_KERBEROS(self, poweroff_vm: int):
+#         vm_id       = poweroff_vm
+#         pw          = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+#         one         = pw.get_client()
+#         host_before = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+
+#         one.vm.action(VmActions.RESCHED, vm_id)
+
+#         # Вот здесь timeout 5 сек - resched может планировщиком быть обработан раньше, чем его отменим. 
+#         # Нужно что-то придумать. Может передачу в функцию параметра таймаута? А по умолчанию 5 сек.
+#         # Либо заморочиться и сделать выполнение функции в отдельном потоке/процессе, но стоит ли?
+#         pw.run_one_vm_action()  
+#         assert one.vm.info(vm_id, True).RESCHED == 1
+
+#         _id = one.vm.action(self.action, vm_id, pw.sessionDir)
+#         pw.run_one_vm_action()
+
+#         assert _id == vm_id
+#         assert one.vm.info(vm_id, True).RESCHED == 0
+
+#         time.sleep(30)
+#         host_after = one.vm.info(vm_id, True).HISTORY_RECORDS.HISTORY[-1].HID
+#         assert host_after == host_before

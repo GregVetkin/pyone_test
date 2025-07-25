@@ -92,14 +92,16 @@ if __name__ == '__main__':
     password = "Qwe!2345"
 
 
-    # one = pyone.OneServer(endpoint, session=f"{username}:7b7d2f5dbd20988ce938deaf04a7979899f35a67a47dbb7461ba351edb7a9305")
-    # print(one.vm.action("reboot", 25))
+    one = pyone.OneServer(endpoint, session=f"{username}:7b7d2f5dbd20988ce938deaf04a7979899f35a67a47dbb7461ba351edb7a9305")
+    # template = f'<USER_TEMPLATE><SCHED_DS_REQUIREMENTS><![CDATA[ID="99999"]]></SCHED_DS_REQUIREMENTS></USER_TEMPLATE>'
+    # print(one.vm.update(58, template, 1))
 
-    # pw = PyoneWrap(endpoint, username, password)
-    # client = pw.get_client()
+
+    pw = PyoneWrap(endpoint, username, password)
+    client = pw.get_client()
     
 
-    # res  = client.vm.action("reboot-hard", 25, pw.sessionDir)
-    # print(res)
+    res  = client.vm.action("resched", 99, pw.sessionDir)
+    print(res)
 
-    # pw.run_one_vm_action()
+    pw.run_one_vm_action()
