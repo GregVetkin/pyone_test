@@ -5,6 +5,7 @@ import base64
 from urllib.parse import urlparse
 
 
+
 class PyoneWrap:
     """
     Обертка для взаимодействия с OpenNebula API
