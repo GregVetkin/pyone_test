@@ -1,10 +1,10 @@
 import pytest
 
-from pyone              import OneNoExistsException, OneActionException
+from pyone              import OneException, OneNoExistsException
 from api                import One
-from utils.other        import get_unic_name, wait_until
+from utils.other        import wait_until
 from utils.kerberos     import PyoneWrap
-from config.opennebula  import VmStates, VmRecoverOperations, VmActions, VmLcmStates
+from config.opennebula  import VmStates, VmLcmStates
 from config.base        import API_URI, BrestAdmin, BREST_VERSION
 
 
@@ -38,7 +38,7 @@ def test_image_not_exist(one: One, dummy_vm_poweroff: int):
     image_id = 99999
     template = f"DISK=[IMAGE_ID={image_id}]"
 
-    with pytest.raises(OneActionException):
+    with pytest.raises(OneException):
         one.vm.attach(vm_id, template)
 
 
