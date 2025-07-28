@@ -4,8 +4,9 @@ import random
 from pyone              import OneActionException
 from api                import One
 from utils.other        import get_unic_name, wait_until
-from config.opennebula  import VmStates, VmRecoverOperations
-
+from utils.kerberos     import PyoneWrap
+from config.opennebula  import VmStates, VmRecoverOperations, VmActions
+from config.base        import API_URI, BrestAdmin, BREST_VERSION
 
 
 
@@ -67,13 +68,13 @@ def test_allocate_vm_by_xml(one: One):
     memory  = random.randint(1, 128)
 
     template = f"""
-        <VM>
-            <NAME>{name}</NAME>
-            <CPU>{cpu}</CPU>
-            <VCPU>{vcpu}</VCPU>
-            <MEMORY>{memory}</MEMORY>
-        </VM>
-    """
+    <VM>
+        <NAME>{name}</NAME>
+        <CPU>{cpu}</CPU>
+        <VCPU>{vcpu}</VCPU>
+        <MEMORY>{memory}</MEMORY>
+    </VM>"""
+    template = template.strip()
     vm_id   = one.vm.allocate(template, False)
     vm_info = one.vm.info(vm_id)
 
@@ -88,4 +89,32 @@ def test_allocate_vm_by_xml(one: One):
 
 
 
+@pytest.mark.KERBEROS
+def test_allocate_vm_KERBEROS():
+    pw      = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+    one     = pw.get_client()
+    name    = get_unic_name()
+    cpu     = random.randint(1, 3)
+    vcpu    = random.randint(1, 3)
+    memory  = random.randint(1, 128)
 
+
+    template = f"""
+        NAME    = {name}
+        CPU     = {cpu}
+        VCPU    = {vcpu}
+        MEMORY  = {memory}
+    """
+    vm_id   = one.vm.allocate(template, False, pw.sessionDir)
+    pw.run_one_vm_action()
+
+    vm_info = one.vm.info(vm_id, True)
+
+    assert vm_info.NAME == name
+    assert int(vm_info.TEMPLATE["CPU"])     == cpu
+    assert int(vm_info.TEMPLATE["VCPU"])    == vcpu
+    assert int(vm_info.TEMPLATE["MEMORY"])  == memory
+
+    wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
+    one.vm.recover(vm_id, VmRecoverOperations.DELETE)
+    wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.DONE)
