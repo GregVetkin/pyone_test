@@ -19,23 +19,15 @@ class OneZone:
         "Enable/disable the given zone"
         return self._one_zone.enable(zone_id, enable)
     
-    def _enable(self, zone_id: int) -> int:
-        "Enables the given zone"
-        return self.enable(zone_id, True)
-    
-    def _disable(self, zone_id: int) -> int:
-        "Disables the given zone"
-        return self.enable(zone_id, False)
-    
-    def update(self, zone_id: int, template: str, replace: bool = False) -> int:
+    def update(self, zone_id: int, template: str, update_type: int) -> int:
         """Replaces the zone template contents"""
-        return self._one_zone.update(zone_id, template, 0 if replace else 1)
+        return self._one_zone.update(zone_id, template, update_type)
     
     def rename(self, zone_id: int, new_name: str) -> int:
         """Renames a zone"""
         return self._one_zone.rename(zone_id, new_name)
     
-    def info(self, zone_id: int, decrypt_secrets: bool = False) -> ZONESub:
+    def info(self, zone_id: int, decrypt_secrets: bool) -> ZONESub:
         """Retrieves information for the zone"""
         return self._one_zone.info(zone_id, decrypt_secrets)
 

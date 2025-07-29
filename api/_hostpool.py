@@ -13,6 +13,6 @@ class OneHostpool:
         return self._one_hostpool.info()
     
 
-    def monitoring(self, last_seconds: int = -1):
+    def monitoring(self, last_seconds: int):
         """Returns all the host monitoring records"""
         return self._one_hostpool.monitoring(last_seconds)

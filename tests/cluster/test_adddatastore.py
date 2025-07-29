@@ -1,7 +1,8 @@
 import pytest
-import pyone
+import random
 
 from api    import One
+from pyone  import OneNoExistsException
 
 
 
@@ -11,7 +12,7 @@ def cluster_with_datastore(one: One, dummy_datastore, dummy_cluster):
     yield dummy_cluster
     try:
         one.cluster.deldatastore(dummy_cluster, dummy_datastore)
-    except pyone.OneNoExistsException:
+    except OneNoExistsException:
         pass
 
 
@@ -19,34 +20,42 @@ def cluster_with_datastore(one: One, dummy_datastore, dummy_cluster):
 
 
 def test_cluster_not_exist(one: One, dummy_datastore):
-    with pytest.raises(pyone.OneNoExistsException):
-        one.cluster.adddatastore(999999, dummy_datastore)
+    cluster_id   = random.randint(9999, 999999)
+    datastore_id = dummy_datastore
+
+    with pytest.raises(OneNoExistsException):
+        one.cluster.adddatastore(cluster_id, datastore_id)
 
 
-   
+
 def test_datastore_not_exist(one: One, dummy_cluster):
-    with pytest.raises(pyone.OneNoExistsException):
-        one.cluster.adddatastore(dummy_cluster, 999999)
+    cluster_id   = dummy_cluster
+    datastore_id = random.randint(9999, 999999)
+
+    with pytest.raises(OneNoExistsException):
+        one.cluster.adddatastore(cluster_id, datastore_id)
    
 
 
-def test_add_datastore_to_cluster(one: One, dummy_cluster, dummy_datastore):
-    cluster_id, datastore_id = dummy_cluster, dummy_datastore
-    assert datastore_id not in one.cluster.info(cluster_id).DATASTORES.ID
-    result = one.cluster.adddatastore(cluster_id, datastore_id)
-    assert result == cluster_id
-    assert datastore_id in one.cluster.info(cluster_id).DATASTORES.ID
+def test_add_datastore(one: One, dummy_cluster, dummy_datastore):
+    cluster_id   = dummy_cluster
+    datastore_id = dummy_datastore
+
+    _id = one.cluster.adddatastore(cluster_id, datastore_id)
+
+    assert _id == cluster_id
+    assert datastore_id in one.cluster.info(cluster_id, False).DATASTORES.ID
 
 
 
-def test_add_already_added_datastore(one: One, cluster_with_datastore):
+def test_add_added_datastore(one: One, cluster_with_datastore):
     cluster_id            = cluster_with_datastore
-    cluster_datastore_ids = one.cluster.info(cluster_id).DATASTORES.ID
+    cluster_datastore_ids = one.cluster.info(cluster_id, False).DATASTORES.ID
     added_datastore_id    = cluster_datastore_ids[-1]
 
     result = one.cluster.adddatastore(cluster_id, added_datastore_id)
     assert result == cluster_id
 
-    new_cluster_datastore_ids = one.cluster.info(cluster_id).DATASTORES.ID
+    new_cluster_datastore_ids = one.cluster.info(cluster_id, False).DATASTORES.ID
     assert added_datastore_id in new_cluster_datastore_ids
     assert len(cluster_datastore_ids) == len(new_cluster_datastore_ids)

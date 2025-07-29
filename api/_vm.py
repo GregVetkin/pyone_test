@@ -7,11 +7,11 @@ class OneVm:
     def __init__(self, one_api: OneServer) -> None:
         self._one_vm = one_api.vm
 
-    def allocate(self, template: str, hold_vm: bool = False) -> int:
+    def allocate(self, template: str, hold_vm: bool) -> int:
         """Allocates a new virtual machine in OpenNebula"""
         return self._one_vm.allocate(template, hold_vm)
     
-    def deploy(self, vm_id: int, host_id: int, host_capacity_check: bool = True, datastore_id: int = -1, network_scheduling_template: str = "") -> int:
+    def deploy(self, vm_id: int, host_id: int, host_capacity_check: bool, datastore_id: int, network_scheduling_template: str) -> int:
         """Initiates the instance of the given vmid on the target host"""
         return self._one_vm.deploy(vm_id, host_id, host_capacity_check, datastore_id, network_scheduling_template)
 
@@ -19,11 +19,11 @@ class OneVm:
         """Submits an action to be performed on a virtual machine"""
         return self._one_vm.action(action_name, vm_id)
     
-    def migrate(self, vm_id: int, host_id: int, live_migration: bool = False, host_capacity_check: bool = True, datastore_id: int = -1, migration_type: int = 0) -> int:
+    def migrate(self, vm_id: int, host_id: int, live_migration: bool, host_capacity_check: bool, datastore_id: int, migration_type: int) -> int:
         """Migrates one virtual machine to the target host"""
         return self._one_vm.migrate(vm_id, host_id, live_migration, host_capacity_check, datastore_id, migration_type)
     
-    def disksaveas(self, vm_id: int, disk_id: int, name: str, image_type: str = "", snapshot_id: int = -1) -> int:
+    def disksaveas(self, vm_id: int, disk_id: int, name: str, image_type: str, snapshot_id: int) -> int:
         """Sets the disk to be saved in the given image"""
         return self._one_vm.disksaveas(vm_id, disk_id, name, image_type, snapshot_id)
     
@@ -64,9 +64,9 @@ class OneVm:
         return self._one_vm.detachnic(vm_id, nic_id)
     
     def chmod(self, vm_id: int, 
-              user_use: int = -1, user_manage: int = -1, user_admin: int = -1,
-              group_use: int = -1, group_manage: int = -1, group_admin: int = -1,
-              other_use: int = -1, other_manage: int = -1, other_admin: int = -1) -> int:
+              user_use: int, user_manage: int, user_admin: int,
+              group_use: int, group_manage: int, group_admin: int,
+              other_use: int, other_manage: int, other_admin: int) -> int:
         """Changes the permission bits of a virtual machine"""
         
         return self._one_vm.chmod(vm_id, 
@@ -74,7 +74,7 @@ class OneVm:
                                   group_use, group_manage, group_admin,
                                   other_use, other_manage, other_admin)
     
-    def chown(self, vm_id: int, user_id: int = -1, group_id: int = -1) -> int:
+    def chown(self, vm_id: int, user_id: int, group_id: int) -> int:
         """Changes the ownership of a virtual machine"""
         return self._one_vm.chown(vm_id, user_id, group_id)
     
@@ -82,7 +82,7 @@ class OneVm:
         """Renames a virtual machine"""
         return self._one_vm.rename(vm_id, new_name)
     
-    def snapshotcreate(self, vm_id: int, snapshot_name: str = "") -> int:
+    def snapshotcreate(self, vm_id: int, snapshot_name: str) -> int:
         """Creates a new virtual machine snapshot"""
         return self._one_vm.snapshotcreate(vm_id, snapshot_name)
     
@@ -94,13 +94,13 @@ class OneVm:
         """Deletes a virtual machine snapshot"""
         return self._one_vm.snapshotdelete(vm_id, snapshot_id)
     
-    def resize(self, vm_id: int, template: str, host_capacity_check: bool = True) -> int:
+    def resize(self, vm_id: int, template: str, host_capacity_check: bool) -> int:
         """Changes the capacity of the virtual machine"""
         return self._one_vm.resize(vm_id, template, host_capacity_check)
 
-    def update(self, vm_id: int, template: str, replace: bool = False) -> int:
+    def update(self, vm_id: int, template: str, update_type: int) -> int:
         """Replaces the user template contents"""
-        return self._one_vm.update(vm_id, template, 0 if replace else 1)
+        return self._one_vm.update(vm_id, template, update_type)
 
     def updateconf(self, vm_id: int, template: str) -> int:
         """Updates (appends) a set of supported configuration attributes in the VM template"""
@@ -110,7 +110,7 @@ class OneVm:
         """Recovers a stuck VM that is waiting for a driver operation. The recovery may be done by failing or succeeding the pending operation."""
         return self._one_vm.recover(vm_id, recover_operation)
     
-    def info(self, vm_id: int, decrypt_secrets: bool = False) -> VMSub:
+    def info(self, vm_id: int, decrypt_secrets: bool) -> VMSub:
         """Retrieves information for the virtual machine"""
         return self._one_vm.info(vm_id, decrypt_secrets)
 
@@ -118,7 +118,7 @@ class OneVm:
         """Returns the virtual machine monitoring records"""
         return self._one_vm.monitoring(vm_id)
     
-    def lock(self, vm_id: int, lock_level: int = 1, check_already_locked: bool = False) -> int:
+    def lock(self, vm_id: int, lock_level: int, check_already_locked: bool) -> int:
         """Locks a Virtual Machine. Lock certain actions depending on blocking level"""
         return self._one_vm.lock(vm_id, lock_level, check_already_locked)
     

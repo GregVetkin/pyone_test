@@ -1,12 +1,12 @@
 import random
 import pytest
-from pyone        import OneNoExistsException, OneException
+
+from pyone import OneNoExistsException
 
 
 
-def __get_random_rights():
+def __get_random_permission():
     return [random.randint(-1, 1) for _ in range(9)]
-
 
 def __permissions_class_to_rights_list(permissions_class):
         return [
@@ -14,7 +14,6 @@ def __permissions_class_to_rights_list(permissions_class):
             permissions_class.GROUP_U, permissions_class.GROUP_M, permissions_class.GROUP_A,
             permissions_class.OTHER_U, permissions_class.OTHER_M, permissions_class.OTHER_A,
         ]
-
 
 def __permissions_changed_correctly(old_permissions, new_permissions, established_rights):
     old_rights_list = __permissions_class_to_rights_list(old_permissions)
@@ -33,41 +32,25 @@ def __permissions_changed_correctly(old_permissions, new_permissions, establishe
 
 
 
-def object_not_exist__test(api_object):
-    one_object_id   = 99999
-    permissions     = (0, 0, 0, 0, 0, 0, 0, 0, 0)
+def not_exist__test(api_object):
+    one_object_id = random.randint(9999, 999999)
+    permissions  = __get_random_permission()
 
     with pytest.raises(OneNoExistsException):
         api_object.chmod(one_object_id, *permissions)
 
 
-
-def cant_be_chmod__test(api_object, one_object_id, permissions):
-    # Когда-нибудь тут будет конкретное исключение
-    with pytest.raises(OneException):
-        api_object.chmod(one_object_id, *permissions)
-
-
-
-def chmod__test(api_object, one_object_id, permissions):
-    old_permissions     = api_object.info(one_object_id).PERMISSIONS
+def chmod__test(api_object, one_object_id: int, permissions):
+    old_permissions = api_object.info(one_object_id, False).PERMISSIONS
 
     _id = api_object.chmod(one_object_id, *permissions)
     assert _id == one_object_id
 
-    new_permissions = api_object.info(one_object_id).PERMISSIONS
-
+    new_permissions = api_object.info(one_object_id, False).PERMISSIONS
     assert __permissions_changed_correctly(old_permissions, new_permissions, permissions)
 
 
 
-def random_permissions__test(api_object, one_object_id):
-    old_permissions     = api_object.info(one_object_id).PERMISSIONS
-    permissions_to_set  = __get_random_rights()
 
-    _id = api_object.chmod(one_object_id, *permissions_to_set)
-    assert _id == one_object_id
-
-    new_permissions = api_object.info(one_object_id).PERMISSIONS
-
-    assert __permissions_changed_correctly(old_permissions, new_permissions, permissions_to_set)
+def random_chmod__test(api_object, one_object_id: int):
+    chmod__test(api_object, one_object_id, __get_random_permission())

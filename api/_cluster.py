@@ -15,9 +15,9 @@ class OneCluster:
         """Deletes the given cluster from the pool"""
         return self._one_cluster.delete(cluster_id)
     
-    def update(self, cluster_id: int, template: str, replace: bool = False) -> int:
+    def update(self, cluster_id: int, template: str, update_type: int) -> int:
         """Replaces the cluster template contents"""
-        return self._one_cluster.update(cluster_id, template, 0 if replace else 1)
+        return self._one_cluster.update(cluster_id, template, update_type)
     
     def addhost(self, cluster_id: int, host_id: int) -> int:
         """Adds a host to the given cluster"""
@@ -47,6 +47,6 @@ class OneCluster:
         """Renames a cluster"""
         return self._one_cluster.rename(cluster_id, new_name)
 
-    def info(self, cluster_id: int, decrypt_secrets: bool = False) -> CLUSTERSub:
+    def info(self, cluster_id: int, decrypt_secrets: bool) -> CLUSTERSub:
         """Retrieves information for the cluster"""
         return self._one_cluster.info(cluster_id, decrypt_secrets)

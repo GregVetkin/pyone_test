@@ -7,7 +7,7 @@ class OneVn:
     def __init__(self, one_api: OneServer) -> None:
         self._one_vn = one_api.vn
 
-    def allocate(self, template: str, cluster_id: int = -1) -> int:
+    def allocate(self, template: str, cluster_id: int) -> int:
         """Allocates a new virtual network in OpenNebula"""
         return self._one_vn.allocate(template, cluster_id)
     

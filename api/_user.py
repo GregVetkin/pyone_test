@@ -8,7 +8,7 @@ class OneUser:
     def __init__(self, one_api: OneServer) -> None:
         self._one_user = one_api.user
 
-    def allocate(self, username: str, password: str, auth_driver: str = "", group_ids: List[int] = []) -> int:
+    def allocate(self, username: str, password: str, auth_driver: str, group_ids: List[int]) -> int:
         """Allocates a new user in OpenNebula"""
         return self._one_user.allocate(username, password, auth_driver, group_ids)
     
@@ -20,15 +20,15 @@ class OneUser:
         """Changes the password for the given user"""
         return self._one_user.passwd(user_id, new_password)
     
-    def login(self, user_name: str, token: str = "", period: int = 0, group_id: int = -1) -> str:
+    def login(self, user_name: str, token: str, period: int, group_id: int) -> str:
         """Generates or sets a login token"""
         return self._one_user.login(user_name, token, period, group_id)
     
-    def update(self, user_id: int, template: str, replace: bool = False) -> int:
+    def update(self, user_id: int, template: str, update_type: int) -> int:
         """Replaces the user template contents"""
-        return self._one_user.update(user_id, template, 0 if replace else 1)
+        return self._one_user.update(user_id, template, update_type)
     
-    def chauth(self, user_id: int, auth_driver: str, new_password: str = "") -> int:
+    def chauth(self, user_id: int, auth_driver: str, new_password: str) -> int:
         """Changes the authentication driver and the password for the given user"""
         return self._one_user.chauth(user_id, auth_driver, new_password)
     
@@ -51,15 +51,7 @@ class OneUser:
     def enable(self, user_id: int, enable: bool) -> int:
         """Enables or disables a user"""
         return self._one_user.enable(user_id, enable)
-    
-    def _enable(self, user_id: int) -> int:
-        """Enables a user"""
-        return self.enable(user_id, True)
-    
-    def _disable(self, user_id: int) -> int:
-        """Disables a user"""
-        return self.enable(user_id, False)
-    
-    def info(self, user_id: int = -1, decrypt_secrets: bool = False) -> USERSub:
+
+    def info(self, user_id: int, decrypt_secrets: bool) -> USERSub:
         """Retrieves information for the user"""
         return self._one_user.info(user_id, decrypt_secrets)

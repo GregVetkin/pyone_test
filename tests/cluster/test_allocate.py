@@ -25,8 +25,10 @@ def test_name_is_taken(one: One, dummy_cluster: int):
 
 
 def test_empty_name(one: One):
+    cluster_name = ""
+
     with pytest.raises(pyone.OneInternalException):
-        one.cluster.allocate("")
+        one.cluster.allocate(cluster_name)
 
 
 

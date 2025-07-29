@@ -1,15 +1,18 @@
 import pytest
+import random
 
 from pyone     import OneNoExistsException
 
 
 
-def unlock_if_not_exist__test(api_object):
+def not_exist__test(api_object):
+    one_object_id = random.randint(9999, 999999)
+
     with pytest.raises(OneNoExistsException):
-        api_object.unlock(999999)
+        api_object.unlock(one_object_id)
 
 
-def unlock__test(api_object, one_object_id):
+def unlock__test(api_object, one_object_id: int):
     _id = api_object.unlock(one_object_id)
     
     assert _id == one_object_id

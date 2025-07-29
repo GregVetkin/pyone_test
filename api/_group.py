@@ -15,13 +15,13 @@ class OneGroup:
         """Deletes the given group from the pool"""
         return self._one_group.delete(group_id)
     
-    def info(self, group_id: int, decrypt_secrets: bool = False) -> GROUPSub:
+    def info(self, group_id: int, decrypt_secrets: bool) -> GROUPSub:
         """Retrieves information for the group"""
         return self._one_group.info(group_id, decrypt_secrets)
 
-    def update(self, group_id: int, template: str, replace: bool = False) -> int:
+    def update(self, group_id: int, template: str, update_type: int) -> int:
         """Replaces the group template contents"""
-        return self._one_group.update(group_id, template, 0 if replace else 1)
+        return self._one_group.update(group_id, template, update_type)
     
     def addadmin(self, group_id: int, user_id: int) -> int:
         """Adds a User to the Group administrators set"""

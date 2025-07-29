@@ -7,7 +7,7 @@ class OneHost:
     def __init__(self, one_api: OneServer) -> None:
         self._one_host = one_api.host
 
-    def allocate(self, hostname: str, im_mad: str = "kvm", vm_mad: str = "kvm", cluster_id: int = -1) -> int:
+    def allocate(self, hostname: str, im_mad: str, vm_mad: str, cluster_id: int) -> int:
         """Allocates a new host in OpenNebula"""
         return self._one_host.allocate(hostname, im_mad, vm_mad, cluster_id)
     
@@ -19,15 +19,15 @@ class OneHost:
         """Sets the status of the host"""
         return self._one_host.status(host_id, status_code)
     
-    def update(self, host_id: int, template: str, replace: bool = False) -> int:
+    def update(self, host_id: int, template: str, update_type: int) -> int:
         """Replaces the host's template contents"""
-        return self._one_host.update(host_id, template, 0 if replace else 1)
+        return self._one_host.update(host_id, template, update_type)
 
     def rename(self, host_id: int, new_name: str) -> int:
         """Renames a host"""
         return self._one_host.rename(host_id, new_name)
     
-    def info(self, host_id: int, decrypt_secrets: bool = False) -> HOSTSub:
+    def info(self, host_id: int, decrypt_secrets: bool) -> HOSTSub:
         """Retrieves information for the host"""
         return self._one_host.info(host_id, decrypt_secrets)
 

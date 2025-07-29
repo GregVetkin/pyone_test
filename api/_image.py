@@ -7,14 +7,14 @@ class OneImage:
     def __init__(self, one_api: OneServer) -> None:
         self._one_image = one_api.image
     
-    def allocate(self, template: str, storage_id: int, check_storage_capacity: bool = True) -> int:
+    def allocate(self, template: str, storage_id: int, check_storage_capacity: bool) -> int:
         """Allocates a new image in OpenNebula"""
         return self._one_image.allocate(template, storage_id, check_storage_capacity)
     
     def chmod(self, image_id: int, 
-              user_use: int = -1, user_manage: int = -1, user_admin: int = -1,
-              group_use: int = -1, group_manage: int = -1, group_admin: int = -1,
-              other_use: int = -1, other_manage: int = -1, other_admin: int = -1) -> int:
+              user_use: int, user_manage: int, user_admin: int,
+              group_use: int, group_manage: int, group_admin: int,
+              other_use: int, other_manage: int, other_admin: int) -> int:
         """Changes the permission bits of an image"""
         
         return self._one_image.chmod(image_id, 
@@ -22,7 +22,7 @@ class OneImage:
                                      group_use, group_manage, group_admin,
                                      other_use, other_manage, other_admin)
     
-    def chown(self, image_id: int, user_id: int = -1, group_id: int = -1) -> int:
+    def chown(self, image_id: int, user_id: int, group_id: int) -> int:
         """Changes the ownership of an image"""
         return self._one_image.chown(image_id, user_id, group_id)
     
@@ -30,11 +30,11 @@ class OneImage:
         """Changes the type of an Image"""
         return self._one_image.chtype(image_id, new_type)
     
-    def clone(self, image_id: int, clone_name: str, datastore_id: int = -1) -> int:
+    def clone(self, image_id: int, clone_name: str, datastore_id: int) -> int:
         """Clones an existing image"""
         return self._one_image.clone(image_id, clone_name, datastore_id)
     
-    def delete(self, image_id: int, force: bool = False) -> int:
+    def delete(self, image_id: int, force: bool = True) -> int:
         """Deletes the given image from the pool"""
         return self._one_image.delete(image_id, force)
     
@@ -42,31 +42,15 @@ class OneImage:
         """Enables or disables an image"""
         return self._one_image.enable(image_id, enable)
 
-    # def _enable(self, image_id: int) -> int:
-    #     """Enables an image"""
-    #     return self.enable(image_id, True)
-    
-    # def _disable(self, image_id: int) -> int:
-    #     """Disables an image"""
-    #     return self.enable(image_id, False)
-    
     def persistent(self, image_id: int, persistent: bool) -> int:
         """Sets the Image as persistent or not persistent"""
         return self._one_image.persistent(image_id, persistent)
 
-    def _persistent(self, image_id: int) -> int:
-        """Sets the Image as persistent"""
-        return self.persistent(image_id, True)
-    
-    def _nonpersistent(self, image_id: int) -> int:
-        """Sets the Image as not persistent"""
-        return self.persistent(image_id, False)
-    
-    def info(self, image_id: int, decrypt_secrets: bool = False) -> IMAGESub:
+    def info(self, image_id: int, decrypt_secrets: bool) -> IMAGESub:
         """Retrieves information for the image"""
         return self._one_image.info(image_id, decrypt_secrets)
     
-    def lock(self, image_id: int, lock_level: int = 1, check_already_locked: bool = False) -> int:
+    def lock(self, image_id: int, lock_level: int, check_already_locked: bool) -> int:
         """Locks an Image. Lock certain actions depending on blocking level"""
         return self._one_image.lock(image_id, lock_level, check_already_locked)
 
@@ -90,10 +74,10 @@ class OneImage:
         """Flatten the snapshot of image and discards others"""
         return self._one_image.snapshotflatten(image_id, snapshot_id)
 
-    def restore(self, image_id: int, datastore_id: int, vm_name: str = "") -> int:
+    def restore(self, image_id: int, datastore_id: int, vm_name: str) -> int:
         """Restores a VM backup"""
         return self._one_image.restore(image_id, datastore_id, vm_name)
 
-    def update(self, image_id: int, template: str, replace: bool = False) -> int:
+    def update(self, image_id: int, template: str, update_type: int) -> int:
         """Replaces the image template contents"""
-        return self._one_image.update(image_id, template, 0 if replace else 1)
+        return self._one_image.update(image_id, template, update_type)

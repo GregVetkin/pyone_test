@@ -1,23 +1,21 @@
 import pytest
-from pyone      import OneNoExistsException, OneException
+import random
+
+from pyone import OneNoExistsException
 
 
 
 
 
-def info_if_not_exist__test(api_object):
+def not_exist__test(api_object):
     with pytest.raises(OneNoExistsException):
         api_object.info(999999)
 
 
 
-def info__test(api_object, one_object_id):
-    object_info = api_object.info(one_object_id)
+def info__test(api_object, one_object_id: int):
+    object_info = api_object.info(one_object_id, False)
     assert object_info.ID == one_object_id
 
 
 
-
-def cant_be_obtained_info__test(api_object, one_object_id):
-    with pytest.raises(OneException):
-        api_object.info(one_object_id)
