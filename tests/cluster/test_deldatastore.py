@@ -2,7 +2,7 @@ import pytest
 import random
 
 from api    import One
-from pyone  import OneNoExistsException
+from pyone  import OneNoExistsException, OneException
 
 
 
@@ -13,7 +13,7 @@ def cluster_with_datastore(one: One, dummy_datastore, dummy_cluster):
     yield dummy_cluster
     try:
         one.cluster.deldatastore(dummy_cluster, dummy_datastore)
-    except OneNoExistsException:
+    except OneException:
         pass
 
 

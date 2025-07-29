@@ -2,7 +2,7 @@ import pytest
 import random
 
 from api    import One
-from pyone  import OneNoExistsException
+from pyone  import OneNoExistsException, OneException
 
 
 
@@ -13,7 +13,7 @@ def cluster_with_host(one: One, dummy_cluster, dummy_host):
     yield dummy_cluster
     try:
         one.cluster.delhost(dummy_cluster, dummy_host)
-    except OneNoExistsException:
+    except OneException:
         pass
     
 

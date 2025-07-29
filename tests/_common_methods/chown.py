@@ -17,7 +17,7 @@ def not_exist__test(api_object):
 
 
 def chown__test(api_object, one_object_id: int, user_id: int, group_id: int):
-    old_one_object_info = api_object.info(one_object_id)
+    old_one_object_info = api_object.info(one_object_id, False)
 
     result = api_object.chown(one_object_id, user_id, group_id)
     assert result == one_object_id

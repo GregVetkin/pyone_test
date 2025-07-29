@@ -10,7 +10,7 @@ from config.tests   import INVALID_CHARS
 def test_create_cluster(one: One):
     cluster_name = get_unic_name()
     cluster_id   = one.cluster.allocate(cluster_name)
-    assert cluster_name == one.cluster.info(cluster_id).NAME
+    assert cluster_name == one.cluster.info(cluster_id, False).NAME
     one.cluster.delete(cluster_id)
 
 

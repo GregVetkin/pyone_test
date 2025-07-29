@@ -1,7 +1,9 @@
+import pytest
+
 from api                            import One
-from tests._common_methods.update   import update_and_merge__test
-from tests._common_methods.update   import update_and_replace__test
-from tests._common_methods.update   import update_if_not_exist__test
+from tests._common_methods.update   import update__test
+from tests._common_methods.update   import not_exist__test
+
 
 
 
@@ -10,12 +12,11 @@ from tests._common_methods.update   import update_if_not_exist__test
 
 
 def test_cluster_not_exist(one: One):
-    update_if_not_exist__test(one.cluster)
+    not_exist__test(one.cluster)
 
 
-def test_update_by_replace(one: One, dummy_cluster):
-    update_and_replace__test(one.cluster, dummy_cluster)
+@pytest.mark.parametrize("update_type", [0, 1])
+def test_update_type(one: One, dummy_cluster: int, update_type: int):
+    cluter_id = dummy_cluster
+    update__test(one.cluster, cluter_id, update_type)
 
-
-def test_update_by_merge(one: One, dummy_cluster):
-    update_and_merge__test(one.cluster, dummy_cluster)

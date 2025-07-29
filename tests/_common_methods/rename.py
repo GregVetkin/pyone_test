@@ -19,16 +19,16 @@ def rename__test(api_object, one_object_id: int, new_name: str) -> None:
     result = api_object.rename(one_object_id, new_name)
 
     assert result   == one_object_id
-    assert new_name == api_object.info(one_object_id).NAME
+    assert new_name == api_object.info(one_object_id, False).NAME
 
 
 def cant_be_renamed__test(api_object, one_object_id, name):
-    old_name = api_object.info(one_object_id).NAME
+    old_name = api_object.info(one_object_id, False).NAME
 
     with pytest.raises(OneActionException):
         api_object.rename(one_object_id, name)
 
-    new_name = api_object.info(one_object_id).NAME
+    new_name = api_object.info(one_object_id, False).NAME
     assert old_name == new_name
 
 

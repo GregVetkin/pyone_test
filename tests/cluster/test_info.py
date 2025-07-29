@@ -1,19 +1,13 @@
 from api                        import One
-from tests._common_methods.info import info_if_not_exist__test
+from tests._common_methods.info import not_exist__test
 from tests._common_methods.info import info__test
 
 
 
 
 
-# =================================================================================================
-# TESTS
-# =================================================================================================
-
-
-
 def test_cluster_not_exist(one: One):
-    info_if_not_exist__test(one.cluster)
+    not_exist__test(one.cluster)
 
 
 

@@ -1,17 +1,14 @@
-import pytest
-import pyone
 from api                            import One
-from tests._common_methods.chmod    import random_permissions__test
+from tests._common_methods.chmod    import random_chmod__test, not_exist__test
 
 
 
 
 
 def test_datastore_not_exist(one: One):
-    with pytest.raises(pyone.OneNoExistsException):
-        one.datastore.chmod(99999)
+    not_exist__test(one.datastore)
 
 
-def test_change_datastore_permissions(one: One, dummy_datastore):
-    random_permissions__test(one.datastore, dummy_datastore)
+def test_random_chmod(one: One, dummy_datastore):
+    random_chmod__test(one.datastore, dummy_datastore)
 

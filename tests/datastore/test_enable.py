@@ -1,5 +1,6 @@
 import pytest
 import pyone
+import random
 from api            import One
 from utils.other    import get_unic_name
 
@@ -12,7 +13,7 @@ def system_datastore(one: One):
         TYPE   = SYSTEM_DS
         TM_MAD = ssh
     """
-    datastore_id = one.datastore.allocate(datastore_template)
+    datastore_id = one.datastore.allocate(datastore_template, -1)
     yield datastore_id
     one.datastore.delete(datastore_id)
 
@@ -25,7 +26,7 @@ def image_datastore(one: One):
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = one.datastore.allocate(datastore_template)
+    datastore_id = one.datastore.allocate(datastore_template, -1)
     yield datastore_id
     one.datastore.delete(datastore_id)
 
@@ -38,7 +39,7 @@ def file_datastore(one: One):
         TM_MAD = ssh
         DS_MAD = fs
     """
-    datastore_id = one.datastore.allocate(datastore_template)
+    datastore_id = one.datastore.allocate(datastore_template, -1)
     yield datastore_id
     one.datastore.delete(datastore_id)
 
@@ -48,44 +49,48 @@ def file_datastore(one: One):
 
 
 def test_datastore_not_exist(one: One):
+    datastore_id = random.randint(9999, 999999)
+
     with pytest.raises(pyone.OneNoExistsException):
-        one.datastore.enable(999999)
+        one.datastore.enable(datastore_id, True)
 
 
 
-def test_cant_enable_or_disable_file_datastore(one: One, file_datastore):
-    file_ds_id = file_datastore
-
-    with pytest.raises(pyone.OneInternalException):
-        one.datastore.disable(file_ds_id)
-    assert one.datastore.info(file_ds_id).STATE == 0
+def test_not_for_file_datastore(one: One, file_datastore):
+    datastore_id = file_datastore
 
     with pytest.raises(pyone.OneInternalException):
-        one.datastore.enable(file_ds_id)
-    assert one.datastore.info(file_ds_id).STATE == 0
-
-
-
-def test_cant_enable_or_disable_image_datastore(one: One, image_datastore):
-    image_ds_id = image_datastore
+        one.datastore.enable(datastore_id, True)
+    assert one.datastore.info(datastore_id, False).STATE == 0
 
     with pytest.raises(pyone.OneInternalException):
-        one.datastore.disable(image_ds_id)
-    assert one.datastore.info(image_ds_id).STATE == 0
+        one.datastore.enable(datastore_id, False)
+    assert one.datastore.info(datastore_id, False).STATE == 0
+
+
+
+def test_not_for_image_datastore(one: One, image_datastore):
+    datastore_id = image_datastore
 
     with pytest.raises(pyone.OneInternalException):
-        one.datastore.enable(image_ds_id)
-    assert one.datastore.info(image_ds_id).STATE == 0
+        one.datastore.enable(datastore_id, True)
+    assert one.datastore.info(datastore_id, False).STATE == 0
+
+    with pytest.raises(pyone.OneInternalException):
+        one.datastore.enable(datastore_id, False)
+    assert one.datastore.info(datastore_id, False).STATE == 0
 
 
 
 def test_enable_disable_system_datastore(one: One, system_datastore):
-    system_ds_id = system_datastore
+    datastore_id = system_datastore
 
-    result = one.datastore.disable(system_ds_id)
-    assert result == system_ds_id
-    assert one.datastore.info(system_ds_id).STATE == 1
+    # Выключение
+    _id = one.datastore.enable(datastore_id, False)
+    assert _id == datastore_id
+    assert one.datastore.info(datastore_id, False).STATE == 1
 
-    result = one.datastore.enable(system_ds_id)
-    assert result == system_ds_id
-    assert one.datastore.info(system_ds_id).STATE == 0
+    # Включение
+    _id = one.datastore.enable(datastore_id, True)
+    assert _id == datastore_id
+    assert one.datastore.info(datastore_id, False).STATE == 0

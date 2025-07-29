@@ -1,6 +1,6 @@
 import pytest
 
-from pyone                          import OneNoExistsException, OneInternalException
+from pyone                          import OneNoExistsException, OneActionException
 from api                            import One
 
 from tests._common_methods.delete   import delete__test
@@ -57,31 +57,26 @@ def test_delete_cluster(one: One, dummy_cluster):
 def test_cant_delete_default_cluster(one: One):
     cluster_id = 0
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(OneActionException):
         delete__test(one.cluster, cluster_id)
-
-
-
 
 
 def test_cant_delete_cluster_with_host(one: One, cluster_with_host):
     cluster_id = cluster_with_host
     
-    with pytest.raises(OneInternalException):
+    with pytest.raises(OneActionException):
         delete__test(one.cluster, cluster_id)
-
 
 
 def test_cant_delete_cluster_with_datastore(one: One, cluster_with_datastore):
     cluster_id = cluster_with_datastore
     
-    with pytest.raises(OneInternalException):
+    with pytest.raises(OneActionException):
         delete__test(one.cluster, cluster_id)
-
 
 
 def test_cant_delete_cluster_with_vnet(one: One, cluster_with_vnet):
     cluster_id = cluster_with_vnet
     
-    with pytest.raises(OneInternalException):
+    with pytest.raises(OneActionException):
         delete__test(one.cluster, cluster_id)

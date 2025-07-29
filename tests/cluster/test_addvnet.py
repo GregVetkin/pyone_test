@@ -2,7 +2,7 @@ import pytest
 import random
 
 from api    import One
-from pyone  import OneNoExistsException
+from pyone  import OneNoExistsException, OneException
 
 
 
@@ -14,7 +14,7 @@ def cluster_with_vnet(one: One, dummy_cluster, dummy_vnet):
     yield dummy_cluster
     try:
         one.cluster.delvnet(dummy_cluster, dummy_vnet)
-    except OneNoExistsException:
+    except OneException:
         pass
     
 
@@ -52,7 +52,7 @@ def test_add_vnet(one: One, dummy_cluster, dummy_vnet):
 
 def test_add_added_vnet(one: One, cluster_with_vnet):
     cluster_id       = cluster_with_vnet
-    cluster_vnet_ids = one.cluster.info(cluster_id).VNETS.ID
+    cluster_vnet_ids = one.cluster.info(cluster_id, False).VNETS.ID
     added_vnet_id    = cluster_vnet_ids[-1]
 
     result = one.cluster.addvnet(cluster_id, added_vnet_id)

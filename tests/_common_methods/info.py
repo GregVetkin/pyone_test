@@ -8,8 +8,10 @@ from pyone import OneNoExistsException
 
 
 def not_exist__test(api_object):
+    one_object_id = random.randint(9999, 999999)
+
     with pytest.raises(OneNoExistsException):
-        api_object.info(999999)
+        api_object.info(one_object_id, False)
 
 
 
