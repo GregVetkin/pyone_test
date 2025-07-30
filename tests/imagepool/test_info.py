@@ -36,7 +36,10 @@ def images(one: One, dummy_datastore: int):
 
 def test_show_all_images(one: One, images: List[int]):
     image_ids     = images
-    imagepool     = one.imagepool.info().IMAGE
+    filter_flag   = -2
+    start_id      = -1
+    end_id        = -1
+    imagepool     = one.imagepool.info(filter_flag, start_id, end_id).IMAGE
     imagepool_ids = [image.ID for image in imagepool]
 
     assert set(image_ids).issubset(imagepool_ids)
@@ -47,7 +50,11 @@ def test_show_all_images(one: One, images: List[int]):
 def test_filter_start_id(one: One, images: List[int]):
     image_ids     = images
     image_ids.sort()
-    imagepool     = one.imagepool.info(start_id=image_ids[1]).IMAGE
+    filter_flag   = -2
+    start_id      = image_ids[1]
+    end_id        = -1
+
+    imagepool     = one.imagepool.info(filter_flag, start_id, end_id).IMAGE
     imagepool_ids = [image.ID for image in imagepool]
     
     assert image_ids[0] not in imagepool_ids
@@ -59,7 +66,11 @@ def test_filter_start_id(one: One, images: List[int]):
 def test_filter_end_id(one: One, images: List[int]):
     image_ids     = images
     image_ids.sort()
-    imagepool     = one.imagepool.info(start_id=image_ids[0], end_id=image_ids[-2]).IMAGE
+    filter_flag   = -2
+    start_id      = image_ids[0]
+    end_id        = image_ids[-2]
+
+    imagepool     = one.imagepool.info(filter_flag, start_id, end_id).IMAGE
     imagepool_ids = [image.ID for image in imagepool]
     
     assert image_ids[-1] not in imagepool_ids

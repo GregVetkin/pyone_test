@@ -1,15 +1,14 @@
 import pytest
 import random
+import pyone
 import time
+
 from typing                         import List
-from pyone                          import OneNoExistsException
 from api                            import One
 from utils.other                    import wait_until, get_unic_name
 from config.tests                   import LOCK_LEVELS
+from tests._common_methods.delete   import delete__test, not_exist__test
 
-from tests._common_methods.delete   import delete__test
-from tests._common_methods.delete   import delete_if_not_exist__test
-from tests._common_methods.delete   import cant_be_deleted__test
 
 
 
@@ -19,15 +18,15 @@ def locked_template(one: One, dummy_template: int, request):
     lock_level  = request.param
 
     one.template.lock(template_id, lock_level, False)
-    wait_until(lambda: one.template.info(template_id, False).LOCK is not None)
+    wait_until(lambda: one.template.info(template_id, False, False).LOCK is not None)
 
     yield template_id
 
     try:
         one.template.unlock(template_id)
-        wait_until(lambda: one.template.info(template_id, False).LOCK is None)
+        wait_until(lambda: one.template.info(template_id, False, False).LOCK is None)
 
-    except OneNoExistsException:
+    except pyone.OneNoExistsException:
         return
 
 
@@ -42,15 +41,16 @@ def images(one: One, dummy_datastore: int):
             TYPE = DATABLOCK
             SIZE = 1
         """
-        image_id = one.image.allocate(template, datastore_id)
+        image_id = one.image.allocate(template, datastore_id, False)
         image_ids.append(image_id)
     
     yield image_ids
 
-    # for image_id in image_ids:
-    #     one.image.delete(image_id, True)
-    
-    # wait_until(lambda: not one.datastore.info(datastore_id, False).IMAGES.ID)
+    if set(image_ids) & set([image.ID for image in one.imagepool.info(-2, -1, -1).IMAGE]):
+
+        for image_id in image_ids:
+            one.image.delete(image_id, True)
+        wait_until(lambda: not one.datastore.info(datastore_id, False).IMAGES.ID)
 
 
 
@@ -80,7 +80,7 @@ def vmtemplate_with_images(one: One, images: List[int]):
 
 
 def test_template_not_exist(one: One):
-    delete_if_not_exist__test(one.template)
+    not_exist__test(one.template)
 
 
 
@@ -96,25 +96,29 @@ def test_locked_template(one: One, locked_template: int):
     if one.template.info(template_id).LOCK.LOCKED == 3:
         delete__test(one.template, template_id)
     else:
-        cant_be_deleted__test(one.template, template_id)
+        with pytest.raises(pyone.OneException):
+            delete__test(one.template, template_id)
 
 
 
 
-
-def test_template_and_images(one: One, vmtemplate_with_images: int):
+@pytest.mark.parametrize("delete_images", [True, False])
+def test_template_and_images(one: One, vmtemplate_with_images: int, delete_images: bool):
     template_id        = vmtemplate_with_images
     template_image_ids = [int(disk["IMAGE_ID"]) for disk in one.template.info(template_id, False, False).TEMPLATE["DISK"]]
 
 
-    _id = one.template.delete(template_id, True)
+    _id = one.template.delete(template_id, delete_images)
     assert _id == template_id
     time.sleep(5)
     
-    tempalte_pool = [tempalte.ID for tempalte in one.templatepool.info().VMTEMPLATE]
-    image_pool    = [image.ID for image in one.imagepool.info().IMAGE]
+    tempalte_pool = [tempalte.ID for tempalte in one.templatepool.info(-2, -1, -1).VMTEMPLATE]
+    image_pool    = [image.ID for image in one.imagepool.info(-2, -1, -1).IMAGE]
     
     assert template_id not in tempalte_pool
-    assert not set(image_pool) & set(template_image_ids)
 
+    if delete_images:
+        assert not set(image_pool) & set(template_image_ids)
+    else:
+        assert set(image_pool) & set(template_image_ids)
 

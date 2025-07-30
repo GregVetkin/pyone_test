@@ -52,6 +52,6 @@ class OneUser:
         """Enables or disables a user"""
         return self._one_user.enable(user_id, enable)
 
-    def info(self, user_id: int, decrypt_secrets: bool) -> USERSub:
+    def info(self, user_id: int, decrypt_secrets: bool = False) -> USERSub:
         """Retrieves information for the user"""
         return self._one_user.info(user_id, decrypt_secrets)

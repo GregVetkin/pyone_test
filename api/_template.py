@@ -11,7 +11,7 @@ class OneTemplate:
         """Allocates a new template in OpenNebula"""
         return self._one_template.allocate(template)
 
-    def clone(self, template_id: int, clone_name: str, clone_disks: bool) -> int:
+    def clone(self, template_id: int, clone_name: str, clone_disks: bool = False) -> int:
         """Clones an existing virtual machine template"""
         return self._one_template.clone(template_id, clone_name, clone_disks)
 
@@ -19,7 +19,7 @@ class OneTemplate:
         """Deletes the given template from the pool"""
         return self._one_template.delete(template_id, delete_images)
 
-    def instantiate(self, template_id: int, vm_name: str, hold_vm: bool, extra_template: str, private_persistent_copy: bool) -> int:
+    def instantiate(self, template_id: int, vm_name: str, hold_vm: bool = False, extra_template: str = "", private_persistent_copy: bool = False) -> int:
         """Instantiates a new virtual machine from a template"""
         return self._one_template.instantiate(template_id, vm_name, hold_vm, extra_template, private_persistent_copy)
 
@@ -31,7 +31,7 @@ class OneTemplate:
               user_use: int, user_manage: int, user_admin: int,
               group_use: int, group_manage: int, group_admin: int,
               other_use: int, other_manage: int, other_admin: int,
-              chmod_images: bool) -> int:
+              chmod_images: bool = False) -> int:
         """Changes the permission bits of a template"""
         
         return self._one_template.chmod(template_id, 
@@ -48,7 +48,7 @@ class OneTemplate:
         """Renames a template"""
         return self._one_template.rename(template_id, new_name)
     
-    def info(self, template_id: int, extended: bool, decrypt_secrets: bool) -> VMTEMPLATESub:
+    def info(self, template_id: int, extended: bool = False, decrypt_secrets: bool = False) -> VMTEMPLATESub:
         """Retrieves information for the template"""
         return self._one_template.info(template_id, extended, decrypt_secrets)
     

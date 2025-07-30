@@ -1,17 +1,10 @@
 import pytest
+import pyone
+import random
 
 from api                import One
-from pyone              import OneInternalException, OneNoExistsException
-
 from utils.other        import wait_until
 from config.opennebula  import ImageStates, VmStates
-
-
-
-
-
-
-
 
 
 
@@ -47,8 +40,9 @@ def used_image(one: One, dummy_vm: int, dummy_image: int):
 
 @pytest.mark.parametrize("enable", [True, False])
 def test_image_not_exist(one: One, enable: bool):
-    image_id = 999999
-    with pytest.raises(OneNoExistsException):
+    image_id = random.randint(9999, 999999)
+    
+    with pytest.raises(pyone.OneNoExistsException):
         one.image.enable(image_id, enable)
 
 
@@ -57,12 +51,12 @@ def test_image_not_exist(one: One, enable: bool):
 def test_used_image(one: One, used_image: int, enable: bool):
     image_id = used_image
 
-    assert one.image.info(image_id).STATE == ImageStates.USED
+    assert one.image.info(image_id, False).STATE == ImageStates.USED
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.image.enable(image_id, enable)
 
-    assert one.image.info(image_id).STATE == ImageStates.USED
+    assert one.image.info(image_id, False).STATE == ImageStates.USED
 
 
 
@@ -80,12 +74,12 @@ def test_image_status_toggle(one: One, dummy_image: int, start_status: bool, exp
     start_state_code = ImageStates.READY if start_status else ImageStates.DISABLED
 
     one.image.enable(image_id, start_status)
-    wait_until(lambda: one.image.info(image_id).STATE == start_state_code)
+    wait_until(lambda: one.image.info(image_id, False).STATE == start_state_code)
 
     _id = one.image.enable(image_id, expected_status)
     assert _id == image_id
 
     if expected_status:
-        assert one.image.info(image_id).STATE == ImageStates.READY
+        assert one.image.info(image_id, False).STATE == ImageStates.READY
     else:
-        assert one.image.info(image_id).STATE == ImageStates.DISABLED
+        assert one.image.info(image_id, False).STATE == ImageStates.DISABLED

@@ -1,8 +1,8 @@
 import pytest
 
 from api                            import One
-from tests._common_methods.update   import update__test
-from tests._common_methods.update   import not_exist__test
+from tests._common_methods.update   import update__test, not_exist__test
+
 
 
 

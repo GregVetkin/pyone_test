@@ -1,16 +1,19 @@
 import pytest
 import random
+import pyone
 
 from typing             import List
 from api                import One
-from pyone              import OneNoExistsException
 
-from utils.other        import wait_until
-from utils.other        import get_unic_name
+from utils.kerberos     import PyoneWrap
+from utils.other        import wait_until, get_unic_name
+from config.base        import API_URI, BrestAdmin
+from config.opennebula  import VmStates, ImageStates, VmRecoverOperations
 
-from config.opennebula  import VmStates
-from config.opennebula  import ImageStates
-from config.opennebula  import VmRecoverOperations
+
+
+
+
 
 
 
@@ -26,7 +29,7 @@ def images(one: One, dummy_datastore: int):
             TYPE = DATABLOCK
             SIZE = 1
         """
-        image_id = one.image.allocate(template, datastore_id)
+        image_id = one.image.allocate(template, datastore_id, False)
         image_ids.append(image_id)
     
     yield image_ids
@@ -69,8 +72,10 @@ def vmtemplate_with_images(one: One, images: List[int]):
 
 
 def test_template_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.template.instantiate(999999)
+    template_id = random.randint(9999, 999999)
+
+    with pytest.raises(pyone.OneNoExistsException):
+        one.template.instantiate(template_id, "", False, "", False)
 
 
 
@@ -79,16 +84,16 @@ def test_vm_name(one: One, dummy_template: int):
     template_id     = dummy_template
     vm_name         = get_unic_name()
     hold_vm         = False
-    extra_template  = "MEMORY=1\nCPU=1\nVCPU=1\n"
+    extra_template  = "MEMORY=1\nCPU=0.1\nVCPU=1\n"
     pers_copy       = False
 
     vm_id = one.template.instantiate(template_id, vm_name, hold_vm, extra_template, pers_copy)
-    wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info().VM])
+    wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info(-2, -1, -1, -2, "").VM])
     
-    assert one.vm.info(vm_id).NAME == vm_name
+    assert one.vm.info(vm_id, False).NAME == vm_name
 
     one.vm.recover(vm_id, VmRecoverOperations.DELETE)
-    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.DONE)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.DONE)
 
 
 
@@ -97,13 +102,13 @@ def test_vm_name(one: One, dummy_template: int):
 def test_hold_vm(one: One, dummy_template: int, hold_vm: bool):
     template_id     = dummy_template
     vm_name         = get_unic_name()
-    extra_template  = "MEMORY=1\nCPU=1\nVCPU=1\n"
+    extra_template  = "MEMORY=1\nCPU=0.1\nVCPU=1\n"
     pers_copy       = False
 
 
-    vm_id   = one.template.instantiate(template_id, vm_name, hold_vm, extra_template, pers_copy)
-    wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info().VM])
-    vm_info = one.vm.info(vm_id)
+    vm_id = one.template.instantiate(template_id, vm_name, hold_vm, extra_template, pers_copy)
+    wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info(-2, -1, -1, -2, "").VM])
+    vm_info = one.vm.info(vm_id, False)
 
     assert vm_info.NAME == vm_name
 
@@ -113,7 +118,7 @@ def test_hold_vm(one: One, dummy_template: int, hold_vm: bool):
         assert vm_info.STATE != VmStates.HOLD
     
     one.vm.recover(vm_id, VmRecoverOperations.DELETE)
-    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.DONE)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.DONE)
 
 
 
@@ -123,22 +128,22 @@ def test_extra_tempalte(one: One, dummy_template: int):
     template_id     = dummy_template
     vm_name         = get_unic_name()
     hold_vm         = True
-    extra_template  = "MEMORY=1\nCPU=1\nVCPU=1\n"
+    extra_template  = "MEMORY=1\nCPU=0.1\nVCPU=1\n"
     pers_copy       = False
 
     init_attr_name  = get_unic_name()
     init_attr_value = get_unic_name()
     init_template   = f"{init_attr_name} = {init_attr_value}"
-    one.template.update(template_id, init_template, False)
+    one.template.update(template_id, init_template, 1)
 
     extra_attr_name  = get_unic_name()
     extra_attr_value = get_unic_name()
     extra_template   += f"{extra_attr_name} = {extra_attr_value}"
 
     vm_id = one.template.instantiate(template_id, vm_name, hold_vm, extra_template, pers_copy)
-    wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info().VM])
+    wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info(-2, -1, -1, -2, "").VM])
 
-    vm_info = one.vm.info(vm_id)
+    vm_info = one.vm.info(vm_id, False)
     vm_user_template = vm_info.USER_TEMPLATE
 
     assert vm_info.NAME == vm_name
@@ -146,7 +151,7 @@ def test_extra_tempalte(one: One, dummy_template: int):
     assert vm_user_template[extra_attr_name.upper()] == extra_attr_value
     
     one.vm.recover(vm_id, VmRecoverOperations.DELETE)
-    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.DONE)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.DONE)
 
 
 
@@ -158,22 +163,22 @@ def test_private_persistent_copy(one: One, vmtemplate_with_images: int):
     vm_name         = get_unic_name()
     hold_vm         = True
     pers_copy       = True
-    extra_template  = "MEMORY=1\nCPU=1\nVCPU=1\n"
+    extra_template  = "MEMORY=1\nCPU=0.1\nVCPU=1\n"
 
     init_attr_name  = get_unic_name()
     init_attr_value = get_unic_name()
     init_template   = f"{init_attr_name} = {init_attr_value}"
-    one.template.update(template_id, init_template, False)
+    one.template.update(template_id, init_template, 1)
 
-    template_images_ids = [int(disk["IMAGE_ID"]) for disk in one.template.info(template_id).TEMPLATE["DISK"]]
+    template_images_ids = [int(disk["IMAGE_ID"]) for disk in one.template.info(template_id, False, False).TEMPLATE["DISK"]]
 
 
     vm_id = one.template.instantiate(template_id, vm_name, hold_vm, extra_template, pers_copy)
-    wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info().VM])
+    wait_until(lambda: vm_id in [vm.ID for vm in one.vmpool.info(-2, -1, -1, -2, "").VM])
 
-    vm_info           = one.vm.info(vm_id)
+    vm_info           = one.vm.info(vm_id, False)
     vm_user_template  = vm_info.USER_TEMPLATE
-    vm_images_ids     = [int(disk["IMAGE_ID"]) for disk in one.vm.info(vm_id).TEMPLATE["DISK"]]
+    vm_images_ids     = [int(disk["IMAGE_ID"]) for disk in one.vm.info(vm_id, False).TEMPLATE["DISK"]]
     clone_template_id = int(vm_info.TEMPLATE["TEMPLATE_ID"])
 
     assert vm_info.NAME == vm_name
@@ -190,19 +195,41 @@ def test_private_persistent_copy(one: One, vmtemplate_with_images: int):
         
 
     one.vm.recover(vm_id, VmRecoverOperations.DELETE)
-    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.DONE)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.DONE)
 
     # for image_id in vm_images_ids:
     #     one.image.delete(image_id, True)
 
     one.template.delete(clone_template_id, True)
     wait_until(
-        lambda: set(vm_images_ids).isdisjoint(set([image.ID for image in one.imagepool.info().IMAGE])),
+        lambda: set(vm_images_ids).isdisjoint(set([image.ID for image in one.imagepool.info(-2, -1, -1).IMAGE])),
         timeout_message="Some images were not removed when the test was completed."
         )
     
     
         
     
+@pytest.mark.KERBEROS
+def test_instantiate_KERBEROS():
+    pw  = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+    one = pw.get_client()
+
+    template = f"""
+        NAME    = {get_unic_name()}
+        CPU     = 0.1
+        MEMORY  = 1
+    """
+    template_id     = one.template.allocate(template)
+    vm_name         = get_unic_name()
+    hold_vm         = False
+    extra_template  = ""
+    pers_copy       = False
+
+    vm_id = one.template.instantiate(template_id, vm_name, hold_vm, extra_template, pers_copy, pw.sessionDir)
     
+    assert one.vm.info(vm_id).NAME == vm_name
     
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
+    one.vm.recover(vm_id, VmRecoverOperations.DELETE)
+    one.template.delete(template_id, False)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.DONE)

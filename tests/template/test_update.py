@@ -1,13 +1,11 @@
 import pytest
-
+import pyone
 from api                import One
 from config.tests       import LOCK_LEVELS
 from utils.other        import wait_until
 
-from tests._common_methods.update import update_and_merge__test
-from tests._common_methods.update import update_and_replace__test
-from tests._common_methods.update import update_if_not_exist__test
-from tests._common_methods.update import cant_be_updated__test
+from tests._common_methods.update import update__test, not_exist__test
+
 
 
 
@@ -18,12 +16,12 @@ def locked_template(one: One, dummy_template: int, request):
     lock_level  = request.param
 
     one.template.lock(tempalte_id, lock_level, False)
-    wait_until(lambda: one.template.info(tempalte_id, False).LOCK is not None)
+    wait_until(lambda: one.template.info(tempalte_id, False, False).LOCK is not None)
 
     yield tempalte_id
 
     one.template.unlock(tempalte_id)
-    wait_until(lambda: one.template.info(tempalte_id, False).LOCK is None)
+    wait_until(lambda: one.template.info(tempalte_id, False, False).LOCK is None)
 
 
 
@@ -36,31 +34,26 @@ def locked_template(one: One, dummy_template: int, request):
 
 
 
-
 def test_template_not_exist(one: One):
-    update_if_not_exist__test(one.template)
+    not_exist__test(one.template)
 
 
-
-def test_update_by_replace(one: One, dummy_template: int):
+@pytest.mark.parametrize("update_type", [0, 1])
+def test_update_type(one: One, dummy_template: int, update_type: int):
     template_id = dummy_template
-    update_and_replace__test(one.template, template_id)
-
-
-
-def test_update_by_merge(one: One, dummy_template: int):
-    template_id = dummy_template
-    update_and_merge__test(one.template, template_id)
+    update__test(one.template, template_id, update_type)
 
 
 
 
-def test_locked_template(one: One, locked_template: int):
+@pytest.mark.parametrize("update_type", [0, 1])
+def test_locked_template(one: One, locked_template: int, update_type: int):
     template_id = locked_template
-    lock_level = one.template.info(template_id).LOCK.LOCKED
+    lock_level  = one.template.info(template_id).LOCK.LOCKED
 
     if lock_level == 3:
-        update_and_replace__test(one.template, template_id)
+        update__test(one.template, template_id, update_type)
     else:
-        cant_be_updated__test(one.template, template_id)
+        with pytest.raises(pyone.OneException):
+            update__test(one.template, template_id,  update_type)
 

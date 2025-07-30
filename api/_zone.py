@@ -27,7 +27,7 @@ class OneZone:
         """Renames a zone"""
         return self._one_zone.rename(zone_id, new_name)
     
-    def info(self, zone_id: int, decrypt_secrets: bool) -> ZONESub:
+    def info(self, zone_id: int, decrypt_secrets: bool = False) -> ZONESub:
         """Retrieves information for the zone"""
         return self._one_zone.info(zone_id, decrypt_secrets)
 

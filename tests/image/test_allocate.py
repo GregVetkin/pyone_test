@@ -1,8 +1,9 @@
 import pytest
+import pyone
+import random
+
 from utils.other        import get_unic_name
 from api                import One
-from pyone              import OneActionException, OneNoExistsException, OneException
-
 
 
 @pytest.fixture
@@ -41,21 +42,21 @@ def file_datastore(one: One):
 
 
 def test_datastore_not_exist(one: One):
-    datastore_id    = 999999
+    datastore_id    = random.randint(9999, 999999)
     check_capacity  = True
     template        = f"""
         NAME = {get_unic_name()}
         TYPE = DATABLOCK
         SIZE = 1
     """
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.image.allocate(template, datastore_id, check_capacity)
 
 
 
 @pytest.mark.parametrize("check_capacity", [
     False,
-    pytest.param(True, marks=pytest.mark.xfail(raises=OneActionException)),
+    pytest.param(True, marks=pytest.mark.xfail(raises=pyone.OneActionException)),
 ])
 def test_capaticy_check(one: One, dummy_datastore: int, check_capacity):
     datastore_id    = dummy_datastore
@@ -66,9 +67,11 @@ def test_capaticy_check(one: One, dummy_datastore: int, check_capacity):
     """
     image_id = one.image.allocate(template, datastore_id, check_capacity)
 
-    assert one.image.info(image_id)
+    assert one.image.info(image_id, False)
 
     one.image.delete(image_id, True)
+
+
 
 
 @pytest.mark.parametrize("datastore_fixture_name", [
@@ -83,7 +86,7 @@ def test_wrong_datastore(one: One, datastore_fixture_name: str, request):
         TYPE = DATABLOCK
         SIZE = 1
     """
-    with pytest.raises(OneException):
+    with pytest.raises(pyone.OneException):
         one.image.allocate(template, datastore_id, check_capacity)
 
 

@@ -1,12 +1,12 @@
 import pytest
 import random
 
-from typing                         import List
-from api                            import One
-from utils.other                    import get_unic_name, wait_until
+from typing         import List
+from api            import One
+from utils.other    import get_unic_name, wait_until
 
-from tests._common_methods.info     import info_if_not_exist__test
-from tests._common_methods.info     import info__test
+from tests._common_methods.info     import info__test, not_exist__test
+
 
 
 
@@ -22,7 +22,7 @@ def images(one: One, dummy_datastore: int):
             TYPE = DATABLOCK
             SIZE = 1
         """
-        image_id = one.image.allocate(template, datastore_id)
+        image_id = one.image.allocate(template, datastore_id, False)
         image_ids.append(image_id)
     
     yield image_ids
@@ -66,7 +66,7 @@ def vmtemplate_with_images(one: One, images: List[int]):
 
 
 def test_template_not_exist(one: One):
-    info_if_not_exist__test(one.template)
+    not_exist__test(one.template)
 
 
 
@@ -77,11 +77,16 @@ def test_template_info(one: One, dummy_template: int):
 
 
 
-
-def test_extended_info_with_images(one: One, vmtemplate_with_images: int):
+@pytest.mark.parametrize("extended", [True, False])
+def test_extended_info_with_images(one: One, vmtemplate_with_images: int, extended: bool):
     template_id   = vmtemplate_with_images
-    tempalte_info = one.template.info(template_id, True, True)
+    tempalte_info = one.template.info(template_id, extended, True)
+
 
     for disk in tempalte_info.TEMPLATE["DISK"]:
         assert "IMAGE_ID" in disk
-        assert "SIZE" in disk
+        
+        if extended:
+            assert "SIZE" in disk
+        else:
+            assert "SIZE" not in disk

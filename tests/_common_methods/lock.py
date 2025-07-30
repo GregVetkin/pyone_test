@@ -1,8 +1,8 @@
 import pytest
 import random
+import pyone
 
-from pyone          import OneNoExistsException, OneActionException
-from utils.other    import wait_until
+
 from utils.version  import Version
 from config.base    import BREST_VERSION
 
@@ -14,13 +14,13 @@ def not_exist__test(api_object):
     lock_level = 1
     lock_check = False
 
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         api_object.lock(one_object_id, lock_level, lock_check)
 
 
 
 def lock__test(api_object, one_object_id: int, lock_level: int, lock_check: bool):
-    if api_object.info(one_object_id, False).LOCK is None:
+    if api_object.info(one_object_id, False).LOCK is not None:
         __was_locked__test(api_object, one_object_id, lock_level, lock_check)
     else:
         ___wasnt_locked__test(api_object, one_object_id, lock_level, lock_check)
@@ -33,10 +33,10 @@ def __was_locked__test(api_object, one_object_id: int, lock_level: int, lock_che
     if lock_check:
         init_lock_level = api_object.info(one_object_id, False).LOCK.LOCKED
 
-        with pytest.raises(OneActionException):
+        with pytest.raises(pyone.OneActionException):
             api_object.lock(one_object_id, lock_level, lock_check)
 
-        assert api_object.info(one_object_id).LOCK.LOCKED == init_lock_level
+        assert api_object.info(one_object_id, False).LOCK.LOCKED == init_lock_level
 
     else:
         ___wasnt_locked__test(api_object, one_object_id, lock_level, lock_check)
@@ -50,7 +50,7 @@ def ___wasnt_locked__test(api_object, one_object_id: int, lock_level: int, lock_
         if Version(BREST_VERSION) >= Version("4") and lock_level == 4:
             lock_level = 1
             
-        assert api_object.info(one_object_id).LOCK.LOCKED == lock_level
+        assert api_object.info(one_object_id, False).LOCK.LOCKED == lock_level
 
 
 

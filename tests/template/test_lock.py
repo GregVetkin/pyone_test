@@ -4,9 +4,8 @@ from api                import One
 from utils.other        import wait_until
 from config.tests       import LOCK_LEVELS
 
-from tests._common_methods.lock import lock_if_not_exist__test
-from tests._common_methods.lock import lock_unlocked__test
-from tests._common_methods.lock import lock_locked__test
+from tests._common_methods.lock import lock__test, not_exist__test
+
 
 
 
@@ -16,12 +15,12 @@ def locked_template(one: One, dummy_template: int, request):
     lock_level  = request.param
 
     one.template.lock(template_id, lock_level, False)
-    wait_until(lambda: one.template.info(template_id, False).LOCK is not None)
+    wait_until(lambda: one.template.info(template_id, False, False).LOCK is not None)
 
     yield template_id
 
     one.template.unlock(template_id)
-    wait_until(lambda: one.template.info(template_id, False).LOCK is None)
+    wait_until(lambda: one.template.info(template_id, False, False).LOCK is None)
 
 
 
@@ -31,8 +30,8 @@ def locked_template(one: One, dummy_template: int, request):
 # =================================================================================================
 
 
-def test_image_not_exist(one: One):
-    lock_if_not_exist__test(one.template)
+def test_template_not_exist(one: One):
+    not_exist__test(one.template)
 
 
 
@@ -40,7 +39,7 @@ def test_image_not_exist(one: One):
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 def test_lock_unlocked(one: One, dummy_template: int, lock_level: int, lock_check: bool):
     template_id = dummy_template
-    lock_unlocked__test(one.template, template_id, lock_level, lock_check)
+    lock__test(one.template, template_id, lock_level, lock_check)
 
     one.template.unlock(template_id)
     wait_until(lambda: one.template.info(template_id, False).LOCK is None)
@@ -51,7 +50,6 @@ def test_lock_unlocked(one: One, dummy_template: int, lock_level: int, lock_chec
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 def test_lock_locked(one: One, locked_template: int, lock_level: int, lock_check: bool):
     template_id = locked_template
-
-    lock_locked__test(one.template, template_id, lock_level, lock_check)
+    lock__test(one.template, template_id, lock_level, lock_check)
     
 

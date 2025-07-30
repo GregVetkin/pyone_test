@@ -15,7 +15,7 @@ class OneGroup:
         """Deletes the given group from the pool"""
         return self._one_group.delete(group_id)
     
-    def info(self, group_id: int, decrypt_secrets: bool) -> GROUPSub:
+    def info(self, group_id: int, decrypt_secrets: bool = False) -> GROUPSub:
         """Retrieves information for the group"""
         return self._one_group.info(group_id, decrypt_secrets)
 

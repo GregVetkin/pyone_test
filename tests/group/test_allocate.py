@@ -6,23 +6,27 @@ from config.tests       import INVALID_CHARS
 
 
 
+
+
+
 def test_create_group(one: One):
     group_name  = get_unic_name()
     group_id    = one.group.allocate(group_name)
-    assert one.group.info(group_id).NAME == group_name
+    assert one.group.info(group_id, False).NAME == group_name
     one.group.delete(group_id)
 
 
-
 def test_empty_name(one: One):
+    group_name = ""
     with pytest.raises(pyone.OneInternalException):
-        one.group.allocate("")
+        one.group.allocate(group_name)
 
 
 
 def test_name_is_taken(one: One):
+    group_name = "brestadmins"
     with pytest.raises(pyone.OneInternalException):
-        one.group.allocate("brestadmins")
+        one.group.allocate(group_name)
 
 
 

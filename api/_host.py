@@ -27,7 +27,7 @@ class OneHost:
         """Renames a host"""
         return self._one_host.rename(host_id, new_name)
     
-    def info(self, host_id: int, decrypt_secrets: bool) -> HOSTSub:
+    def info(self, host_id: int, decrypt_secrets: bool = False) -> HOSTSub:
         """Retrieves information for the host"""
         return self._one_host.info(host_id, decrypt_secrets)
 

@@ -88,7 +88,7 @@ def dummy_vm(one: One):
 
     yield vm_id
 
-    if one.vm.info(vm_id, False).STATE != 8:
+    if one.vm.info(vm_id, False).STATE != VmStates.DONE:
         one.vm.recover(vm_id, VmRecoverOperations.DELETE)
 
 
@@ -197,11 +197,11 @@ def poweroff_vm_mini(one: One):
     command = f"cd {script_dir} && ./cli_prepare.sh create_vm mini {vm_name} nonpers"
     
     run_command_via_ssh(ssh_conn, command)
-    vm_id = next(vm.ID for vm in one.vmpool.info().VM if vm.NAME == vm_name)
+    vm_id = next(vm.ID for vm in one.vmpool.info(-2, -1, -1, -2, "").VM if vm.NAME == vm_name)
 
     yield vm_id
 
-    if one.vm.info(vm_id).STATE != VmStates.DONE:
+    if one.vm.info(vm_id, False).STATE != VmStates.DONE:
         run_command_via_ssh(brest_admin_ssh_conn, f"onevm terminate {vm_id} --hard")
 
 
@@ -209,5 +209,5 @@ def poweroff_vm_mini(one: One):
 def running_vm_mini(one: One, poweroff_vm: int):
     vm_id = poweroff_vm
     run_command_via_ssh(brest_admin_ssh_conn, f"echo '{BrestAdmin.PASSWORD}' | kinit; onevm resume {vm_id}")
-    wait_until(lambda: one.vm.info(vm_id).LCM_STATE == VmLcmStates.RUNNING)
+    wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.RUNNING)
     yield vm_id

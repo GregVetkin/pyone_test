@@ -6,11 +6,7 @@ from utils.other    import get_unic_name
 
 @pytest.fixture
 def host_ids(one: One):
-    host_ids_list = []
-    for _ in range(5):
-        host_name = get_unic_name()
-        host_id   = one.host.allocate(host_name)
-        host_ids_list.append(host_id)
+    host_ids_list = [one.host.allocate(get_unic_name(), "kvm", "kvm", -1) for _ in range(5)]
 
     yield host_ids_list
 

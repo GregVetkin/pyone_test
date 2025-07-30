@@ -47,6 +47,6 @@ class OneCluster:
         """Renames a cluster"""
         return self._one_cluster.rename(cluster_id, new_name)
 
-    def info(self, cluster_id: int, decrypt_secrets: bool) -> CLUSTERSub:
+    def info(self, cluster_id: int, decrypt_secrets: bool = False) -> CLUSTERSub:
         """Retrieves information for the cluster"""
         return self._one_cluster.info(cluster_id, decrypt_secrets)

@@ -1,13 +1,10 @@
+import pyone
 import pytest
-from api       import One
+import random
 
-from tests._common_methods.chown    import object_not_exist__test
-from tests._common_methods.chown    import user_not_exist__test
-from tests._common_methods.chown    import group_not_exist__test
-from tests._common_methods.chown    import user_and_group_change__test
-from tests._common_methods.chown    import user_and_group_not_changed__test
-from tests._common_methods.chown    import user_change__test
-from tests._common_methods.chown    import group_change__test
+from api                            import One
+from tests._common_methods.chown    import not_exist__test, chown__test
+
 
 
 
@@ -20,17 +17,26 @@ from tests._common_methods.chown    import group_change__test
 
 
 def test_image_not_exist(one: One):
-    object_not_exist__test(one.image)
+    not_exist__test(one.image)
 
 
 def test_user_not_exist(one: One, dummy_image: int):
     image_id = dummy_image
-    user_not_exist__test(one.image, image_id)
+    user_id  = random.randint(9999, 999999)
+    group_id = -1
+
+    with pytest.raises(pyone.OneNoExistsException):
+        chown__test(one.image, image_id, user_id, group_id)
+
 
 
 def test_group_not_exist(one: One, dummy_image: int):
     image_id = dummy_image
-    group_not_exist__test(one.image, image_id)
+    user_id  = -1
+    group_id = random.randint(9999, 999999)
+
+    with pytest.raises(pyone.OneNoExistsException):
+        chown__test(one.image, image_id, user_id, group_id)
 
 
 
@@ -39,24 +45,31 @@ def test_user_and_group_change(one: One, dummy_image: int, dummy_user: int, dumm
     image_id = dummy_image
     user_id  = dummy_user
     group_id = dummy_group
-    user_and_group_change__test(one.image, image_id, user_id, group_id)
+
+    chown__test(one.image, image_id, user_id, group_id)
 
 
 
 def test_user_and_group_not_changed(one: One, dummy_image: int):
     image_id = dummy_image
-    user_and_group_not_changed__test(one.image, image_id)
+    user_id  = -1
+    group_id = -1
+
+    chown__test(one.image, image_id, user_id, group_id)
 
 
 
 
-def test_user_change(one: One, dummy_image: int, dummy_user: int):
+def test_only_user_change(one: One, dummy_image: int, dummy_user: int):
     image_id = dummy_image
     user_id  = dummy_user
-    user_change__test(one.image, image_id, user_id)
+    group_id = -1
+
+    chown__test(one.image, image_id, user_id, group_id)
 
 
-def test_group_change(one: One, dummy_image: int, dummy_group: int):
+def test_only_group_change(one: One, dummy_image: int, dummy_group: int):
     image_id = dummy_image
+    user_id  = -1
     group_id = dummy_group
-    group_change__test(one.image, image_id, group_id)
+    chown__test(one.image, image_id, user_id, group_id)

@@ -46,7 +46,7 @@ class OneImage:
         """Sets the Image as persistent or not persistent"""
         return self._one_image.persistent(image_id, persistent)
 
-    def info(self, image_id: int, decrypt_secrets: bool) -> IMAGESub:
+    def info(self, image_id: int, decrypt_secrets: bool = False) -> IMAGESub:
         """Retrieves information for the image"""
         return self._one_image.info(image_id, decrypt_secrets)
     

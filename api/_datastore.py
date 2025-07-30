@@ -42,7 +42,7 @@ class OneDatastore:
         """Enables a datastore"""
         return self._one_ds.enable(datastore_id, enable)
 
-    def info(self, datastore_id: int, decrypt_secrets: bool) -> DATASTORESub:
+    def info(self, datastore_id: int, decrypt_secrets: bool = False) -> DATASTORESub:
         """Retrieves information for the datastore"""
         return self._one_ds.info(datastore_id, decrypt_secrets)
     

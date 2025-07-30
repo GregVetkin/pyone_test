@@ -1,10 +1,11 @@
 import pytest
 import random
-from pyone                          import OneNoExistsException
+import pyone
+
 from typing                         import List
 from api                            import One
 from utils.other                    import get_unic_name, wait_until
-from tests._common_methods.chmod    import random_permissions__test, __permissions_changed_correctly, __permissions_class_to_rights_list
+from tests._common_methods.chmod    import random_chmod__test, not_exist__test
 
 
 
@@ -19,7 +20,7 @@ def images(one: One, dummy_datastore: int):
             TYPE = DATABLOCK
             SIZE = 1
         """
-        image_id = one.image.allocate(template, datastore_id)
+        image_id = one.image.allocate(template, datastore_id, False)
         image_ids.append(image_id)
     
     yield image_ids
@@ -67,15 +68,14 @@ def vmtemplate_with_images(one: One, images: List[int]):
 
 
 def test_template_not_exist(one: One):
-    with pytest.raises(OneNoExistsException):
-        one.template.chmod(99999)
+    not_exist__test(one.template)
 
 
 
 
 def test_change_template_permissions(one: One, dummy_template: int):
     template_id = dummy_template
-    random_permissions__test(one.template, template_id)
+    random_chmod__test(one.template, template_id)
 
 
 
@@ -88,7 +88,7 @@ def test_change_template_permissions_and_its_images(one: One, vmtemplate_with_im
     _id = one.template.chmod(template_id, *permissions, True)
     assert _id == template_id
 
-    new_template_permissions = one.template.info(template_id).PERMISSIONS
+    new_template_permissions = one.template.info(template_id, False, False).PERMISSIONS
 
     assert new_template_permissions.OWNER_U == 1
     assert new_template_permissions.OWNER_M == 1
@@ -104,7 +104,7 @@ def test_change_template_permissions_and_its_images(one: One, vmtemplate_with_im
 
 
     for image_id in image_ids:
-        new_image_permissions = one.image.info(image_id).PERMISSIONS
+        new_image_permissions = one.image.info(image_id, False).PERMISSIONS
 
         assert new_template_permissions.OWNER_U == new_image_permissions.OWNER_U
         assert new_template_permissions.OWNER_M == new_image_permissions.OWNER_M

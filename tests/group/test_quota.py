@@ -1,9 +1,10 @@
 import pytest
-from typing                 import List
-from random                 import randint
-from api                    import One
-from pyone                  import OneNoExistsException, OneInternalException, OneActionException
-from utils.other            import get_unic_name
+import random
+import pyone
+
+
+from api  import One
+
 
 
 
@@ -17,23 +18,23 @@ from utils.other            import get_unic_name
 
 
 def test_group_not_exist(one: One):
-    group_id = 99999
+    group_id = random.randint(9999, 999999)
     template = ""
 
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.group.quota(group_id, template)
 
 
 
 def test_vm_quota(one: One, dummy_group: int):
     group_id            = dummy_group
-    vms                 = randint(1, 1024)
-    cpu                 = randint(1, 1024)
-    memory              = randint(1, 1024)
-    system_disk_size    = randint(1, 1024)
-    running_cpu         = randint(1, 1024)
-    running_memory      = randint(1, 1024)
-    running_vms         = randint(1, 1024)
+    vms                 = random.randint(1, 1024)
+    cpu                 = random.randint(1, 1024)
+    memory              = random.randint(1, 1024)
+    system_disk_size    = random.randint(1, 1024)
+    running_cpu         = random.randint(1, 1024)
+    running_memory      = random.randint(1, 1024)
+    running_vms         = random.randint(1, 1024)
     vm_quota_template   = f"""
         VM=[
             VMS=                "{vms}",
@@ -49,7 +50,7 @@ def test_vm_quota(one: One, dummy_group: int):
     _id = one.group.quota(group_id, vm_quota_template)
     assert _id == group_id
 
-    group_info = one.group.info(group_id)
+    group_info = one.group.info(group_id, False)
 
     assert group_info.VM_QUOTA.VM
     assert group_info.VM_QUOTA.VM.VMS               == vms
@@ -72,8 +73,8 @@ def test_vm_quota(one: One, dummy_group: int):
 def test_storage_quota(one: One, dummy_group: int, dummy_datastore: int):
     group_id        = dummy_group
     datastore_id    = dummy_datastore
-    images          = randint(1, 1024)
-    size            = randint(1, 1024)
+    images          = random.randint(1, 1024)
+    size            = random.randint(1, 1024)
     quota_template  = f"""
         DATASTORE=[
             ID=     "{datastore_id}",
@@ -85,7 +86,7 @@ def test_storage_quota(one: One, dummy_group: int, dummy_datastore: int):
     _id = one.group.quota(group_id, quota_template)
     assert _id == group_id
 
-    group_info = one.group.info(group_id)
+    group_info = one.group.info(group_id, False)
     
     assert group_info.DATASTORE_QUOTA.DATASTORE
     assert group_info.DATASTORE_QUOTA.DATASTORE[-1].ID      == str(datastore_id)
@@ -101,7 +102,7 @@ def test_storage_quota(one: One, dummy_group: int, dummy_datastore: int):
 def test_image_quota(one: One, dummy_group: int, dummy_image: int):
     group_id        = dummy_group
     image_id        = dummy_image
-    rvms            = randint(1, 1024)
+    rvms            = random.randint(1, 1024)
     quota_template  = f"""
         IMAGE=[
             ID=     "{image_id}",
@@ -112,7 +113,7 @@ def test_image_quota(one: One, dummy_group: int, dummy_image: int):
     _id = one.group.quota(group_id, quota_template)
     assert _id == group_id
 
-    group_info = one.group.info(group_id)
+    group_info = one.group.info(group_id, False)
 
     assert group_info.IMAGE_QUOTA.IMAGE
     assert group_info.IMAGE_QUOTA.IMAGE[-1].ID   == str(image_id)
@@ -130,7 +131,7 @@ def test_image_quota(one: One, dummy_group: int, dummy_image: int):
 def test_network_quota(one: One, dummy_group: int, dummy_vnet: int):
     group_id        = dummy_group
     vnet_id         = dummy_vnet
-    leases          = randint(1, 1024)
+    leases          = random.randint(1, 1024)
     quota_template  = f"""
         NETWORK=[
             ID=     "{vnet_id}",
@@ -141,7 +142,7 @@ def test_network_quota(one: One, dummy_group: int, dummy_vnet: int):
     _id = one.group.quota(group_id, quota_template)
     assert _id == group_id
 
-    group_info = one.group.info(group_id)
+    group_info = one.group.info(group_id, False)
     assert group_info.NETWORK_QUOTA.NETWORK
     assert group_info.NETWORK_QUOTA.NETWORK[-1].ID      == str(vnet_id)
     assert group_info.NETWORK_QUOTA.NETWORK[-1].LEASES  == str(leases)

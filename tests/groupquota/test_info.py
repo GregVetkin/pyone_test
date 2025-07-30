@@ -1,22 +1,17 @@
-import pytest
+import random
 import xmlrpc.client
-from random                 import randint
-from api                    import One
+
+from api  import One
 
 
-
-
-# =================================================================================================
-# TESTS
-# =================================================================================================
 
 
 
 def test_get_default_quotas(one: One):
     # pyone возвращает неверный объект, поэтому проверка через прямой xmlrpc запрос
     server      = xmlrpc.client.ServerProxy(one._uri)
-    image_id    = randint(1, 1024)
-    rvms        = randint(1, 1024)
+    image_id    = random.randint(1, 1024)
+    rvms        = random.randint(1, 1024)
 
     default_quota_template  = f'IMAGE = [ID="{image_id}", RVMS="{rvms}"]'
     expected_string_part    = f"<IMAGE><ID><![CDATA[{image_id}]]></ID><RVMS><![CDATA[{rvms}]]></RVMS>"

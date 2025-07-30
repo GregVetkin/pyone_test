@@ -1,7 +1,7 @@
 import pytest
+import pyone
 
 from api                import One
-from pyone              import OneInternalException
 from utils.other        import get_unic_name
 
 
@@ -22,29 +22,31 @@ def test_name_is_mandatory(one: One):
         MEMORY  = 32
     """
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.template.allocate(template)
     
 
 
 
 def test_only_name(one: One):
-    name     = get_unic_name()
+    name = get_unic_name()
     template = f"NAME={name}"
-    _id      = one.template.allocate(template)
 
-    assert one.template.info(_id).NAME == name
-    one.template.delete(_id, False)
+    template_id = one.template.allocate(template)
 
-
-
+    assert one.template.info(template_id, False, False).NAME == name
+    one.template.delete(template_id, False)
 
 
-def test_creation_by_xml(one: One):
-    name     = get_unic_name()
+
+
+
+def test_allocate_by_xml(one: One):
+    name = get_unic_name()
     template = f"<VMTEMPLATE><NAME>{name}</NAME></VMTEMPLATE>"
 
-    _id = one.template.allocate(template)
-    assert one.template.info(_id).NAME == name
-    one.template.delete(_id, False)
+    template_id = one.template.allocate(template)
+
+    assert one.template.info(template_id, False, False).NAME == name
+    one.template.delete(template_id, False)
 

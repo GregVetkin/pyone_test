@@ -1,34 +1,39 @@
 import pytest
 import random
 import time
+import pyone
 
 from api                import One
-from pyone              import OneNoExistsException, OneActionException
 from utils.other        import wait_until
 from utils.version      import Version
-from config.opennebula  import VmStates, ImageStates
+from config.opennebula  import VmStates, ImageStates, VmRecoverOperations
 from config.base        import BREST_VERSION
+
+
 
 
 @pytest.fixture
 def image_with_snapshots(one: One, dummy_image: int, dummy_vm: int):
-    wait_until(lambda: one.vm.info(dummy_vm).STATE == VmStates.POWEROFF)
+    image_id = dummy_image
+    vm_id = dummy_vm
 
-    one.image.persistent(dummy_image, True)
-    wait_until(lambda: one.image.info(dummy_image).PERSISTENT == 1)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
-    one.vm.attach(dummy_vm, f"DISK=[IMAGE_ID={dummy_image}]")
-    wait_until(lambda: one.vm.info(dummy_vm).STATE == VmStates.POWEROFF)
+    one.image.persistent(image_id, True)
+    wait_until(lambda: one.image.info(image_id, False).PERSISTENT == 1)
 
-    for _ in range(5):
-        one.vm.disksnapshotcreate(dummy_vm, 0, "")
-        wait_until(lambda: one.vm.info(dummy_vm).STATE == VmStates.POWEROFF)
+    one.vm.attach(vm_id, f"DISK=[IMAGE_ID={image_id}]")
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
-    one.vm.recover(dummy_vm, 3) # delete vm
+    for _ in range(3):
+        one.vm.disksnapshotcreate(vm_id, 0, "")
+        wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
-    yield dummy_image
+    one.vm.recover(vm_id, VmRecoverOperations.DELETE)
 
-    wait_until(lambda: one.image.info(dummy_image).STATE == ImageStates.READY)
+    yield image_id
+
+    wait_until(lambda: one.image.info(image_id, False).STATE == ImageStates.READY)
 
 
 
@@ -41,26 +46,26 @@ def image_with_snapshots(one: One, dummy_image: int, dummy_vm: int):
 
 
 def test_image_not_exist(one: One):
-    image_id    = 99999
+    image_id    = random.randint(9999, 999999)
     snapshot_id = 0
 
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.image.snapshotrevert(image_id, snapshot_id)
 
 
 
 def test_snapshot_not_exist(one: One, dummy_image: int):
     image_id    = dummy_image
-    snapshot_id = 99999
+    snapshot_id = random.randint(9999, 999999)
 
-    with pytest.raises(OneActionException):
+    with pytest.raises(pyone.OneActionException):
         one.image.snapshotrevert(image_id, snapshot_id)
 
 
 
 def test_unactive_snapshot(one: One, image_with_snapshots: int):
     image_id                = image_with_snapshots
-    snapshots               = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
+    snapshots               = one.image.info(image_id, False).SNAPSHOTS.SNAPSHOT
     unactive_snapshots_ids  = [snapshot.ID for snapshot in snapshots if not snapshot.ACTIVE]
     snapshot_id             = random.choice(unactive_snapshots_ids)
 
@@ -68,7 +73,7 @@ def test_unactive_snapshot(one: One, image_with_snapshots: int):
     assert _id == snapshot_id
     time.sleep(5)
 
-    snapshots               = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
+    snapshots               = one.image.info(image_id, False).SNAPSHOTS.SNAPSHOT
     active_snapshot_id      = next(snapshot.ID for snapshot in snapshots if snapshot.ACTIVE)
     assert active_snapshot_id == snapshot_id
 
@@ -76,17 +81,18 @@ def test_unactive_snapshot(one: One, image_with_snapshots: int):
 
 @pytest.mark.xfail(
         Version(BREST_VERSION) < Version("4"),
-        raises=OneActionException,
-        reason="Тест ожидаемо провален. Запрещен откат активного снимка в Брест 3.х")
+        raises=pyone.OneActionException,
+        reason="Тест ожидаемо провален. Запрещен откат активного снимка в Брест 3.х"
+)
 def test_active_snapshtot(one: One, image_with_snapshots: int):
     image_id            = image_with_snapshots
-    snapshots           = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
+    snapshots           = one.image.info(image_id, False).SNAPSHOTS.SNAPSHOT
     active_snapshot_id  = next(snapshot.ID for snapshot in snapshots if snapshot.ACTIVE)
 
     _id = one.image.snapshotrevert(image_id, active_snapshot_id)
     assert _id == active_snapshot_id
     time.sleep(5)
 
-    snapshots               = one.image.info(image_id).SNAPSHOTS.SNAPSHOT
+    snapshots               = one.image.info(image_id, False).SNAPSHOTS.SNAPSHOT
     new_active_snapshot_id  = next(snapshot.ID for snapshot in snapshots if snapshot.ACTIVE)
     assert active_snapshot_id == new_active_snapshot_id

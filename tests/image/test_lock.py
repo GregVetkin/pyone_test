@@ -1,12 +1,12 @@
 import pytest
+import pyone
 
-from api                import One
-from utils.other        import wait_until
-from config.tests       import LOCK_LEVELS
+from api                        import One
+from utils.other                import wait_until
+from config.tests               import LOCK_LEVELS
 
-from tests._common_methods.lock import lock_if_not_exist__test
-from tests._common_methods.lock import lock_unlocked__test
-from tests._common_methods.lock import lock_locked__test
+from tests._common_methods.lock import lock__test, not_exist__test
+
 
 
 
@@ -35,15 +35,15 @@ def locked_image(one: One, dummy_image: int, request):
 
 
 def test_image_not_exist(one: One):
-    lock_if_not_exist__test(one.image)
+    not_exist__test(one.image)
 
 
 @pytest.mark.parametrize("lock_check", [True, False])
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 def test_lock_unlocked(one: One, dummy_image: int, lock_level: int, lock_check: bool):
     image_id = dummy_image
-    lock_unlocked__test(one.image, image_id, lock_level, lock_check)
 
+    lock__test(one.image, image_id, lock_level, lock_check)
     one.image.unlock(image_id)
 
 
@@ -52,5 +52,5 @@ def test_lock_unlocked(one: One, dummy_image: int, lock_level: int, lock_check: 
 @pytest.mark.parametrize("lock_level", LOCK_LEVELS)
 def test_lock_locked(one: One, locked_image: int, lock_level: int, lock_check: bool):
     image_id = locked_image
-
-    lock_locked__test(one.image, image_id, lock_level, lock_check)
+    lock__test(one.image, image_id, lock_level, lock_check)
+  

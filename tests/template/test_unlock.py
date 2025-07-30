@@ -3,8 +3,8 @@ import pytest
 from api                            import One
 from utils.other                    import wait_until
 from config.tests                   import LOCK_LEVELS
-from tests._common_methods.unlock   import unlock__test
-from tests._common_methods.unlock   import unlock_if_not_exist__test
+from tests._common_methods.unlock   import unlock__test, not_exist__test
+
 
 
 
@@ -15,12 +15,12 @@ def locked_template(one: One, dummy_template: int, request):
     lock_level  = request.param
 
     one.template.lock(tempalte_id, lock_level, False)
-    wait_until(lambda: one.template.info(tempalte_id, False).LOCK is not None)
+    wait_until(lambda: one.template.info(tempalte_id, False, False).LOCK is not None)
 
     yield tempalte_id
 
     one.template.unlock(tempalte_id)
-    wait_until(lambda: one.template.info(tempalte_id, False).LOCK is None)
+    wait_until(lambda: one.template.info(tempalte_id, False, False).LOCK is None)
 
 
 
@@ -37,7 +37,7 @@ def locked_template(one: One, dummy_template: int, request):
 
 
 def test_template_not_exist(one: One):
-    unlock_if_not_exist__test(one.template)
+    not_exist__test(one.template)
 
 
 

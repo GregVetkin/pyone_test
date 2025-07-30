@@ -1,11 +1,11 @@
 import pytest
+import pyone
 
 from api                            import One
 from utils.other                    import get_unic_name
 from config.tests                   import INVALID_CHARS
-from tests._common_methods.rename   import rename__test
-from tests._common_methods.rename   import not_exist__test
-from tests._common_methods.rename   import cant_be_renamed__test
+from tests._common_methods.rename   import rename__test, not_exist__test
+
 
 
 
@@ -43,25 +43,40 @@ def test_image_not_exist(one: One):
 
 def test_rename_image(one: One, dummy_image: int):
     image_id = dummy_image
-    rename__test(one.image, image_id)
+    new_name = get_unic_name()
+    rename__test(one.image, image_id, new_name)
 
 
-def test_name_collision(one: One, dummy_image: int, taken_image_name: str):
-    image_id    = dummy_image
-    taken_name  = taken_image_name
-    cant_be_renamed__test(one.image, image_id, taken_name)
+def test_name_is_taken(one: One, dummy_image: int, taken_image_name: str):
+    image_id = dummy_image
+    new_name = taken_image_name
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.image, image_id, new_name)
 
 
 
 def test_empty_image_name(one: One, dummy_image: int):
     image_id = dummy_image
-    cant_be_renamed__test(one.image, image_id, "")
+    new_name = ""
+    
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.image, image_id, new_name)
+
 
 
 @pytest.mark.parametrize("char", INVALID_CHARS)
 def test_invalid_char(one: One, dummy_image: int, char: str):
     image_id = dummy_image
-    cant_be_renamed__test(one.image, image_id, f"{char}")
-    cant_be_renamed__test(one.image, image_id, f"Greg{char}")
-    cant_be_renamed__test(one.image, image_id, f"{char}Vetkin")
-    cant_be_renamed__test(one.image, image_id, f"Greg{char}Vetkin")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.image, image_id, f"{char}")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.image, image_id, f"Greg{char}")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.image, image_id, f"{char}Vetkin")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.image, image_id, f"Greg{char}Vetkin")

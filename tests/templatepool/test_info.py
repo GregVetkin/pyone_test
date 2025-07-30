@@ -35,30 +35,45 @@ def vmtemplates(one: One):
 
 
 def test_show_all_templates(one: One, vmtemplates: List[int]):
-    ids      = vmtemplates
-    pool_ids = [vmtemplate.ID for vmtemplate in one.templatepool.info().VMTEMPLATE]
+    template_ids = vmtemplates
 
-    assert set(ids).issubset(pool_ids)
+    filter_flag = -2
+    start_id    = -1
+    end_id      = -1
+
+    pool_ids    = [vmtemplate.ID for vmtemplate in one.templatepool.info(filter_flag, start_id, end_id).VMTEMPLATE]
+
+    assert set(template_ids).issubset(pool_ids)
 
 
 
 
 def test_filter_start_id(one: One, vmtemplates: List[int]):
-    ids      = vmtemplates
-    ids.sort()
-    pool     = one.templatepool.info(start_id=ids[1]).VMTEMPLATE
-    pool_ids = [vmtemplate.ID for vmtemplate in pool]
+    template_ids = vmtemplates
+    template_ids.sort()
+
+    filter_flag = -2
+    start_id    = template_ids[1]
+    end_id      = -1
+
+    pool        = one.templatepool.info(filter_flag, start_id, end_id).VMTEMPLATE
+    pool_ids    = [vmtemplate.ID for vmtemplate in pool]
  
-    assert ids[0] not in pool_ids
-    assert set(ids[1:]).issubset(pool_ids)
+    assert template_ids[0] not in pool_ids
+    assert set(template_ids[1:]).issubset(pool_ids)
 
 
 
 def test_filter_end_id(one: One, vmtemplates: List[int]):
-    ids      = vmtemplates
-    ids.sort()
-    pool     = one.templatepool.info(start_id=ids[0], end_id=ids[-2]).VMTEMPLATE
-    pool_ids = [vmtemplate.ID for vmtemplate in pool]
+    template_ids = vmtemplates
+    template_ids.sort()
 
-    assert ids[-1] not in pool_ids
-    assert set(ids[:-2]).issubset(pool_ids)
+    filter_flag = -2
+    start_id    = template_ids[0]
+    end_id      = template_ids[-2]
+
+    pool        = one.templatepool.info(filter_flag, start_id, end_id).VMTEMPLATE
+    pool_ids    = [vmtemplate.ID for vmtemplate in pool]
+
+    assert template_ids[-1] not in pool_ids
+    assert set(template_ids[:-2]).issubset(pool_ids)

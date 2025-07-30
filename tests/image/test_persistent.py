@@ -1,7 +1,8 @@
 import pytest
+import pyone
+import random
 
 from api                import One
-from pyone              import OneInternalException, OneNoExistsException
 from utils.other        import wait_until
 from config.opennebula  import ImageStates, VmStates
 
@@ -60,28 +61,13 @@ def image_with_snapshot(one: One, dummy_vm: int, dummy_image: int):
 
 
 def test_image_not_exist(one: One):
-    image_id = 99999
+    image_id = random.randint(9999, 999999)
 
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.image.persistent(image_id, True)
 
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.image.persistent(image_id, False)
-
-
-
-
-def test_cant_change_persistence_for_used_image(one: One, used_image: int):
-    image_id    = used_image
-    persistence = one.image.info(image_id).PERSISTENT
-    
-    with pytest.raises(OneInternalException):
-        one.image.persistent(image_id, True)
-    assert one.image.info(image_id).PERSISTENT == persistence
-
-    with pytest.raises(OneInternalException):
-        one.image.persistent(image_id, False)
-    assert one.image.info(image_id).PERSISTENT == persistence
 
 
 
@@ -100,10 +86,25 @@ def test_change_persistence(one: One, dummy_image: int):
 
 
 
+def test_cant_change_for_used_image(one: One, used_image: int):
+    image_id    = used_image
+    persistence = one.image.info(image_id, False).PERSISTENT
+    
+    with pytest.raises(pyone.OneInternalException):
+        one.image.persistent(image_id, True)
+    assert one.image.info(image_id, False).PERSISTENT == persistence
+
+    with pytest.raises(pyone.OneInternalException):
+        one.image.persistent(image_id, False)
+    assert one.image.info(image_id, False).PERSISTENT == persistence
+
+
+
+
 def test_cant_set_nonpers_for_image_with_snapshots(one: One, image_with_snapshot: int):
     image_id = image_with_snapshot
 
-    with pytest.raises(OneInternalException):
+    with pytest.raises(pyone.OneInternalException):
         one.image.persistent(image_id, False)
 
-    assert one.image.info(image_id).PERSISTENT == 1
+    assert one.image.info(image_id, False).PERSISTENT == 1

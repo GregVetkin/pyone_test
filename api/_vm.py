@@ -110,7 +110,7 @@ class OneVm:
         """Recovers a stuck VM that is waiting for a driver operation. The recovery may be done by failing or succeeding the pending operation."""
         return self._one_vm.recover(vm_id, recover_operation)
     
-    def info(self, vm_id: int, decrypt_secrets: bool) -> VMSub:
+    def info(self, vm_id: int, decrypt_secrets: bool = False) -> VMSub:
         """Retrieves information for the virtual machine"""
         return self._one_vm.info(vm_id, decrypt_secrets)
 

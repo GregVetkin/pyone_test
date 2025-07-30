@@ -56,18 +56,3 @@ def update__test(api_object, one_object_id: int, update_type: int):
     
     # Обновляемый атрибут изменил свое значение
     assert result_template[attribute_name] == new_attribute_value
-
-
-
-
-def cant_be_updated__test(api_object, one_object_id):
-    attribute_name  = "TEST_ATTR"
-    template        = f"{attribute_name} = TEST_DATA"
-
-    with pytest.raises(OneException):
-        api_object.update(one_object_id, template, True)
-    
-    with pytest.raises(OneException):
-        api_object.update(one_object_id, template, False)
-
-    assert not api_object.info(one_object_id).TEMPLATE.get(attribute_name)

@@ -24,7 +24,7 @@ def test_rename_cluster(one: One, dummy_cluster):
 
 
 
-def test_name_collision(one: One, dummy_cluster):
+def test_name_is_taken(one: One, dummy_cluster):
     cluster_id = dummy_cluster
     new_name   = one.cluster.info(0, False).NAME
 

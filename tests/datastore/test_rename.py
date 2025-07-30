@@ -40,7 +40,7 @@ def test_rename(one: One, dummy_datastore):
     rename__test(one.datastore, dummy_datastore, new_name)
 
 
-def test_name_collision(one: One, dummy_datastore, taken_datastore_name):
+def test_name_is_taken(one: One, dummy_datastore, taken_datastore_name):
     datastore_id = dummy_datastore
     new_name     = taken_datastore_name
 

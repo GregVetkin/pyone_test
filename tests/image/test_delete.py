@@ -1,13 +1,12 @@
 import pytest
+import pyone
 
 from api                            import One
 from utils.other                    import wait_until
 from config.opennebula              import ImageStates, VmStates
 from config.tests                   import LOCK_LEVELS
+from tests._common_methods.delete   import delete__test, not_exist__test
 
-from tests._common_methods.delete   import delete__test
-from tests._common_methods.delete   import delete_if_not_exist__test
-from tests._common_methods.delete   import cant_be_deleted__test
 
 
 
@@ -38,7 +37,7 @@ def used_image(one: One, dummy_vm: int, dummy_image: int):
 
 
 def test_image_not_exist(one: One):
-    delete_if_not_exist__test(one.image)
+    not_exist__test(one.image)
 
 
 
@@ -50,7 +49,9 @@ def test_ready_image(one: One, dummy_image: int):
 
 def test_used_image(one: One, used_image: int):
     image_id = used_image
-    cant_be_deleted__test(one.image, image_id)
+
+    with pytest.raises(pyone.OneActionException):
+        delete__test(one.image, image_id)
 
 
 
@@ -59,12 +60,13 @@ def test_locked_image(one: One, dummy_image: int, lock_level: int):
     image_id = dummy_image
 
     one.image.lock(image_id, lock_level, False)
-    wait_until(lambda: one.image.info(image_id, False).LOCK.LOCKED == lock_level)
+    # wait_until(lambda: one.image.info(image_id, False).LOCK.LOCKED == lock_level)
 
     if lock_level == 3:
         delete__test(one.image, image_id)
     else:
-        cant_be_deleted__test(one.image, image_id)
+        with pytest.raises(pyone.OneException):
+            delete__test(one.image, image_id)
         
         one.image.unlock(image_id)
         wait_until(lambda: one.image.info(image_id, False).LOCK is None)

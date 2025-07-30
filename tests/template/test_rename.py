@@ -1,13 +1,11 @@
 import pytest
-from api                            import One
-from utils.other                    import get_unic_name
-from config.tests                   import INVALID_CHARS
-from tests._common_methods.rename   import rename__test
-from tests._common_methods.rename   import not_exist__test
-from tests._common_methods.rename   import cant_be_renamed__test
+import pyone
 
+from api            import One
+from utils.other    import get_unic_name
+from config.tests   import INVALID_CHARS
 
-
+from tests._common_methods.rename   import rename__test, not_exist__test
 
 
 
@@ -16,9 +14,9 @@ from tests._common_methods.rename   import cant_be_renamed__test
 def take_vmtemplate_name(one: One):
     name = get_unic_name()
     template = f"NAME = {name}"
-    _id = one.template.allocate(template)
+    template_id = one.template.allocate(template)
     yield name
-    one.template.delete(_id)
+    one.template.delete(template_id, False)
 
 
 
@@ -35,22 +33,44 @@ def test_template_not_exist(one: One):
 
 
 def test_rename(one: One, dummy_template: int):
-    rename__test(one.template, dummy_template)
+    template_id = dummy_template
+    new_name    = get_unic_name()
+
+    rename__test(one.template, template_id, new_name)
 
 
 
-def test_name_collision(one: One, dummy_template: int, take_vmtemplate_name: str):
-    cant_be_renamed__test(one.template, dummy_template, take_vmtemplate_name)
+def test_name_is_taken(one: One, dummy_template: int, take_vmtemplate_name: str):
+    template_id = dummy_template
+    new_name    = take_vmtemplate_name
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.template, template_id, new_name)
 
 
 
 def test_empty_name(one: One, dummy_template: int):
-    cant_be_renamed__test(one.template, dummy_template, "")
+    template_id = dummy_template
+    new_name    = ""
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.template, template_id, new_name)
+
 
 
 @pytest.mark.parametrize("char", INVALID_CHARS)
 def test_invalid_char(one: One, dummy_template: int, char: str):
-    cant_be_renamed__test(one.template, dummy_template, f"{char}")
-    cant_be_renamed__test(one.template, dummy_template, f"Greg{char}")
-    cant_be_renamed__test(one.template, dummy_template, f"{char}Vetkin")
-    cant_be_renamed__test(one.template, dummy_template, f"Greg{char}Vetkin")
+    template_id = dummy_template
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.template, template_id, f"{char}")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.template, template_id, f"Greg{char}")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.template, template_id, f"{char}Vetkin")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.template, template_id, f"Greg{char}Vetkin")
+
