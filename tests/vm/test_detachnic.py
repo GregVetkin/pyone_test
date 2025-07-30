@@ -1,41 +1,16 @@
 import pytest
 import random
+import pyone
 
-from pyone              import OneNoExistsException, OneActionException
 from api                import One
 
-from utils.commands     import run_command_via_ssh, check_ping
-from utils.connection   import brest_admin_ssh_conn, local_admin_ssh_conn
 from utils.kerberos     import PyoneWrap
-from utils.other        import wait_until, get_unic_name
-from utils.version      import Version
+from utils.other        import wait_until
 
-from config.base        import API_URI, BrestAdmin, BREST_VERSION
-from config.opennebula  import VmStates, VmLcmStates, VmRecoverOperations, VmActions
-
+from config.base        import API_URI, BrestAdmin
+from config.opennebula  import VmStates
 
 
-
-
-@pytest.fixture
-def poweroff_vm(one: One):
-    if Version(BREST_VERSION) < Version("4"):
-        script_dir = "~/brest"
-        ssh_conn   = local_admin_ssh_conn
-    else:
-        script_dir = "/opt/brest"
-        ssh_conn   = brest_admin_ssh_conn
-    
-    vm_name = f"api_test_{random.randint(0, 9999)}" # С длинным именем из get_unic_name(), cli_prepare.sh не отрабатывает отлов статуса ВМ
-    command = f"cd {script_dir} && ./cli_prepare.sh create_vm mini {vm_name} nonpers"
-    
-    run_command_via_ssh(ssh_conn, command)
-    vm_id = next(vm.ID for vm in one.vmpool.info().VM if vm.NAME == vm_name)
-
-    yield vm_id
-
-    if one.vm.info(vm_id).STATE != VmStates.DONE:
-        run_command_via_ssh(brest_admin_ssh_conn, f"onevm terminate {vm_id} --hard")
 
 
 
@@ -55,26 +30,26 @@ def dummy_vm_poweroff(one: One, dummy_vm: int):
 
 
 def test_vm_not_exist(one: One):
-    vm_id = random.randint(1000, 99999)
+    vm_id  = random.randint(9999, 999999)
     nic_id = 0
 
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.vm.detachnic(vm_id, nic_id)
 
 
 
 def test_vnet_not_exist(one: One, dummy_vm_poweroff: int):
-    vm_id = dummy_vm_poweroff
-    nic_id = random.randint(1000, 99999)
+    vm_id  = dummy_vm_poweroff
+    nic_id = random.randint(9999, 999999)
 
-    with pytest.raises(OneActionException):
+    with pytest.raises(pyone.OneActionException):
         one.vm.detachnic(vm_id, nic_id)
 
 
 
-def test_detachnic(one: One, poweroff_vm: int):
-    vm_id = poweroff_vm
-    vm_info = one.vm.info(vm_id, True)
+def test_detachnic(one: One, poweroff_vm_mini: int):
+    vm_id   = poweroff_vm_mini
+    vm_info = one.vm.info(vm_id, False)
     vm_nics = vm_info.TEMPLATE["NIC"]
 
     if isinstance(vm_nics, dict):
@@ -92,9 +67,9 @@ def test_detachnic(one: One, poweroff_vm: int):
     _id = one.vm.detachnic(vm_id, nic_id)
     assert _id == vm_id
 
-    wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
-    vm_info = one.vm.info(vm_id, True)
+    vm_info = one.vm.info(vm_id, False)
     vm_template = vm_info.TEMPLATE
 
     if "NIC" not in vm_template:
@@ -116,12 +91,12 @@ def test_detachnic(one: One, poweroff_vm: int):
 
 
 @pytest.mark.KERBEROS
-def test_detachnic_KERBEROS(poweroff_vm: int):
-    pw = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+def test_detachnic_KERBEROS(poweroff_vm_mini: int):
+    pw  = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
     one = pw.get_client()
 
-    vm_id = poweroff_vm
-    vm_info = one.vm.info(vm_id, True)
+    vm_id   = poweroff_vm_mini
+    vm_info = one.vm.info(vm_id, False)
     vm_nics = vm_info.TEMPLATE["NIC"]
 
     if isinstance(vm_nics, dict):
@@ -140,9 +115,9 @@ def test_detachnic_KERBEROS(poweroff_vm: int):
     pw.run_one_vm_action()
     assert _id == vm_id
 
-    wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
-    vm_info = one.vm.info(vm_id, True)
+    vm_info = one.vm.info(vm_id, False)
     vm_template = vm_info.TEMPLATE
 
     if "NIC" not in vm_template:

@@ -5,7 +5,7 @@ from utils.other        import get_unic_name, wait_until
 from utils.commands     import run_command_via_ssh
 from utils.connection   import local_admin_ssh_conn
 from utils.opennebula   import federation_master, federation_standalone
-from config.base        import API_URI
+from config.base        import API_URI, RAFT_ENABLED
 from typing             import List
 
 
@@ -52,7 +52,9 @@ def zones(one: One, federation_master_mode):
 # =================================================================================================
 
 
-
+@pytest.mark.skipif(RAFT_ENABLED is True, 
+                    reason="Test for ONE_SERVER scenario only"
+                    )
 def test_show_all_zones(one: One, zones: List[int]):
     created_zone_ids = zones
     all_zone_ids     = [zone.ID for zone in one.zonepool.info().ZONE]

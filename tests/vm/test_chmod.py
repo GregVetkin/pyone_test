@@ -5,8 +5,8 @@ from utils.kerberos     import PyoneWrap
 from config.base        import API_URI, BrestAdmin
 
 
-from tests._common_methods.chmod    import random_permissions__test
-from tests._common_methods.chmod    import object_not_exist__test
+from tests._common_methods.chmod    import random_chmod__test, not_exist__test
+
 
 
 # =================================================================================================
@@ -16,14 +16,14 @@ from tests._common_methods.chmod    import object_not_exist__test
 
 
 def test_vm_not_exist(one: One):
-    object_not_exist__test(one.vm)
+    not_exist__test(one.vm)
 
 
 
 
 def test_chmod(one: One, dummy_vm: int):
     vm_id = dummy_vm
-    random_permissions__test(one.vm, vm_id)
+    random_chmod__test(one.vm, vm_id)
 
 
 

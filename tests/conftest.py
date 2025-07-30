@@ -206,8 +206,8 @@ def poweroff_vm_mini(one: One):
 
 
 @pytest.fixture
-def running_vm_mini(one: One, poweroff_vm: int):
-    vm_id = poweroff_vm
+def running_vm_mini(one: One, poweroff_vm_mini: int):
+    vm_id = poweroff_vm_mini
     run_command_via_ssh(brest_admin_ssh_conn, f"echo '{BrestAdmin.PASSWORD}' | kinit; onevm resume {vm_id}")
     wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.RUNNING)
     yield vm_id

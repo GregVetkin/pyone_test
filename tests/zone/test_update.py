@@ -1,14 +1,15 @@
 import pytest
+import pyone
+
 from api                import One
 from utils.other        import get_unic_name
 from utils.commands     import run_command_via_ssh
 from utils.connection   import local_admin_ssh_conn
 from utils.opennebula   import federation_master, federation_standalone
-from config.base        import API_URI
+from config.base        import API_URI, RAFT_ENABLED
 
-from tests._common_methods.update   import update_and_merge__test
-from tests._common_methods.update   import update_and_replace__test
-from tests._common_methods.update   import update_if_not_exist__test
+from tests._common_methods.update   import update__test, not_exist__test
+
 
 
 
@@ -48,21 +49,14 @@ def dummy_zone(one: One, federation_master_mode):
 
 
 def test_zone_not_exist(one: One):
-    update_if_not_exist__test(one.zone)
+    not_exist__test(one.zone)
 
 
 
-def test_update_by_replace(one: One, dummy_zone: int):
+@pytest.mark.skipif(RAFT_ENABLED is True, 
+                    reason="Test for ONE_SERVER scenario only"
+                    )
+@pytest.mark.parametrize("update_type", [0, 1])
+def test_update_type(one: One, dummy_zone: int, update_type: int):
     zone_id = dummy_zone
-    update_and_replace__test(one.zone, zone_id)
-
-
-
-
-def test_update_by_merge(one: One, dummy_zone: int):
-    zone_id = dummy_zone
-    update_and_merge__test(one.zone, zone_id)
-
-
-
-
+    update__test(one.zone, zone_id, update_type)

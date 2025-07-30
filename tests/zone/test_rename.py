@@ -1,15 +1,16 @@
 import pytest
+import pyone
+
 from api                import One
 from utils.other        import get_unic_name
 from utils.commands     import run_command_via_ssh
 from utils.connection   import local_admin_ssh_conn
 from utils.opennebula   import federation_master, federation_standalone
-from config.base        import API_URI
+from config.base        import API_URI, RAFT_ENABLED
 from config.tests       import INVALID_CHARS
 
-from tests._common_methods.rename   import rename__test
-from tests._common_methods.rename   import not_exist__test
-from tests._common_methods.rename   import cant_be_renamed__test
+from tests._common_methods.rename   import rename__test, not_exist__test
+
 
 
 
@@ -54,35 +55,59 @@ def test_zone_not_exist(one: One):
 
 
 
-
+@pytest.mark.skipif(RAFT_ENABLED is True, 
+                    reason="Test for ONE_SERVER scenario only"
+                    )
 def test_rename(one: One, dummy_zone: int):
-    zone_id = dummy_zone
-    rename__test(one.zone, zone_id)
+    zone_id  = dummy_zone
+    new_name = get_unic_name()
+
+    rename__test(one.zone, zone_id, new_name)
 
 
 
 
+@pytest.mark.skipif(RAFT_ENABLED is True, 
+                    reason="Test for ONE_SERVER scenario only"
+                    )
 def test_name_collision(one: One, dummy_zone: int):
     zone_id  = dummy_zone
-    new_name = one.zone.info(0).NAME
-    cant_be_renamed__test(one.zone, zone_id, new_name)
+    new_name = one.zone.info(0, False).NAME
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.zone, zone_id, new_name)
     
 
 
 
+@pytest.mark.skipif(RAFT_ENABLED is True, 
+                    reason="Test for ONE_SERVER scenario only"
+                    )
 def test_empty_name(one: One, dummy_zone: int):
     zone_id  = dummy_zone
     new_name = ""
-    cant_be_renamed__test(one.zone, zone_id, new_name)
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.zone, zone_id, new_name)
 
 
 
+
+@pytest.mark.skipif(RAFT_ENABLED is True, 
+                    reason="Test for ONE_SERVER scenario only"
+                    )
 @pytest.mark.parametrize("char", INVALID_CHARS)
 def test_invalid_char(one: One, dummy_zone: int, char: str):
     zone_id = dummy_zone
 
-    cant_be_renamed__test(one.zone, zone_id, f"{char}")
-    cant_be_renamed__test(one.zone, zone_id, f"Greg{char}")
-    cant_be_renamed__test(one.zone, zone_id, f"{char}Vetkin")
-    cant_be_renamed__test(one.zone, zone_id, f"Greg{char}Vetkin")
-    
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.zone, zone_id, f"{char}")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.zone, zone_id, f"Greg{char}")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.zone, zone_id, f"{char}Vetkin")
+
+    with pytest.raises(pyone.OneActionException):
+        rename__test(one.zone, zone_id, f"Greg{char}Vetkin")

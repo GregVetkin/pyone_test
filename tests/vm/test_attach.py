@@ -1,6 +1,7 @@
 import pytest
+import pyone
+import random
 
-from pyone              import OneException, OneNoExistsException
 from api                import One
 from utils.other        import wait_until
 from utils.kerberos     import PyoneWrap
@@ -12,7 +13,7 @@ from config.base        import API_URI, BrestAdmin, BREST_VERSION
 @pytest.fixture
 def dummy_vm_poweroff(one: One, dummy_vm: int):
     vm_id = dummy_vm
-    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
     return vm_id
 
 
@@ -24,21 +25,21 @@ def dummy_vm_poweroff(one: One, dummy_vm: int):
 
 
 def test_vm_not_exist(one: One, dummy_image: int):
-    vm_id    = 99999
+    vm_id    = random.randint(9999, 999999)
     image_id = dummy_image
     template = f"DISK=[IMAGE_ID={image_id}]"
 
-    with pytest.raises(OneNoExistsException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.vm.attach(vm_id, template)
 
 
 
 def test_image_not_exist(one: One, dummy_vm_poweroff: int):
     vm_id    = dummy_vm_poweroff
-    image_id = 99999
+    image_id = random.randint(9999, 999999)
     template = f"DISK=[IMAGE_ID={image_id}]"
 
-    with pytest.raises(OneException):
+    with pytest.raises(pyone.OneException):
         one.vm.attach(vm_id, template)
 
 
@@ -48,7 +49,7 @@ def test_attach_disk(one: One, dummy_vm_poweroff: int, dummy_image: int):
     image_id = dummy_image
     template = f"DISK=[IMAGE_ID={image_id}]"
 
-    vm_template_before = one.vm.info(vm_id, True).TEMPLATE
+    vm_template_before = one.vm.info(vm_id, False).TEMPLATE
 
     if "DISK" not in vm_template_before:
         disk_count_brefore = 0
@@ -60,10 +61,10 @@ def test_attach_disk(one: One, dummy_vm_poweroff: int, dummy_image: int):
 
     _id = one.vm.attach(vm_id, template)
     assert _id == vm_id
-    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
 
-    vm_template = one.vm.info(vm_id, True).TEMPLATE
+    vm_template = one.vm.info(vm_id, False).TEMPLATE
     vm_disks = vm_template["DISK"]
 
 
@@ -78,7 +79,7 @@ def test_attach_disk(one: One, dummy_vm_poweroff: int, dummy_image: int):
     assert int(vm_disk["IMAGE_ID"]) == image_id
 
     one.vm.detach(vm_id, int(vm_disk["DISK_ID"]))
-    wait_until(lambda: one.vm.info(vm_id).STATE == VmStates.POWEROFF)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
 
 @pytest.mark.KERBEROS
@@ -91,7 +92,7 @@ def test_attach_KERBEROS(dummy_vm_poweroff: int, dummy_image: int):
     image_id = dummy_image
     template = f"DISK=[IMAGE_ID={image_id}]"
 
-    vm_template_before = one.vm.info(vm_id, True).TEMPLATE
+    vm_template_before = one.vm.info(vm_id, False).TEMPLATE
 
     if "DISK" not in vm_template_before:
         disk_count_brefore = 0
@@ -104,10 +105,10 @@ def test_attach_KERBEROS(dummy_vm_poweroff: int, dummy_image: int):
     _id = one.vm.attach(vm_id, template, pw.sessionDir)
     pw.run_one_vm_action()
     assert _id == vm_id
-    wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
 
-    vm_template = one.vm.info(vm_id, True).TEMPLATE
+    vm_template = one.vm.info(vm_id, False).TEMPLATE
     vm_disks = vm_template["DISK"]
 
 
@@ -122,5 +123,5 @@ def test_attach_KERBEROS(dummy_vm_poweroff: int, dummy_image: int):
     assert int(vm_disk["IMAGE_ID"]) == image_id
 
     one.vm.detach(vm_id, int(vm_disk["DISK_ID"]))
-    wait_until(lambda: one.vm.info(vm_id, True).STATE == VmStates.POWEROFF)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 

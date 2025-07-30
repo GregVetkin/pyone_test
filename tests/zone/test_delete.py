@@ -1,15 +1,16 @@
 import pytest
+import pyone
+
 from api                import One
 from utils.other        import get_unic_name
 from utils.commands     import run_command_via_ssh
 from utils.connection   import local_admin_ssh_conn
 from utils.opennebula   import federation_master, federation_standalone
-from config.base        import API_URI
+from config.base        import API_URI, RAFT_ENABLED
 
 
-from tests._common_methods.delete   import delete__test
-from tests._common_methods.delete   import delete_if_not_exist__test
-from tests._common_methods.delete   import cant_be_deleted__test
+from tests._common_methods.delete   import delete__test, not_exist__test
+
 
 
 
@@ -52,18 +53,23 @@ def dummy_zone(one: One, federation_master_mode):
 
 
 def test_zone_not_exist(one: One):
-    delete_if_not_exist__test(one.zone)
+    not_exist__test(one.zone)
 
 
 
-
+@pytest.mark.skipif(RAFT_ENABLED is True, 
+                    reason="Test for ONE_SERVER scenario only"
+                    )
 def test_delete_zone(one: One,  dummy_zone: int):
     zone_id = dummy_zone
+
     delete__test(one.zone, zone_id)
 
 
 
-def test_delete_system_zone_0(one: One):
+def test_cant_delete_system_zone_0(one: One):
     zone_id = 0
-    cant_be_deleted__test(one.zone, zone_id)
+
+    with pytest.raises(pyone.OneActionException):
+        delete__test(one.zone, zone_id)
 

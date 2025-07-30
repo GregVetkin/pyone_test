@@ -6,12 +6,12 @@ from config.base            import API_URI
 
 
 def get_user_name_by_id(user_id: int) -> str:
-    command = f"oneuser show {user_id} --xml" + r" | grep -oP '<NAME>\K.*?(?=</NAME>)'"
+    command = f'oneuser show {user_id} -x | xmlstarlet sel -t -v "/USER/NAME"'
     return run_command_via_ssh(brest_admin_ssh_conn, command)
 
 
 def get_user_token_by_id(user_id: int) -> str:
-    command = f"oneuser show {user_id} --xml" + r" | grep -oPm1 '<TOKEN>\K.*?(?=</TOKEN>)'"
+    command = f'oneuser show {user_id} -x | xmlstarlet sel -t -v "(//TOKEN)[1]"'
     return run_command_via_ssh(brest_admin_ssh_conn, command)
 
 

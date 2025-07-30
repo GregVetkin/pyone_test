@@ -60,7 +60,7 @@ class PyoneWrap:
                 print(e)
 
 
-    def run_one_vm_action(self):
+    def run_one_vm_action(self, timeout = 1):
         """
         Вызовите после vm.action.
         У one-apache2.cgi таймаут 120 сек. Если в каталоге sessionDir за это время не появится новый скрипт, вернёт 200.
@@ -77,7 +77,7 @@ class PyoneWrap:
                 "Cookie": f"rack.session={self.sessionDir}"
             }
             host = urlparse(self.endpoint).hostname
-            response = requests.get(f"https://{host}/brestcloud/one-apache2.cgi", headers=headers, verify=False, timeout=5)
+            response = requests.get(f"https://{host}/brestcloud/one-apache2.cgi", headers=headers, verify=False, timeout=timeout)
             response.raise_for_status()
             return response
 
