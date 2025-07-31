@@ -151,28 +151,29 @@ def test_certain_datastore(one: One, hold_vm: int):
 
 
 
-# @pytest.mark.KERBEROS
-# def test_deploy_vm_KERBEROS():
-#     pw  = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
-#     one = pw.get_client()
+@pytest.mark.KERBEROS
+def test_deploy_vm_KERBEROS():
+    pw  = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+    one = pw.get_client()
 
-#     vm_id = one.vm.allocate(f"NAME={get_unic_name()}\nCPU=1\nMEMORY=1\n", True, pw.sessionDir)
-#     pw.run_one_vm_action()
-#     wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.HOLD)
+    vm_id = one.vm.allocate(f"NAME={get_unic_name()}\nCPU=1\nMEMORY=1\n", True, pw.sessionDir)
+    pw.run_one_vm_action()
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.HOLD)
 
 
-#     host_id = random.choice([host.ID for host in one.hostpool.info().HOST])
-#     host_check = False
-#     datastore_id = -1
-#     network_template = ""
+    host_id = random.choice([host.ID for host in one.hostpool.info().HOST])
+    host_check = False
+    datastore_id = -1
+    network_template = ""
+    from_shed = False # какой-то еще один опциональный параметр, инфа от Артема Григораша
 
-#     _id = one.vm.deploy(vm_id, host_id, host_check, datastore_id, network_template,  pw.sessionDir)
-#     pw.run_one_vm_action()
-#     assert _id == vm_id
+    _id = one.vm.deploy(vm_id, host_id, host_check, datastore_id, network_template, from_shed,  pw.sessionDir)
+    pw.run_one_vm_action()
+    assert _id == vm_id
 
-#     wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
-#     assert vm_id in one.host.info(host_id, False).VMS.ID
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
+    assert vm_id in one.host.info(host_id, False).VMS.ID
 
-#     one.vm.action(VmActions.TERMINATE_HARD, vm_id, pw.sessionDir)
-#     pw.run_one_vm_action()
-#     wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.DONE)
+    one.vm.action(VmActions.TERMINATE_HARD, vm_id, pw.sessionDir)
+    pw.run_one_vm_action()
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.DONE)

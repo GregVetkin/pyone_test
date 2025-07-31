@@ -92,10 +92,10 @@ if __name__ == '__main__':
     password = "Qwe!2345"
 
 
-    one = pyone.OneServer(endpoint, session=f"{username}:a611c2a838db62bad4a5343e35743e3a744cbeb9dee14a6a0ca68990f33cf84d")
+    one = pyone.OneServer(endpoint, session=f"{username}:7b7d2f5dbd20988ce938deaf04a7979899f35a67a47dbb7461ba351edb7a9305")
     # template = f'<USER_TEMPLATE><SCHED_DS_REQUIREMENTS><![CDATA[ID="99999"]]></SCHED_DS_REQUIREMENTS></USER_TEMPLATE>'
-    perm = [0 for _ in range(9)]
-    print(one.template.instantiate(55, ""))
+
+    print(one.vm.diskresize(91, 0, "15000"))
 
 
     # pw = PyoneWrap(endpoint, username, password)
