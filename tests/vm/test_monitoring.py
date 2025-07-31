@@ -31,13 +31,13 @@ def test_monitoring(one: One, running_vm_mini: int):
     time.sleep(VM_MONITOR_INTERVAL * 2)
     monitoring_before = one.vm.monitoring(vm_id)
     assert monitoring_before.has__content()
-    first_monitoring = monitoring_before[0]
+    first_monitoring = monitoring_before.MONITORING[0]
     
 
     time.sleep(VM_MONITOR_INTERVAL * 2)
     monitoring_after = one.vm.monitoring(vm_id)
     assert monitoring_after.has__content()
-    last_monitoring = monitoring_after[-1]
+    last_monitoring = monitoring_after.MONITORING[-1]
 
     assert len(monitoring_before.MONITORING) < len(monitoring_after.MONITORING)
 
