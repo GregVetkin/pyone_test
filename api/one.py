@@ -23,14 +23,14 @@ from api._vmpool            import OneVmpool
 from api._vn                import OneVn
 
 
-from utils.connection  import ApiConnectionData
+from utils.connection       import ApiConnectionData
 
 
 class One():
     def __init__(self, api_connection_data: ApiConnectionData) -> None:
         self._uri     = api_connection_data.uri
         self._session = api_connection_data.session
-        self._server = OneServer(self._uri, self._session)
+        self._server  = OneServer(self._uri, self._session)
 
 
         self.system         = OneSystem(self._server)
