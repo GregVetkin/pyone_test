@@ -1,90 +1,51 @@
 import pytest
+import pyone
 import random
+import time
 
-
-from time               import sleep
-from pyone              import OneException
 from api                import One
-from utils              import get_unic_name
-from one_cli.image      import Image
-from one_cli.vm         import VirtualMachine
-from config             import ADMIN_NAME
-
-
-def await_vm_status_code(one: One, vm_id: int, status_code: int, intervals=1.0):
-    while one.vm.info(vm_id).STATE != status_code:
-        sleep(intervals)
-
-
-@pytest.fixture()
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def image(one: One):
-    template = f"""
-        NAME = {get_unic_name()}
-        TYPE = DATABLOCK
-        SIZE = 1
-    """
-    ds_id = 1
-    for ds in one.datastorepool.info().DATASTORE:
-        if ds.NAME.startswith("image_"):
-            ds_id = ds.ID
-            break
-
-    _id = one.image.allocate(template, ds_id, False)
-
-    yield Image(_id)
-
-    while one.image.info(_id).STATE != 1:
-        sleep(1)
-
-    one.image.delete(_id, True)
+from utils.other        import wait_until, get_unic_name
+from utils.kerberos     import PyoneWrap
+from config.opennebula  import VmLcmStates, VmStates
+from config.base        import API_URI, BrestAdmin
 
 
 
-@pytest.fixture()
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def vm(one: One): 
-    vm_id = one.vm.allocate(f"NAME={get_unic_name()}\nCPU=0.1\nMEMORY=1\n")
-    await_vm_status_code(one, vm_id, 8)
-
-    yield VirtualMachine(vm_id)
-
-    one.vm.action("terminate-hard", vm_id)
-    await_vm_status_code(one, vm_id, 6)
 
 
-@pytest.fixture()
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def vm_with_disk(one: One, image: Image, vm: VirtualMachine): 
-    one.vm.attach(vm._id, f"DISK=[IMAGE_ID={image._id}]")
-    await_vm_status_code(one, vm._id, 8)
 
-    yield VirtualMachine(vm._id)
+@pytest.fixture
+def poweroff_vm_mini_with_disk_snapshots(poweroff_vm_mini: int):
+    pw  = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+    one = pw.get_client()
 
-    one.vm.detach(vm._id, 0)
-    await_vm_status_code(one, vm._id, 8)
+    vm_id    = poweroff_vm_mini
+    image_id = one.vm.info(vm_id, False).TEMPLATE["DISK"]["IMAGE_ID"]
 
-
-@pytest.fixture()
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def vm_with_disk_snapshots(one: One, image: Image, vm: VirtualMachine):
-
-    for disk_number in range(random.randint(2, 5)):
-        one.vm.attach(vm._id, f"DISK=[IMAGE_ID={image._id}]")
-        await_vm_status_code(one, vm._id, 8)
-        for _ in range(random.randint(2, 4)):
-            one.vm.disksnapshotcreate(vm._id, disk_number, get_unic_name())
-            await_vm_status_code(one, vm._id, 8)
+    for _ in range(2):
+        one.vm.attach(vm_id, f"DISK=[IMAGE_ID={image_id}]", pw.sessionDir)
+        pw.run_one_vm_action()
+        wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
     
-    yield VirtualMachine(vm._id)
+    disk_ids = [int(disk["DISK_ID"]) for disk in one.vm.info(vm_id, False).TEMPLATE["DISK"]]
 
-    for disk_info in one.vm.info(vm._id).TEMPLATE["DISK"]:
-        disk_id = int(disk_info["DISK_ID"])
-        one.vm.detach(vm._id, disk_id)
-        await_vm_status_code(one, vm._id, 8)
-    
+    for disk_id in disk_ids:
+        for _ in range(8):
+            snapshot_id = one.vm.disksnapshotcreate(vm_id, disk_id, get_unic_name(), pw.sessionDir)
+            pw.run_one_vm_action()
+            wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
-    
+            if _ != 0 and _ % 2 == 0:
+                snapshot_id_to_revert = snapshot_id - random.randint(1, _)
+                one.vm.disksnapshotrevert(vm_id, disk_id, snapshot_id_to_revert, pw.sessionDir)
+                pw.run_one_vm_action()
+                wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.DISK_SNAPSHOT_REVERT_POWEROFF)
+                wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
+
+    return vm_id
+
+
+
 
 
 
@@ -94,55 +55,61 @@ def vm_with_disk_snapshots(one: One, image: Image, vm: VirtualMachine):
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
+
 def test_vm_not_exist(one: One):
-    vm_id         = 99999
+    vm_id         = random.randint(9999, 999999)
     disk_id       = 0
     snapshot_id   = 0
 
-    with pytest.raises(OneException):
+    with pytest.raises(pyone.OneNoExistsException):
         one.vm.disksnapshotrevert(vm_id, disk_id, snapshot_id)
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_disk_not_exist(one: One, vm: VirtualMachine):
-    vm_id         = vm._id
-    disk_id       = 99999
+
+def test_disk_not_exist(one: One, poweroff_vm_mini: int):
+    vm_id         = poweroff_vm_mini
+    disk_id       = random.randint(9999, 999999)
     snapshot_id   = 0
 
-    with pytest.raises(OneException):
+    with pytest.raises(pyone.OneActionException):
         one.vm.disksnapshotrevert(vm_id, disk_id, snapshot_id)
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_snapshot_not_exist(one: One, vm_with_disk: VirtualMachine):
-    vm_id         = vm_with_disk._id
+
+def test_snapshot_not_exist(one: One, poweroff_vm_mini: int):
+    vm_id         = poweroff_vm_mini
     disk_id       = 0
-    snapshot_id   = 99999
+    snapshot_id   = random.randint(9999, 999999)
 
-    with pytest.raises(OneException):
+    with pytest.raises(pyone.OneActionException):
         one.vm.disksnapshotrevert(vm_id, disk_id, snapshot_id)
 
 
 
-@pytest.mark.parametrize("one", [ADMIN_NAME], indirect=True)
-def test_revert_snapshot(one: One, vm_with_disk_snapshots: VirtualMachine):
-    vm_id = vm_with_disk_snapshots._id
+@pytest.mark.KERBEROS
+def test_revert_snapshot_KERBEROS(poweroff_vm_mini_with_disk_snapshots: int):
+    pw  = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+    one = pw.get_client()
 
-    disks_snapshots_active = {disk_snapshots_info.DISK_ID : {snapshot_info.ID: snapshot_info.ACTIVE for snapshot_info in disk_snapshots_info.SNAPSHOT}
-                                for disk_snapshots_info in one.vm.info(vm_id).SNAPSHOTS}
+    vm_id    = poweroff_vm_mini_with_disk_snapshots
+    disk_ids = [int(disk["DISK_ID"]) for disk in one.vm.info(vm_id, False).TEMPLATE["DISK"]]
+    disk_id  = random.choice(disk_ids)
     
-    while True:
-        target_disk_id              = random.choice(list(disks_snapshots_active.keys()))
-        target_snapshot_id          = random.choice(list(disks_snapshots_active[target_disk_id].keys()))
-        if (target_disk_id != vm_id) and (target_snapshot_id != target_disk_id): break
+    snapshots_before        = one.vm.info(vm_id, False).SNAPSHOTS
+    disk_snapshots_before   = next(_.SNAPSHOT for _ in snapshots_before if _.DISK_ID == disk_id)
+    not_active_shapshot_ids = [_.ID for _ in disk_snapshots_before if _.ACTIVE is None]
     
+    snapshot_id = random.choice(not_active_shapshot_ids)
+    
+    reverted_snapshot_id = one.vm.disksnapshotrevert(vm_id, disk_id, snapshot_id, pw.sessionDir)
+    pw.run_one_vm_action()
 
-    reverted_snapshot_id = one.vm.disksnapshotrevert(vm_id, target_disk_id, target_snapshot_id)
-    sleep(5)
-    assert reverted_snapshot_id == target_snapshot_id
+    wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.DISK_SNAPSHOT_REVERT_POWEROFF)
+    wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
-    disks_snapshots_active = {disk_snapshots_info.DISK_ID : {snapshot_info.ID: snapshot_info.ACTIVE for snapshot_info in disk_snapshots_info.SNAPSHOT}
-                                for disk_snapshots_info in one.vm.info(vm_id).SNAPSHOTS}
+    snapshots_after      = one.vm.info(vm_id, False).SNAPSHOTS
+    disk_snapshots_after = next(_.SNAPSHOT for _ in snapshots_after if _.DISK_ID == disk_id)
+    reverted_snapshot    = next(_ for _ in disk_snapshots_after if _.ID == snapshot_id)
 
-    assert disks_snapshots_active[target_disk_id][target_snapshot_id]
+    assert reverted_snapshot_id == snapshot_id
+    assert reverted_snapshot.ACTIVE == "YES"

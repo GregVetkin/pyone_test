@@ -56,38 +56,41 @@ def poweroff_vm_mini_with_disk_snapshots(poweroff_vm_mini: int):
 
 
 
-# def test_vm_not_exist(one: One):
-#     vm_id       = random.randint(9999, 999999)
-#     disk_id     = 0
-#     snapshot_id = 0
+def test_vm_not_exist(one: One):
+    vm_id       = random.randint(9999, 999999)
+    disk_id     = 0
+    snapshot_id = 0
 
-#     with pytest.raises(pyone.OneException):
-#         one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
-
-
-# def test_disk_not_exist(one: One, poweroff_vm_mini: int):
-#     vm_id       = poweroff_vm_mini
-#     disk_id     = random.randint(9999, 999999)
-#     snapshot_id = 0
-
-#     with pytest.raises(pyone.OneActionException):
-#         one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
+    with pytest.raises(pyone.OneException):
+        one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
 
 
-# def test_disksnapshot_not_exist(one: One, poweroff_vm_mini: int):
-#     vm_id       = poweroff_vm_mini
-#     disk_id     = 0
-#     snapshot_id = random.randint(9999, 999999)
+def test_disk_not_exist(one: One, poweroff_vm_mini: int):
+    vm_id       = poweroff_vm_mini
+    disk_id     = random.randint(9999, 999999)
+    snapshot_id = 0
 
-#     with pytest.raises(pyone.OneActionException):
-#         one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
+    with pytest.raises(pyone.OneActionException):
+        one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
+
+
+def test_disksnapshot_not_exist(one: One, poweroff_vm_mini: int):
+    vm_id       = poweroff_vm_mini
+    disk_id     = 0
+    snapshot_id = random.randint(9999, 999999)
+
+    with pytest.raises(pyone.OneActionException):
+        one.vm.disksnapshotdelete(vm_id, disk_id, snapshot_id)
     
 
 
 
 
+@pytest.mark.KERBEROS
+def test_delete_disk_snapshot_KERBEROS(poweroff_vm_mini_with_disk_snapshots: int):
+    pw  = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
+    one = pw.get_client()
 
-def test_delete_disk_snapshot(one: One, poweroff_vm_mini_with_disk_snapshots: int):
     vm_id          = poweroff_vm_mini_with_disk_snapshots
     disk_ids       = [int(disk["DISK_ID"]) for disk in one.vm.info(vm_id, False).TEMPLATE["DISK"]]
     target_disk_id = random.choice(disk_ids)
@@ -101,7 +104,8 @@ def test_delete_disk_snapshot(one: One, poweroff_vm_mini_with_disk_snapshots: in
     removable_shapshot_ids = [_.ID for _ in disk_snapshots_before if _.CHILDREN is None and _.ACTIVE is None]
     target_snapshot_id = random.choice(removable_shapshot_ids)
 
-    deleted_snapshot_id = one.vm.disksnapshotdelete(vm_id, target_disk_id, target_snapshot_id)
+    deleted_snapshot_id = one.vm.disksnapshotdelete(vm_id, target_disk_id, target_snapshot_id, pw.sessionDir)
+    pw.run_one_vm_action()
 
     wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.DISK_SNAPSHOT_DELETE_POWEROFF)
     wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
@@ -117,4 +121,9 @@ def test_delete_disk_snapshot(one: One, poweroff_vm_mini_with_disk_snapshots: in
     assert (total_disk_snapshots_before - total_disk_snapshots_after) == 1
     assert (total_snapshots_before - total_snapshots_after) == 1
     
-    # добавить проверку, что родителя удаленного снепшота в CHILDREN больше нет id удаленного снепшота
+
+# Можно добавить проверку, что у родителя удаленного снепшота в CHILDREN больше нет id удаленного снепшота
+# Но для этого лучше заранее создать в фикстуре ВМ такие снепшоты, подходящие под проверку
+
+
+
