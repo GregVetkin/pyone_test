@@ -95,7 +95,7 @@ if __name__ == '__main__':
     one = pyone.OneServer(endpoint, session=f"{username}:7b7d2f5dbd20988ce938deaf04a7979899f35a67a47dbb7461ba351edb7a9305")
     # template = f'<USER_TEMPLATE><SCHED_DS_REQUIREMENTS><![CDATA[ID="99999"]]></SCHED_DS_REQUIREMENTS></USER_TEMPLATE>'
 
-    print(one.vm.diskresize(91, 0, "15000"))
+    print(one.vm.monitoring(190).MONITORING[-1])
 
 
     # pw = PyoneWrap(endpoint, username, password)
