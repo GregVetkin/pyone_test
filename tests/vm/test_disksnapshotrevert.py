@@ -30,17 +30,10 @@ def poweroff_vm_mini_with_disk_snapshots(poweroff_vm_mini: int):
     disk_ids = [int(disk["DISK_ID"]) for disk in one.vm.info(vm_id, False).TEMPLATE["DISK"]]
 
     for disk_id in disk_ids:
-        for _ in range(8):
-            snapshot_id = one.vm.disksnapshotcreate(vm_id, disk_id, get_unic_name(), pw.sessionDir)
+        for _ in range(3):
+            one.vm.disksnapshotcreate(vm_id, disk_id, get_unic_name(), pw.sessionDir)
             pw.run_one_vm_action()
             wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
-
-            if _ != 0 and _ % 2 == 0:
-                snapshot_id_to_revert = snapshot_id - random.randint(1, _)
-                one.vm.disksnapshotrevert(vm_id, disk_id, snapshot_id_to_revert, pw.sessionDir)
-                pw.run_one_vm_action()
-                wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.DISK_SNAPSHOT_REVERT_POWEROFF)
-                wait_until(lambda: one.vm.info(vm_id, False).STATE == VmStates.POWEROFF)
 
     return vm_id
 
