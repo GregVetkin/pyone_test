@@ -92,9 +92,9 @@ if __name__ == '__main__':
     password = "Qwe!2345"
 
 
-    one = pyone.OneServer(endpoint, session=f"{username}:7b7d2f5dbd20988ce938deaf04a7979899f35a67a47dbb7461ba351edb7a9305")
+    one = pyone.OneServer(endpoint, session=f"{username}:565fb973b0ad3f70c3581924fa6fcfaba1890f6d89a6da4af98cbc06e7b6a4a5")
     # template = f'<USER_TEMPLATE><SCHED_DS_REQUIREMENTS><![CDATA[ID="99999"]]></SCHED_DS_REQUIREMENTS></USER_TEMPLATE>'
-    print(one.vm.resize(181, "CPU=2000", False))
+    print(one.vm.snapshotdelete(9, 2))
     # print(one.vm.info(0).SNAPSHOTS[0].SNAPSHOT[-1].CHILDREN)
 
     # pw = PyoneWrap(endpoint, username, password)

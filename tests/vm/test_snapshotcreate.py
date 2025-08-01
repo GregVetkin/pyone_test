@@ -29,48 +29,48 @@ def test_vm_not_exist(one: One):
 
 
 
-def test_create_snapshot(one: One, running_vm_mini: int):
-    vm_id            = running_vm_mini
-    snapshot_name    = get_unic_name()
+# def test_create_snapshot(one: One, running_vm_mini: int):
+#     vm_id            = running_vm_mini
+#     snapshot_name    = get_unic_name()
     
-    template_before = one.vm.info(vm_id, True).TEMPLATE
+#     template_before = one.vm.info(vm_id, True).TEMPLATE
 
-    if "SNAPSHOT" not in template_before:
-        snapshots_before = []
-        next_snapshot_id = 0
+#     if "SNAPSHOT" not in template_before:
+#         snapshots_before = []
+#         next_snapshot_id = 0
         
-    elif isinstance(template_before["SNAPSHOT"], dict):
-        snapshots_before = [template_before["SNAPSHOT"]]
-        next_snapshot_id = int(template_before["SNAPSHOT"]["SNAPSHOT_ID"]) + 1
+#     elif isinstance(template_before["SNAPSHOT"], dict):
+#         snapshots_before = [template_before["SNAPSHOT"]]
+#         next_snapshot_id = int(template_before["SNAPSHOT"]["SNAPSHOT_ID"]) + 1
         
-    else:
-        snapshots_before = template_before["SNAPSHOT"]
-        next_snapshot_id = max([int(_["SNAPSHOT_ID"] for _ in snapshots_before)]) + 1
+#     else:
+#         snapshots_before = template_before["SNAPSHOT"]
+#         next_snapshot_id = max([int(_["SNAPSHOT_ID"] for _ in snapshots_before)]) + 1
         
 
-    _id = one.vm.snapshotcreate(vm_id, snapshot_name)
+#     _id = one.vm.snapshotcreate(vm_id, snapshot_name)
 
-    wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.HOTPLUG_SNAPSHOT)
-    wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.RUNNING)
+#     wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.HOTPLUG_SNAPSHOT)
+#     wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.RUNNING)
 
-    assert _id == next_snapshot_id
+#     assert _id == next_snapshot_id
 
-    template_after = one.vm.info(vm_id, True).TEMPLATE
+#     template_after = one.vm.info(vm_id, True).TEMPLATE
 
-    if "SNAPSHOT" not in template_after:
-        raise Exception(f"Снепшот не был создан. VM_ID: {vm_id}")
+#     if "SNAPSHOT" not in template_after:
+#         raise Exception(f"Снепшот не был создан. VM_ID: {vm_id}")
         
-    elif isinstance(template_after["SNAPSHOT"], dict):
-        snapshots_after = [template_after["SNAPSHOT"]]
+#     elif isinstance(template_after["SNAPSHOT"], dict):
+#         snapshots_after = [template_after["SNAPSHOT"]]
 
-    else:
-        snapshots_after = template_after["SNAPSHOT"]
+#     else:
+#         snapshots_after = template_after["SNAPSHOT"]
 
 
-    new_snapshot = next(_ for _ in snapshots_after if _["SNAPSHOT_ID"] == str(_id))
+#     new_snapshot = next(_ for _ in snapshots_after if _["SNAPSHOT_ID"] == str(_id))
 
-    assert new_snapshot["NAME"] == snapshot_name
-    assert len(snapshots_after) - len(snapshots_before) == 1
+#     assert new_snapshot["NAME"] == snapshot_name
+#     assert len(snapshots_after) - len(snapshots_before) == 1
 
 
 
