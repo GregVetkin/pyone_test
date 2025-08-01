@@ -97,10 +97,9 @@ if __name__ == '__main__':
     print(one.vmpool.info(-2, -1, -1, -1, "").VM)
     # print(one.vm.info(0).SNAPSHOTS[0].SNAPSHOT[-1].CHILDREN)
 
-
+    from pyone.bindings import HOOKLOGTypeSub
     # pw = PyoneWrap(endpoint, username, password)
     # client = pw.get_client()
-    
 
     # res  = client.vm.action("resched", 99, pw.sessionDir)
     # print(res)
