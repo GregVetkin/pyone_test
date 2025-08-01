@@ -30,9 +30,6 @@ def vm_with_snapshots(running_vm_mini: int):
     return vm_id
 
 
-
-
-
 # =================================================================================================
 # TESTS
 # =================================================================================================
@@ -44,22 +41,23 @@ def test_vm_not_exist(one: One):
     snapshot_id = 0
 
     with pytest.raises(pyone.OneNoExistsException):
-        one.vm.snapshotdelete(vm_id, snapshot_id)
+        one.vm.snapshotrevert(vm_id, snapshot_id)
 
 
 
-def test_snapshot_not_exist(one: One, dummy_vm: int):
-    vm_id = dummy_vm
+
+def test_snapshot_not_exist(one: One, running_vm_mini: int):
+    vm_id = running_vm_mini
     snapshot_id = random.randint(9999, 999999)
 
     with pytest.raises(pyone.OneActionException):
-        one.vm.snapshotdelete(vm_id, snapshot_id)
+        one.vm.snapshotrevert(vm_id, snapshot_id)
 
 
 
 
 @pytest.mark.KERBEROS
-def test_delete_snapshot_KERBEROS(vm_with_snapshots: int):
+def test_revert_snapshot_KERBEROS(vm_with_snapshots: int):
     pw  = PyoneWrap(API_URI, BrestAdmin.USERNAME, BrestAdmin.PASSWORD)
     one = pw.get_client()
 
@@ -78,8 +76,7 @@ def test_delete_snapshot_KERBEROS(vm_with_snapshots: int):
     snapshot_ids_before = [int(_["SNAPSHOT_ID"]) for _ in snapshots_before]
     target_snapshot_id  = random.choice(snapshot_ids_before)
 
-
-    _id = one.vm.snapshotdelete(vm_id, target_snapshot_id, pw.sessionDir)
+    _id = one.vm.snapshotrevert(vm_id, target_snapshot_id, pw.sessionDir)
     pw.run_one_vm_action()
 
     wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.HOTPLUG_SNAPSHOT)
@@ -88,7 +85,7 @@ def test_delete_snapshot_KERBEROS(vm_with_snapshots: int):
     template_after = one.vm.info(vm_id, True).TEMPLATE
 
     if "SNAPSHOT" not in template_after:
-        snapshots_after = []
+        raise Exception(f"Пропали снепшоты у ВМ после отката к снимку. VM_ID:{vm_id}")
         
     elif isinstance(template_after["SNAPSHOT"], dict):
         snapshots_after = [template_after["SNAPSHOT"]]
@@ -98,8 +95,10 @@ def test_delete_snapshot_KERBEROS(vm_with_snapshots: int):
 
     snapshot_ids_after = [int(_["SNAPSHOT_ID"]) for _ in snapshots_after]
 
-    assert len(snapshot_ids_after) - len(snapshot_ids_before) == -1
-    assert target_snapshot_id not in snapshot_ids_after
-    assert _id == vm_id, "Возвращает -1, по документации должно возвращать VM_ID. Создать баг."
-    
-    
+    assert len(snapshot_ids_after) == len(snapshot_ids_before)
+    assert target_snapshot_id in snapshot_ids_after
+    assert _id == vm_id
+
+    time.sleep(30)
+    assert "ERROR" not in one.vm.info(vm_id, True).USER_TEMPLATE
+
