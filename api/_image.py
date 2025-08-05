@@ -74,9 +74,9 @@ class OneImage:
         """Flatten the snapshot of image and discards others"""
         return self._one_image.snapshotflatten(image_id, snapshot_id)
 
-    def restore(self, image_id: int, datastore_id: int, vm_name: str) -> int:
-        """Restores a VM backup"""
-        return self._one_image.restore(image_id, datastore_id, vm_name)
+    def restore(self, image_id: int, datastore_id: int, tempalte: str) -> int:
+        """Restores a VM backup. Brest 3: vm_name instead of template"""
+        return self._one_image.restore(image_id, datastore_id, tempalte)
 
     def update(self, image_id: int, template: str, update_type: int) -> int:
         """Replaces the image template contents"""
