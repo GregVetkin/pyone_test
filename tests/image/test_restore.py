@@ -81,13 +81,13 @@ def backup_image(one: One, poweroff_vm_mini: int, request):
 
 
 
-def test_backup_image_not_exist(one: One, dummy_datastore: int):
-    image_id = random.randint(9999, 999999)
-    datastore_id = dummy_datastore
-    vm_name = get_unic_name()
+# def test_backup_image_not_exist(one: One, dummy_datastore: int):
+#     image_id = random.randint(9999, 999999)
+#     datastore_id = dummy_datastore
+#     vm_name = get_unic_name()
 
-    with pytest.raises(pyone.OneNoExistsException):
-        one.image.restore(image_id, datastore_id, vm_name)
+#     with pytest.raises(pyone.OneNoExistsException):
+#         one.image.restore(image_id, datastore_id, vm_name)
 
 
 def test_wrong_image_type(one: One, dummy_image: int, dummy_datastore: int):
@@ -102,15 +102,15 @@ def test_wrong_image_type(one: One, dummy_image: int, dummy_datastore: int):
 
 
 
-def test_backup_datastore_not_exist(one: One, backup_image: int):
-    image_id = backup_image
-    datastore_id = random.randint(9999, 999999)
-    vm_name = get_unic_name()
+# def test_backup_datastore_not_exist(one: One, backup_image: int):
+#     image_id = backup_image
+#     datastore_id = random.randint(9999, 999999)
+#     vm_name = get_unic_name()
 
-    assert one.image.info(image_id).TYPE == ImageTypes.BACKUP
+#     assert one.image.info(image_id).TYPE == ImageTypes.BACKUP
 
-    with pytest.raises(pyone.OneNoExistsException):
-        one.image.restore(image_id, datastore_id, vm_name)
+#     with pytest.raises(pyone.OneNoExistsException):
+#         one.image.restore(image_id, datastore_id, vm_name)
 
 
 

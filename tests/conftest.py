@@ -70,7 +70,12 @@ def dummy_image(one: One, dummy_datastore):
 
     yield image_id
 
-    __graceful_delete(one.image, image_id)
+    try:
+        one.image.delete(image_id, True)
+    except OneNoExistsException:
+        pass
+
+    wait_until(lambda: image_id not in  [_.ID for _ in one.imagepool.info(-2, -1, -1).IMAGE])
 
 
 
