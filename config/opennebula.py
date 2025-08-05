@@ -132,6 +132,15 @@ class ImageStates:
     LOCKED_USED_PERS    = 10
 
 
+class ImageTypes:
+    OS          = 0
+    CDROM       = 1
+    DATABLOCK   = 2
+    KERNEL      = 3
+    RAMDISK     = 4
+    CONTEXT     = 5
+    BACKUP      = 6
+
 
 class DatastoreTypes:
     IMAGE   = 0
