@@ -14,7 +14,7 @@ from utils.commands     import run_command_via_ssh
 
 
 @pytest.fixture
-def file_datastore(one: One):
+def file_ds(one: One):
     template = f"""
         NAME   = {get_unic_name()}
         TYPE   = FILE_DS
@@ -31,7 +31,7 @@ def file_datastore(one: One):
 
 
 @pytest.fixture
-def backup_datastore(one: One):
+def rsync_backup_ds(one: One):
     template = f"""
         NAME={get_unic_name()}
         DS_MAD=rsync
@@ -50,8 +50,8 @@ def backup_datastore(one: One):
 
 
 @pytest.fixture(params=[
-    pytest.param("backup_datastore", marks=pytest.mark.skipif( Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")),
-    pytest.param("file_datastore",   marks=pytest.mark.skipif( Version(BREST_VERSION) >= Version("4"), reason="Brest 3.x only"))
+    pytest.param("rsync_backup_ds",  marks=pytest.mark.skipif( Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")),
+    pytest.param("file_ds",          marks=pytest.mark.skipif( Version(BREST_VERSION) >= Version("4"), reason="Brest 3.x only"))
 ])
 def backup_image(one: One, poweroff_vm_mini: int, request):
     vm_id = poweroff_vm_mini
@@ -59,10 +59,7 @@ def backup_image(one: One, poweroff_vm_mini: int, request):
 
     run_command_via_ssh(brest_admin_ssh_conn, f"onevm backup {vm_id} -d {backup_ds_id}")
 
-    if Version(BREST_VERSION) < Version("4"):
-        time.sleep(120)
-    else:
-        time.sleep(20)
+    time.sleep(120)
 
     backups = [image.ID for image in one.imagepool.info(-2, -1, -1).IMAGE if image.TYPE == ImageTypes.BACKUP]
     backup_id = max(backups)
@@ -78,22 +75,25 @@ def backup_image(one: One, poweroff_vm_mini: int, request):
 # TESTS
 # =================================================================================================
 
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+# В Brest 3.x метод one.image.restore принимает аргументы one.image.restore(image_id, datastore_id, vm_name)
+# Однако в Brest 4.x метод работает иначе и принимает вместо vm_name - шаблон с параметрами (см. документацию 6.8)
+# !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 
 
+def test_backup_image_not_exist(one: One, dummy_datastore: int):
+    image_id = random.randint(9999, 999999)
+    datastore_id = dummy_datastore
+    template = ""
 
-# def test_backup_image_not_exist(one: One, dummy_datastore: int):
-#     image_id = random.randint(9999, 999999)
-#     datastore_id = dummy_datastore
-#     vm_name = get_unic_name()
-
-#     with pytest.raises(pyone.OneNoExistsException):
-#         one.image.restore(image_id, datastore_id, vm_name)
+    with pytest.raises(pyone.OneNoExistsException):
+        one.image.restore(image_id, datastore_id, template)
 
 
 def test_wrong_image_type(one: One, dummy_image: int, dummy_datastore: int):
     image_id = dummy_image
     datastore_id = dummy_datastore
-    vm_name = get_unic_name()
+    vm_name = ""
 
     assert one.image.info(image_id, False).TYPE != ImageTypes.BACKUP
 
@@ -102,21 +102,21 @@ def test_wrong_image_type(one: One, dummy_image: int, dummy_datastore: int):
 
 
 
-# def test_backup_datastore_not_exist(one: One, backup_image: int):
-#     image_id = backup_image
-#     datastore_id = random.randint(9999, 999999)
-#     vm_name = get_unic_name()
+def test_backup_datastore_not_exist(one: One, backup_image: int):
+    image_id = backup_image
+    datastore_id = random.randint(9999, 999999)
+    template = ""
 
-#     assert one.image.info(image_id).TYPE == ImageTypes.BACKUP
+    assert one.image.info(image_id, False).TYPE == ImageTypes.BACKUP
 
-#     with pytest.raises(pyone.OneNoExistsException):
-#         one.image.restore(image_id, datastore_id, vm_name)
+    with pytest.raises(pyone.OneNoExistsException):
+        one.image.restore(image_id, datastore_id, template)
 
 
 
 
 @pytest.mark.skipif(Version(BREST_VERSION) >= Version("4"), reason="Brest 3.x only")
-def test_restore_into_certain_storage_v3(one: One, backup_image: int, dummy_datastore: int):
+def test_restore_Brest_3(one: One, backup_image: int, dummy_datastore: int):
     image_id     = backup_image
     datastore_id = dummy_datastore
     vm_name      = get_unic_name()
@@ -147,50 +147,77 @@ def test_restore_into_certain_storage_v3(one: One, backup_image: int, dummy_data
 
 
 
+
+@pytest.mark.skipif(Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")
+def test_restore_Brest_4(one: One, backup_image: int, dummy_datastore: int):
+    image_id     = backup_image
+    datastore_id = dummy_datastore
+
+    name = get_unic_name()
+
+    template = f"""
+        NAME    = {name}
+        NO_IP   = YES
+        NO_NIC  = YES
+    """
+
+    # RETURNS: Blank separated list of restored objects IDs. The first one is the VM Template ID.
+    # Сейчас возвращает первым не id шаблона, а ВМ
+    api_response = one.image.restore(image_id, datastore_id, template)
+
+    ids = [int(_id) for _id in api_response.split()]
+
+    restored_vm_id = ids[0]
+    restored_image_ids = ids[1:]
+
+    time.sleep(60)
+
+    vm_info = one.vm.info(restored_vm_id, False)
+    restored_template_id = int(vm_info.TEMPLATE["TEMPLATE_ID"])
+    template_info = one.template.info(restored_template_id, False, False)
+
+    assert template_info.NAME == name
+    assert vm_info.NAME == f"{name}-{restored_vm_id}"
+
+
+    for restored_image_id in restored_image_ids:
+        image_info = one.image.info(restored_image_id, False)
+        assert image_info.NAME.startswith(f"{name}-disk")
+        assert image_info.DATASTORE_ID == datastore_id
+
+    one.vm.recover(restored_vm_id, VmRecoverOperations.DELETE)
+    time.sleep(10)
+    one.template.delete(restored_template_id, delete_images=True)
+    time.sleep(10)
+
+
+
+
+
 # @pytest.mark.skipif(Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")
 # def test_restore_without_template(one: One, backup_image: int, dummy_datastore: int):
-#     image_id             = backup_image
-#     datastore_id         = dummy_datastore
-#     backup_info          = one.image.info(image_id)
-#     vm_id                = backup_info.VMS.ID[-1]
-#     api_response         = one.image.restore(backup_image, datastore_id)
-#     ids                  = [int(_id) for _id in api_response.split()]
+#     image_id     = backup_image
+#     datastore_id = dummy_datastore
+#     template     = ""
+
+#     backup_info = one.image.info(image_id, False)
+#     vm_id = backup_info.VMS.ID[-1]
+
+#     api_response = one.image.restore(backup_image, datastore_id, template)
+
+#     ids = [int(_id) for _id in api_response.split()]
+
 #     restored_template_id = ids[0]
 #     restored_image_ids   = ids[1:]
 
-#     time.sleep(30)
+#     time.sleep(60)
 
-#     assert one.template.info(restored_template_id).NAME.startswith(str(vm_id))
+#     assert one.template.info(restored_template_id, False, False).NAME.startswith(str(vm_id))
 
 #     for restored_image_id in restored_image_ids:
-#         assert one.image.info(restored_image_id).NAME.startswith(str(vm_id))
+#         assert one.image.info(restored_image_id, False).NAME.startswith(str(vm_id))
 
 #     one.template.delete(restored_template_id, delete_images=True)
 
 #     time.sleep(10)
 
-
-
-# @pytest.mark.skipif(Version(BREST_VERSION) < Version("4"), reason="Brest 4.x only")
-# def test_restore_with_template(one: One, backup_image: int, dummy_datastore: int):
-#     image_id             = backup_image
-#     datastore_id         = dummy_datastore
-#     name                 = get_unic_name()
-#     template             = f"NAME={name}"
-#     backup_info          = one.image.info(backup_image)
-#     vm_id                = backup_info.VMS.ID[-1]
-#     api_response         = one.image.restore(image_id, datastore_id, template)
-#     ids                  = [int(_id) for _id in api_response.split()]
-#     restored_template_id = ids[0]
-#     restored_image_ids   = ids[1:]
-
-#     time.sleep(30)
-
-#     assert one.template.info(restored_template_id).NAME == name
-
-#     for restored_image_id in restored_image_ids:
-#         assert one.image.info(restored_image_id).NAME.startswith(f"{name}-disk-")
-
-#     one.template.delete(restored_template_id, delete_images=True)
-
-#     time.sleep(10)
