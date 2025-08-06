@@ -94,7 +94,7 @@ if __name__ == '__main__':
 
     one = pyone.OneServer(endpoint, session=f"{username}:565fb973b0ad3f70c3581924fa6fcfaba1890f6d89a6da4af98cbc06e7b6a4a5")
     # template = f'<USER_TEMPLATE><SCHED_DS_REQUIREMENTS><![CDATA[ID="99999"]]></SCHED_DS_REQUIREMENTS></USER_TEMPLATE>'
-    print(one.image.restore(57, 101, ""))
+    print(one.hooklog.info(0, 999999999, 0, 0).HISTORY)
     # print(one.vm.info(0).SNAPSHOTS[0].SNAPSHOT[-1].CHILDREN)
 
     # pw = PyoneWrap(endpoint, username, password)

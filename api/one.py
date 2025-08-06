@@ -21,7 +21,9 @@ from api._userquota         import OneUserquota
 from api._vm                import OneVm
 from api._vmpool            import OneVmpool
 from api._vn                import OneVn
-
+from api._hook              import OneHook
+from api._hookpool          import OneHookpool
+from api._hooklog           import OneHooklog
 
 from utils.connection       import ApiConnectionData
 
@@ -65,3 +67,7 @@ class One():
         self.vmpool         = OneVmpool(self._server)
         
         self.vn             = OneVn(self._server)
+
+        self.hook           = OneHook(self._server)
+        self.hookpool       = OneHookpool(self._server)
+        self.hooklog        = OneHooklog(self._server)
