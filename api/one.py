@@ -24,6 +24,8 @@ from api._vn                import OneVn
 from api._hook              import OneHook
 from api._hookpool          import OneHookpool
 from api._hooklog           import OneHooklog
+from api._marketapp         import OneMarketapp
+from api._marketapppool     import OneMarketapppool
 
 from utils.connection       import ApiConnectionData
 
@@ -71,3 +73,6 @@ class One():
         self.hook           = OneHook(self._server)
         self.hookpool       = OneHookpool(self._server)
         self.hooklog        = OneHooklog(self._server)
+
+        self.marketapp      = OneMarketapp(self._server)
+        self.marketapppool  = OneMarketapppool(self._server)
