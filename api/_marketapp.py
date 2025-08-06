@@ -53,3 +53,7 @@ class OneMarketapp:
     def unlock(self, marketapp_id: int) -> int:
         """Unlocks a MarketPlaceApp"""
         return self._one_marketapp.unlock(marketapp_id)
+    
+    def export(self, marketapp_id: int, datastore_id: int):
+        """https://jira.astralinux.ru/browse/BREST-4544"""
+        return self._one_marketapp.export(marketapp_id, datastore_id)
