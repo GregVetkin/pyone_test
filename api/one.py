@@ -26,6 +26,8 @@ from api._hookpool          import OneHookpool
 from api._hooklog           import OneHooklog
 from api._marketapp         import OneMarketapp
 from api._marketapppool     import OneMarketapppool
+from api._market            import OneMarket
+from api._marketpool        import OneMarketpool
 
 from utils.connection       import ApiConnectionData
 
@@ -76,3 +78,6 @@ class One():
 
         self.marketapp      = OneMarketapp(self._server)
         self.marketapppool  = OneMarketapppool(self._server)
+
+        self.market         = OneMarket(self._server)
+        self.marketpool     = OneMarketpool(self._server)
