@@ -216,3 +216,34 @@ def running_vm_mini(one: One, poweroff_vm_mini: int):
     run_command_via_ssh(brest_admin_ssh_conn, f"echo '{BrestAdmin.PASSWORD}' | kinit; onevm resume {vm_id}")
     wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.RUNNING)
     yield vm_id
+
+
+
+
+@pytest.fixture
+def dummy_market(one: One):
+    template = f"""
+        NAME        = {get_unic_name()}
+        MARKET_MAD  = http
+        BASE_URL    = blablalbla
+        PUBLIC_DIR  = BLABLABLA
+    """
+    market_id = one.market.allocate(template)
+
+    yield market_id
+
+    __graceful_delete(one.market, market_id)
+
+
+
+@pytest.fixture
+def dummy_marketapp(one: One, dummy_image: int, dummy_market):
+    template = f"""
+        NAME = {get_unic_name()}
+        ORIGIN_ID = {dummy_image}
+    """
+    marketapp_id = one.marketapp.allocate(template, dummy_market)
+
+    yield marketapp_id
+
+    __graceful_delete(one.marketapp, marketapp_id)
