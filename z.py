@@ -3,6 +3,11 @@ import pyone
 import requests
 import base64
 from urllib.parse import urlparse
+from api import One
+from utils.connection   import ApiConnectionData
+
+
+
 
 
 class PyoneWrap:
@@ -76,7 +81,7 @@ class PyoneWrap:
                 "Cookie": f"rack.session={self.sessionDir}"
             }
             host = urlparse(self.endpoint).hostname
-            response = requests.get(f"https://{host}/brestcloud/one-apache2.cgi", headers=headers, verify=False, timeout=5)
+            response = requests.get(f"https://{host}/brestcloud/one-apache2.cgi", headers=headers, verify=False, timeout=1)
             response.raise_for_status()
             return response
 
@@ -87,20 +92,33 @@ class PyoneWrap:
 
 
 if __name__ == '__main__':
-    endpoint = "http://10.0.70.20:2633/RPC2"
+    endpoint = "http://10.0.70.21:2633/RPC2"
     username = "brestadm"
     password = "Qwe!2345"
 
+    token = "7b7d2f5dbd20988ce938deaf04a7979899f35a67a47dbb7461ba351edb7a9305"
 
-    one = pyone.OneServer(endpoint, session=f"{username}:565fb973b0ad3f70c3581924fa6fcfaba1890f6d89a6da4af98cbc06e7b6a4a5")
+    
+
+    # one = pyone.OneServer(endpoint, session=f"{username}:{token}")
+    
+
+    one = One(ApiConnectionData(username, token , endpoint))
+
+    r = one.vm.monitoring(4).MONITORING
+    print(r)
+
+
+
+# ===============================================================================================================================
+    # one = pyone.OneServer(endpoint, session=f"{username}:token")
     # template = f'<USER_TEMPLATE><SCHED_DS_REQUIREMENTS><![CDATA[ID="99999"]]></SCHED_DS_REQUIREMENTS></USER_TEMPLATE>'
-    print(one.hooklog.info(0, 999999999, 0, 0).HISTORY)
+    # print(one.hooklog.info(0, 999999999, 0, 0).HISTORY)
     # print(one.vm.info(0).SNAPSHOTS[0].SNAPSHOT[-1].CHILDREN)
 
     # pw = PyoneWrap(endpoint, username, password)
     # client = pw.get_client()
 
-    # res  = client.vm.action("resched", 99, pw.sessionDir)
-    # print(res)
-
+    # res  = client.vm.snapshotrevert(7, 0, pw.sessionDir)
     # pw.run_one_vm_action()
+    # print(pw.sessionDir)

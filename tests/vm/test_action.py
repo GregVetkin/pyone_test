@@ -14,39 +14,6 @@ from config.opennebula  import VmStates, VmLcmStates, VmRecoverOperations, VmAct
 
 
 
-
-
-
-# @pytest.fixture
-# def poweroff_vm(one: One):
-#     if Version(BREST_VERSION) < Version("4"):
-#         script_dir = "~/brest"
-#         ssh_conn   = local_admin_ssh_conn
-#     else:
-#         script_dir = "/opt/brest"
-#         ssh_conn   = brest_admin_ssh_conn
-    
-#     vm_name = f"api_test_{random.randint(0, 9999)}" # С длинным именем из get_unic_name(), cli_prepare.sh не отрабатывает отлов статуса ВМ
-#     command = f"cd {script_dir} && ./cli_prepare.sh create_vm mini {vm_name} nonpers"
-    
-#     run_command_via_ssh(ssh_conn, command)
-#     vm_id = next(vm.ID for vm in one.vmpool.info().VM if vm.NAME == vm_name)
-
-#     yield vm_id
-
-#     if one.vm.info(vm_id).STATE != VmStates.DONE:
-#         run_command_via_ssh(brest_admin_ssh_conn, f"onevm terminate {vm_id} --hard")
-
-
-# @pytest.fixture
-# def running_vm(one: One, poweroff_vm: int):
-#     vm_id = poweroff_vm
-#     run_command_via_ssh(brest_admin_ssh_conn, f"echo '{BrestAdmin.PASSWORD}' | kinit; onevm resume {vm_id}")
-#     wait_until(lambda: one.vm.info(vm_id).LCM_STATE == VmLcmStates.RUNNING)
-#     yield vm_id
-
-
-
 @pytest.fixture
 def pending_vm(one: One):
     template = '<VM><CPU><![CDATA[0.1]]></CPU><MEMORY><![CDATA[1]]></MEMORY><SCHED_DS_REQUIREMENTS><![CDATA[ID="99999"]]></SCHED_DS_REQUIREMENTS></VM>'
@@ -144,6 +111,8 @@ class TestUndeploy:
 
 @pytest.mark.parametrize('action', [VmActions.POWEROFF, VmActions.POWEROFF_HARD])
 class TestPoweroff:
+
+    @pytest.mark.skip(reason="Не работает без KERBEROS")
     def test_poweroff(self, one: One, running_vm_mini: int, action: str):
         vm_id = running_vm_mini
         _id   = one.vm.action(action, vm_id)
@@ -174,7 +143,7 @@ class TestPoweroff:
 
 @pytest.mark.parametrize('action', [VmActions.REBOOT, VmActions.REBOOT_HARD])
 class TestReboot:
-
+    @pytest.mark.skip(reason="Не работает без KERBEROS")
     def test_reboot(self, one: One, running_vm_mini: int, action: str):
         vm_id = running_vm_mini
         vm_ip = one.vm.info(vm_id, False).TEMPLATE["NIC"]["IP"] # Если NIC несколько, то будет список словарей
@@ -357,6 +326,7 @@ class TestSuspend:
 class TestResume:
     action = VmActions.RESUME
 
+    @pytest.mark.skip(reason="Не работает без KERBEROS")
     def test_resume(self, one: One, poweroff_vm_mini: int):
         vm_id = poweroff_vm_mini
         _id   = one.vm.action(self.action, vm_id)

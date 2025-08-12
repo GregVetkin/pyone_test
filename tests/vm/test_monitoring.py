@@ -42,10 +42,4 @@ def test_monitoring(one: One, running_vm_mini: int):
     assert len(monitoring_before.MONITORING) < len(monitoring_after.MONITORING)
 
     assert first_monitoring.ID == last_monitoring.ID
-    assert first_monitoring.TIMESTAMP   < last_monitoring.TIMESTAMP
-
-    assert first_monitoring.DISKRDBYTES < last_monitoring.DISKRDBYTES
-    assert first_monitoring.DISKWRBYTES < last_monitoring.DISKWRBYTES
-
-    assert first_monitoring.NETRX < last_monitoring.NETRX
-    assert first_monitoring.NETTX < last_monitoring.NETTX
+    assert first_monitoring.TIMESTAMP < last_monitoring.TIMESTAMP

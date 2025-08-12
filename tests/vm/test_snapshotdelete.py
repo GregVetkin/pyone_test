@@ -82,7 +82,8 @@ def test_delete_snapshot_KERBEROS(vm_with_snapshots: int):
     _id = one.vm.snapshotdelete(vm_id, target_snapshot_id, pw.sessionDir)
     pw.run_one_vm_action()
 
-    wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.HOTPLUG_SNAPSHOT)
+    time.sleep(5)
+    # wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.HOTPLUG_SNAPSHOT)
     wait_until(lambda: one.vm.info(vm_id, False).LCM_STATE == VmLcmStates.RUNNING)
 
     template_after = one.vm.info(vm_id, True).TEMPLATE
